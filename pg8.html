@@ -1,0 +1,233 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <style>
+        body {
+            margin: 0;
+            height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            font-family: Verdana, Sans-serif;
+            background: linear-gradient(135deg, #ffecd2 0%, #fcb69f 100%);
+            overflow: hidden; /* Hide shapes outside view */
+        }
+
+        /* Floating shapes */
+        /* Floating shapes */
+        .shape {
+            position: absolute;
+            width: 20px;
+            height: 20px;
+            background-color: rgba(255, 255, 255, 0.4);
+            border-radius: 50%;
+            animation: float 8s linear infinite;
+        }
+        .shape:nth-child(1) { width: 25px; height: 25px; animation-duration: 9s; }
+        .shape:nth-child(2) { width: 35px; height: 35px; animation-duration: 12s; }
+        .shape:nth-child(3) { width: 15px; height: 15px; animation-duration: 7s; }
+
+        .shape.star {
+            background-color: rgba(255, 223, 0, 0.6);
+            clip-path: polygon(
+                50% 0%, 61% 35%, 98% 35%,
+                68% 57%, 79% 91%, 50% 70%,
+                21% 91%, 32% 57%, 2% 35%,
+                39% 35%
+            );
+        }
+
+        @keyframes float {
+            from {
+                transform: translateY(100vh) scale(0.8) rotate(0deg);
+                opacity: 0;
+            }
+            to {
+                transform: translateY(-10vh) scale(1.2) rotate(360deg);
+                opacity: 1;
+            }
+        }
+
+        .container {
+            text-align: center;
+            background: rgba(255, 255, 255, 0.7);
+            padding: 30px;
+            border-radius: 20px;
+            box-shadow: 0px 4px 15px rgba(0, 0, 0, 0.2);
+            max-width: 700px;
+        }
+
+        .next-button {
+            display: inline-block;
+            text-decoration: none;
+            text-align: center;
+            line-height: 36px;
+            background-color: rgb(127, 70, 133);
+            color: white;
+            border: none;
+            height: 36px;
+            width: 120px;
+            border-radius: 20px;
+            font-weight: bold;
+            font-size: 16px;
+            cursor: pointer;
+            margin-top: 20px;
+            transition: all 0.3s ease;
+        }
+        .next-button:hover {
+            background-color: rgb(150, 90, 160);
+            transform: scale(1.1);
+        }
+
+        .center-image {
+            width: 260px;
+            display: block;
+            margin: 20px auto;
+        }
+
+        .welcome-interface {
+            font-weight: bold;
+            font-style: italic;
+            font-size: 35px;
+            margin-bottom: 20px;
+            color: #444;
+        }
+
+        .first-question {
+            font-family: Verdana, Sans-serif;
+            font-size: 22px;
+            font-style: italic;
+        }
+
+        /* Option buttons */
+        .option-btn {
+            background: #7f4685;
+            color: white;
+            border: none;
+            padding: 25px 35px;
+            margin: 15px;
+            border-radius: 20px;
+            cursor: pointer;
+            font-size: 25px;
+            width: 210px;
+            height: 85px;
+            transition: transform 0.2s;
+        }
+        .option-btn:hover {
+            background: #9b5ca3;
+            transform: scale(1.1);
+        }
+    </style>
+</head>
+<body>
+
+    <!-- Floating shapes -->
+    <div class="shape" style="left: 10%; animation-delay: 0s;"></div>
+    <div class="shape star" style="left: 30%; animation-delay: 2s;"></div>
+    <div class="shape" style="left: 50%; animation-delay: 4s;"></div>
+    <div class="shape star" style="left: 70%; animation-delay: 6s;"></div>
+    <div class="shape" style="left: 90%; animation-delay: 8s;"></div>
+
+    <div class="container">
+        <p class="welcome-interface">Welcome to MathChamp!</p>
+
+        <img src="image.png" alt="Centered Image" class="center-image">
+
+        <p class="first-question">What topic do you want them to improvise in?</p>
+
+        
+        
+
+        
+        <form>
+            <label><input type="checkbox" name="shape" value="Numbers and counting"> Numbers and counting</label><br>
+            <label><input type="checkbox" name="shape" value="Comparing & Sorting"> Comparing & Sorting</label><br>
+            <label><input type="checkbox" name="shape" value="Patterns, Shapes and Space"> Patterns, Shapes and Space</label><br>
+            <label><input type="checkbox" name="shape" value="Measurements"> Measurements</label><br>
+            <label><input type="checkbox" name="shape" value="Basic addition-subtraction"> Basic addition-subtraction</label><br>
+            <label><input type="checkbox" name="shape" value="Problem solving"> Problem solving</label><br>
+            <label><input type="checkbox" name="shape" value="Geometry"> Geometry</label><br>
+            <label><input type="checkbox" name="shape" value="Multiplication & Division"> Multiplication & Division</label><br>
+            <label><input type="checkbox" name="shape" value="Fractions and decimals"> Fractions and decimals</label><br>
+            <label><input type="checkbox" name="shape" value="Data & Graphs"> Data & Graphs</label><br>
+           
+        </form>
+
+      <button class="next-button" id="topicNextBtn">Next</button>
+
+<script>
+document.getElementById("topicNextBtn").addEventListener("click", function(event) {
+    event.preventDefault(); // stop form from reloading the page
+
+    const age = localStorage.getItem("childAge");  // retrieve saved age
+
+    // collect selected topics
+    const selected = Array.from(document.querySelectorAll('input[type="checkbox"]:checked'))
+                    .map(cb => cb.value.trim());
+
+    console.log("Age:", age, "Selected topics:", selected); // debug log
+
+    // ---------------- CONDITIONS ----------------
+
+    if (age === "3" && selected.includes("Numbers and counting") && selected.includes("Comparing & Sorting")) {
+        window.location.href = "pg12.html";
+    } 
+    else if (age === "4" && selected.includes("Numbers and counting") && selected.includes("Comparing & Sorting")) {
+        window.location.href = "pg9.html";
+    } 
+    else if (age === "4" && selected.includes("Patterns, Shapes and Space") && selected.includes("Comparing & Sorting")) {
+        window.location.href = "pg13.html";
+    } 
+    else if (age === "4" && selected.includes("Numbers and counting") && selected.includes("Comparing & Sorting") && selected.includes("Patterns, Shapes and Space")) {
+        window.location.href = "pg14.html";
+    } 
+    else if (age === "5" && selected.includes("Comparing & Sorting") && selected.includes("Patterns, Shapes and Space") && selected.includes("Basic addition-subtraction")) {
+        window.location.href = "pg15.html";
+    } 
+    else if (age === "5" && selected.includes("Patterns, Shapes and Space") && selected.includes("Basic addition-subtraction") && selected.includes("Problem solving")) {
+        window.location.href = "pg16.html";
+    } 
+    else if (age === "5" && selected.includes("Measurements") && selected.includes("Basic addition-subtraction") && selected.includes("Problem solving")) {
+        window.location.href = "pg17.html";
+    } 
+    else if (age === "6" && selected.includes("Patterns, Shapes and Space") && selected.includes("Basic addition-subtraction") && selected.includes("Problem solving")) {
+        window.location.href = "pg13.html";
+    } 
+    else if (age === "6" && selected.includes("Basic addition-subtraction") && selected.includes("Problem solving") && selected.includes("Measurements")) {
+        window.location.href = "pg17.html";
+    } 
+    else if (age === "6" && selected.includes("Basic addition-subtraction") && selected.includes("Problem solving") && selected.includes("Multiplication & Division")) {
+        window.location.href = "pg18.html";
+    } 
+    else if (age === "7" && selected.includes("Basic addition-subtraction") && selected.includes("Problem solving") && selected.includes("Multiplication & Division")) {
+        window.location.href = "pg18.html";
+    } 
+    else if (age === "7" && selected.includes("Basic addition-subtraction") && selected.includes("Multiplication & Division") && selected.includes("Geometry")) {
+        window.location.href = "pg19.html";
+    } 
+    else if (age === "7" && selected.includes("Basic addition-subtraction") && selected.includes("Multiplication & Division") && selected.includes("Fractions and decimals")) {
+        window.location.href = "pg20.html";
+    } 
+    else if (age === "7" && selected.includes("Problem solving") && selected.includes("Multiplication & Division") && selected.includes("Fractions and decimals")) {
+        window.location.href = "pg20.html";
+    } 
+    else if (age === "7" && selected.includes("Basic addition-subtraction") && selected.includes("Measurements") && selected.includes("Multiplication & Division")) {
+        window.location.href = "pg18.html";
+    } 
+    else if (age === "8" && selected.includes("Data & Graphs") && selected.includes("Measurements") && selected.includes("Multiplication & Division")) {
+        window.location.href = "pg21.html";
+    }
+        else if (age === "8" && selected.includes("Data & Graphs") && selected.includes("Basic addition-subtraction") && selected.includes("Multiplication & Division")) {
+        window.location.href = "pg21.html";
+        }
+    else {
+        // default page
+        window.location.href = "pg9.html";
+    }
+});
+</script>
+
+
+    </div>
+</body>
+</html>

@@ -1,0 +1,146 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <style>
+        body {
+            margin: 0;
+            height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            font-family: Verdana, Sans-serif;
+            background: linear-gradient(135deg, #ffecd2 0%, #fcb69f 100%);
+            overflow: hidden; /* Hide shapes outside view */
+        }
+
+        /* Static shapes (no animation now) */
+        .shape {
+            position: absolute;
+            width: 20px;
+            height: 20px;
+            background-color: rgba(255, 255, 255, 0.4);
+            border-radius: 50%;
+        }
+
+        .shape.star {
+            background-color: rgba(255, 223, 0, 0.6);
+            clip-path: polygon(
+                50% 0%, 61% 35%, 98% 35%,
+                68% 57%, 79% 91%, 50% 70%,
+                21% 91%, 32% 57%, 2% 35%,
+                39% 35%
+            );
+        }
+
+        .container {
+            text-align: center;
+            background: rgba(255, 255, 255, 0.7);
+            padding: 30px;
+            border-radius: 20px;
+            box-shadow: 0px 4px 15px rgba(0, 0, 0, 0.2);
+        }
+
+        .next-button {
+            display: inline-block;
+            text-decoration: none;
+            text-align: center;
+            line-height: 36px;
+            background-color: rgb(127, 70, 133);
+            color: white;
+            border: none;
+            height: 36px;
+            width: 120px;
+            border-radius: 20px;
+            font-weight: bold;
+            font-size: 16px;
+            cursor: pointer;
+            margin-top: 20px;
+            transition: all 0.3s ease;
+        }
+
+        .next-button:hover {
+            background-color: rgb(150, 90, 160);
+            transform: scale(1.1);
+        }
+
+        .center-image {
+            width: 260px;
+            display: block;
+            margin: 20px auto;
+        }
+
+        .welcome-interface {
+            font-weight: bold;
+            font-style: italic;
+            font-size: 35px;
+            margin-bottom: 20px;
+            color: #444;
+        }
+
+        .first-question {
+            font-size: 22px;
+            font-style: italic;
+        }
+
+        .option-btn {
+            background: #7f4685;
+            color: white;
+            border: none;
+            padding: 25px 35px;
+            margin: 15px;
+            border-radius: 20px;
+            cursor: pointer;
+            font-size: 25px;
+            width: 210px;
+            height: 85px;
+            transition: transform 0.2s;
+        }
+
+        .option-btn:hover {
+            background: #9b5ca3;
+            transform: scale(1.1);
+        }
+    </style>
+</head>
+<body>
+
+    <!-- Static shapes (no animation) -->
+    <div class="shape" style="left: 10%; top: 20%;"></div>
+    <div class="shape star" style="left: 30%; top: 40%;"></div>
+    <div class="shape" style="left: 50%; top: 60%;"></div>
+    <div class="shape star" style="left: 70%; top: 30%;"></div>
+    <div class="shape" style="left: 90%; top: 50%;"></div>
+
+    <div class="container">
+        <p class="welcome-interface">Welcome to MathChamp!</p>
+
+        <img src="image.png" alt="Centered Image" class="center-image">
+
+        <p class="first-question">How old is your child?</p>
+
+        <form id="ageForm">
+            <label><input type="radio" name="age" value="3"> 3</label><br>
+            <label><input type="radio" name="age" value="4"> 4</label><br>
+            <label><input type="radio" name="age" value="5"> 5</label><br>
+            <label><input type="radio" name="age" value="6"> 6</label><br>
+            <label><input type="radio" name="age" value="7"> 7</label><br>
+            <label><input type="radio" name="age" value="8"> 8</label><br>
+        </form>
+
+        <button id="ageNextBtn" class="next-button">Next</button>
+        <hr style="margin: 30px 0;">
+    </div>
+
+    <script>
+        document.getElementById("ageNextBtn").addEventListener("click", function() {
+            const selected = document.querySelector('input[name="age"]:checked');
+            if (!selected) {
+                alert("Please select an age!");
+                return;
+            }
+            localStorage.setItem("childAge", selected.value); // save for later
+            window.location.href = "pg5.html"; // go to topics page
+        });
+    </script>
+</body>
+</html>
