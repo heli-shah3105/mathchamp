@@ -16,6 +16,13 @@
       color: #333;
       overflow-x: hidden;
       min-height: 100vh;
+      transition: background 0.3s ease, color 0.3s ease;
+    }
+    
+    /* Dark theme styles */
+    body.dark-theme {
+      background: linear-gradient(135deg, #1a237e 0%, #283593 50%, #3949ab 100%);
+      color: #e0e0e0;
     }
     
     @keyframes gradientShift {
@@ -49,6 +56,19 @@
       background: linear-gradient(45deg, #facc15, #f97316);
     }
     
+    /* Dark theme shapes */
+    body.dark-theme .circle {
+      background: linear-gradient(45deg, #64b5f6, #42a5f5);
+    }
+
+    body.dark-theme .triangle {
+      border-bottom-color: #64b5f6;
+    }
+
+    body.dark-theme .square {
+      background: linear-gradient(45deg, #5c6bc0, #7986cb);
+    }
+    
     @keyframes float {
       0%, 100% { transform: translateY(0) rotate(0deg); }
       50% { transform: translateY(-20px) rotate(10deg); }
@@ -66,6 +86,13 @@
       box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
       position: relative;
       z-index: 10;
+      transition: background 0.3s ease, border-color 0.3s ease;
+    }
+
+    /* Dark theme header */
+    body.dark-theme .header {
+      background: rgba(30, 41, 59, 0.9);
+      border-bottom: 2px dashed #64b5f6;
     }
 
     .brand {
@@ -76,7 +103,15 @@
       font-size: 26px;
       color: #333;
       text-shadow: 2px 2px 0px #f87171;
+      transition: color 0.3s ease, text-shadow 0.3s ease;
     }
+
+    /* Dark theme brand */
+    body.dark-theme .brand {
+      color: #e0e0e0;
+      text-shadow: 2px 2px 0px #64b5f6;
+    }
+
     .brand-logo {
       width: 40px;
       height: 40px;
@@ -84,6 +119,13 @@
       background: conic-gradient(from 180deg,#ff6ec4,#7873f5,#4ade80,#22d3ee,#facc15,#f97316,#ff6ec4);
       box-shadow: 0 0 15px rgba(120,115,245,0.7);
       animation: pulse 2s infinite;
+      transition: background 0.3s ease, box-shadow 0.3s ease;
+    }
+    
+    /* Dark theme brand logo */
+    body.dark-theme .brand-logo {
+      background: conic-gradient(from 180deg,#64b5f6,#42a5f5,#5c6bc0,#7986cb,#64b5f6,#42a5f5,#64b5f6);
+      box-shadow: 0 0 15px rgba(100, 181, 246, 0.7);
     }
     
     @keyframes pulse {
@@ -113,16 +155,33 @@
       font-size:20px;
       box-shadow: 0 4px 6px rgba(0,0,0,0.1);
     }
+
+    /* Dark theme settings button */
+    body.dark-theme .settings-btn {
+      background: #64b5f6;
+    }
+    
     .settings-btn:hover { 
       background:#ef4444;
       transform: rotate(30deg);
     }
+
+    body.dark-theme .settings-btn:hover {
+      background: #42a5f5;
+    }
+    
     .avatar { 
       background:#8b5cf6; 
       color:#fff;
       font-size:18px;
       box-shadow: 0 4px 6px rgba(0,0,0,0.1);
     }
+
+    /* Dark theme avatar */
+    body.dark-theme .avatar {
+      background: #5c6bc0;
+    }
+    
     .avatar:hover {
       transform: scale(1.1);
     }
@@ -131,9 +190,19 @@
       font-size:20px;
       box-shadow: 0 4px 6px rgba(0,0,0,0.1);
     }
+
+    /* Dark theme chatbot button */
+    body.dark-theme .chatbot-btn {
+      background: #5c6bc0;
+    }
+    
     .chatbot-btn:hover {
       background:#22c55e;
       transform: scale(1.1);
+    }
+
+    body.dark-theme .chatbot-btn:hover {
+      background: #7986cb;
     }
 
     /* Welcome */
@@ -150,6 +219,14 @@
       box-shadow: 0 8px 20px rgba(0,0,0,0.1);
       position: relative;
       z-index: 5;
+      transition: color 0.3s ease, background 0.3s ease, box-shadow 0.3s ease;
+    }
+
+    /* Dark theme welcome box */
+    body.dark-theme .welcome-box {
+      color: #e0e0e0;
+      background: rgba(30, 41, 59, 0.7);
+      box-shadow: 0 8px 20px rgba(0, 0, 0, 0.3);
     }
 
     /* Top option boxes */
@@ -180,6 +257,13 @@
       position: relative;
       overflow: hidden;
     }
+
+    /* Dark theme box */
+    body.dark-theme .box {
+      background:linear-gradient(135deg,#42a5f5,#5c6bc0);
+      box-shadow:0 8px 15px rgba(0, 0, 0, 0.4);
+    }
+    
     .box:before {
       content: '';
       position: absolute;
@@ -190,6 +274,11 @@
       background: rgba(255,255,255,0.3);
       transition: all 0.5s ease;
     }
+
+    body.dark-theme .box:before {
+      background: rgba(255,255,255,0.2);
+    }
+    
     .box:hover:before {
       left: 100%;
     }
@@ -197,6 +286,11 @@
       transform: translateY(-10px) scale(1.05);
       box-shadow: 0 15px 25px rgba(0,0,0,0.2);
     }
+
+    body.dark-theme .box:hover {
+      box-shadow: 0 15px 25px rgba(0, 0, 0, 0.4);
+    }
+    
     .box:active {
       transform: translateY(5px);
     }
@@ -223,9 +317,21 @@
       position: relative;
       z-index: 5;
     }
+
+    /* Dark theme middle box */
+    body.dark-theme .middle-box {
+      background:linear-gradient(135deg,#1e3a8a,#283593);
+      color:#bbdefb;
+      box-shadow:0 8px 20px rgba(0, 0, 0, 0.3);
+    }
+    
     .middle-box:hover { 
       transform: scale(1.03);
       box-shadow: 0 12px 25px rgba(0,0,0,0.2);
+    }
+
+    body.dark-theme .middle-box:hover {
+      box-shadow: 0 12px 25px rgba(0, 0, 0, 0.4);
     }
 
     /* Main row for 3 equal cards */
@@ -252,10 +358,24 @@
       overflow: hidden;
       cursor: pointer;
     }
+
+    /* Dark theme cards */
+    body.dark-theme .progress-container,
+    body.dark-theme .rewards-card,
+    body.dark-theme .challenge-card {
+      background: rgba(30, 41, 59, 0.8);
+      box-shadow:0 10px 20px rgba(0, 0, 0, 0.3);
+    }
     
     .progress-container:hover, .rewards-card:hover, .challenge-card:hover {
       transform: translateY(-15px) scale(1.05);
       box-shadow: 0 15px 30px rgba(0,0,0,0.2);
+    }
+
+    body.dark-theme .progress-container:hover,
+    body.dark-theme .rewards-card:hover,
+    body.dark-theme .challenge-card:hover {
+      box-shadow: 0 15px 30px rgba(0, 0, 0, 0.4);
     }
     
     .card-emoji {
@@ -294,6 +414,23 @@
     .progress-details { font-size:16px; color:#333; }
     .progress-details strong { color:#8b5cf6; font-size:20px; }
 
+    /* Dark theme progress */
+    body.dark-theme .progress-bg { 
+      stroke: #37474f; 
+    }
+
+    body.dark-theme .progress-text {
+      color: #bbdefb;
+    }
+
+    body.dark-theme .progress-details { 
+      color: #e0e0e0; 
+    }
+
+    body.dark-theme .progress-details strong { 
+      color: #64b5f6; 
+    }
+
     /* Rewards */
     .rewards-card { text-align:center; }
     .rewards-card h3 { margin-top:0; color:#22c55e; font-size:22px; }
@@ -301,10 +438,36 @@
     .rewards-card .highlight { color:#f59e0b; font-weight:bold; }
     .badge-preview { font-size:50px; margin-top:10px; animation: bounce 2s infinite; }
 
+    /* Dark theme rewards */
+    body.dark-theme .rewards-card h3 { 
+      color: #64b5f6; 
+    }
+
+    body.dark-theme .rewards-card p { 
+      color: #e0e0e0; 
+    }
+
+    body.dark-theme .rewards-card .highlight { 
+      color: #ffb74d; 
+    }
+
     /* Challenge */
     .challenge-card h3 { margin-top:0; color:#ef4444; font-size:22px; }
     .challenge-card p { font-size:16px; margin:10px 0; }
     .streak { margin-top:15px; font-weight:bold; color:#f97316; font-size:16px; }
+
+    /* Dark theme challenge */
+    body.dark-theme .challenge-card h3 { 
+      color: #ef5350; 
+    }
+
+    body.dark-theme .challenge-card p { 
+      color: #e0e0e0; 
+    }
+
+    body.dark-theme .streak { 
+      color: #ffb74d; 
+    }
 
     /* Modal */
     .modal {
@@ -328,7 +491,15 @@
       text-align:center;
       position:relative;
       animation: popIn 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+      transition: background 0.3s ease, color 0.3s ease;
     }
+
+    /* Dark theme modal content */
+    body.dark-theme .modal-content {
+      background: #1e293b;
+      color: #e0e0e0;
+    }
+    
     .close {
       position:absolute;
       top:15px; right:20px;
@@ -338,6 +509,12 @@
       color: #ef4444;
       transition: all 0.3s ease;
     }
+
+    /* Dark theme close button */
+    body.dark-theme .close {
+      color: #ef5350;
+    }
+    
     .close:hover {
       transform: rotate(90deg);
     }
@@ -350,11 +527,25 @@
       cursor:pointer; transition: all 0.3s ease;
       box-shadow: 0 4px 8px rgba(0,0,0,0.1);
     }
+
+    /* Dark theme options buttons */
+    body.dark-theme .options button {
+      background:linear-gradient(135deg, #42a5f5, #5c6bc0);
+      color: #e0e0e0;
+      box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3);
+    }
+    
     .options button:hover { 
       background:linear-gradient(135deg, #60a5fa, #3b82f6);
       transform: translateY(-5px);
       box-shadow: 0 8px 15px rgba(0,0,0,0.2);
     }
+
+    body.dark-theme .options button:hover { 
+      background:linear-gradient(135deg, #5c6bc0, #7986cb);
+      box-shadow: 0 8px 15px rgba(0, 0, 0, 0.4);
+    }
+    
     .options button:active {
       transform: translateY(2px);
     }
@@ -372,10 +563,22 @@
       transition: all 0.3s ease;
       box-shadow: 0 4px 8px rgba(0,0,0,0.1);
     }
+
+    /* Dark theme done button */
+    body.dark-theme .done-btn {
+      background:linear-gradient(135deg, #42a5f5, #5c6bc0);
+      box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3);
+    }
+    
     .done-btn:hover { 
       background:linear-gradient(135deg, #16a34a, #15803d);
       transform: translateY(-5px);
       box-shadow: 0 8px 15px rgba(0,0,0,0.2);
+    }
+
+    body.dark-theme .done-btn:hover { 
+      background:linear-gradient(135deg, #5c6bc0, #7986cb);
+      box-shadow: 0 8px 15px rgba(0, 0, 0, 0.4);
     }
 
     /* Chatbot Styles */
@@ -394,6 +597,12 @@
       overflow: hidden;
       transition: all 0.3s ease;
     }
+
+    /* Dark theme chatbot container */
+    body.dark-theme .chatbot-container {
+      background: #1e293b;
+      box-shadow: 0 10px 25px rgba(0, 0, 0, 0.4);
+    }
     
     .chatbot-header {
       background: linear-gradient(135deg, #8b5cf6, #6366f1);
@@ -404,6 +613,11 @@
       display: flex;
       justify-content: space-between;
       align-items: center;
+    }
+
+    /* Dark theme chatbot header */
+    body.dark-theme .chatbot-header {
+      background: linear-gradient(135deg, #42a5f5, #5c6bc0);
     }
     
     .chatbot-close {
@@ -441,10 +655,20 @@
       z-index: 1000;
       transition: all 0.3s ease;
     }
+
+    /* Dark theme chatbot toggle */
+    body.dark-theme .chatbot-toggle {
+      background: linear-gradient(135deg, #42a5f5, #5c6bc0);
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.4);
+    }
     
     .chatbot-toggle:hover {
       transform: scale(1.1);
       box-shadow: 0 6px 16px rgba(0,0,0,0.3);
+    }
+
+    body.dark-theme .chatbot-toggle:hover {
+      box-shadow: 0 6px 16px rgba(0, 0, 0, 0.5);
     }
     
     @keyframes popIn {
@@ -542,10 +766,24 @@
       background: linear-gradient(135deg, #f87171, #ef4444);
       color: white;
     }
+
+    /* Dark theme settings buttons */
+    body.dark-theme .save-btn {
+      background: linear-gradient(135deg, #42a5f5, #5c6bc0);
+    }
+
+    body.dark-theme .cancel-btn {
+      background: linear-gradient(135deg, #ef5350, #e53935);
+    }
     
     .save-btn:hover, .cancel-btn:hover {
       transform: translateY(-3px);
       box-shadow: 0 5px 10px rgba(0,0,0,0.2);
+    }
+
+    body.dark-theme .save-btn:hover,
+    body.dark-theme .cancel-btn:hover {
+      box-shadow: 0 5px 10px rgba(0, 0, 0, 0.4);
     }
 
     /* Responsive */
@@ -888,7 +1126,10 @@
     
     // Create confetti effect
     function createConfetti() {
-      const colors = ['#f87171', '#60a5fa', '#34d399', '#fbbf24', '#a78bfa'];
+      const colors = settings.darkTheme ? 
+        ['#64b5f6', '#42a5f5', '#5c6bc0', '#7986cb', '#90caf9'] : 
+        ['#f87171', '#60a5fa', '#34d399', '#fbbf24', '#a78bfa'];
+      
       const confettiCount = 50;
       
       for (let i = 0; i < confettiCount; i++) {
