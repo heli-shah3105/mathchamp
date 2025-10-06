@@ -10,11 +10,9 @@
             align-items: center;
             font-family: Verdana, Sans-serif;
             background: linear-gradient(135deg, #ffecd2 0%, #fcb69f 100%);
-            overflow: hidden; /* Hide shapes outside view */
+            overflow: hidden;
         }
 
-        /* Floating shapes */
-        /* Floating shapes */
         .shape {
             position: absolute;
             width: 20px;
@@ -99,23 +97,34 @@
             font-style: italic;
         }
 
-        /* Option buttons */
-        .option-btn {
-            background: #7f4685;
-            color: white;
-            border: none;
-            padding: 25px 35px;
-            margin: 15px;
-            border-radius: 20px;
-            cursor: pointer;
-            font-size: 25px;
-            width: 210px;
-            height: 85px;
-            transition: transform 0.2s;
+        .topic-container {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: center;
+            margin: 20px 0;
         }
-        .option-btn:hover {
-            background: #9b5ca3;
-            transform: scale(1.1);
+        
+        .topic-item {
+            flex: 0 0 45%;
+            margin: 5px;
+            text-align: left;
+        }
+        
+        .topic-item input {
+            margin-right: 10px;
+        }
+        
+        .error-message {
+            color: red;
+            font-weight: bold;
+            margin-top: 10px;
+            display: none;
+        }
+        
+        .topic-counter {
+            margin-top: 15px;
+            font-size: 16px;
+            color: #555;
         }
     </style>
 </head>
@@ -135,99 +144,244 @@
 
         <p class="first-question">What topic do you want them to improvise in?</p>
 
-        
-        
+        <div class="topic-container">
+            <div class="topic-item">
+                <label><input type="checkbox" name="topic" value="Numbers and counting"> Numbers and counting</label>
+            </div>
+            <div class="topic-item">
+                <label><input type="checkbox" name="topic" value="Comparing & Sorting"> Comparing & Sorting</label>
+            </div>
+            <div class="topic-item">
+                <label><input type="checkbox" name="topic" value="Patterns, Shapes and Space"> Patterns, Shapes and Space</label>
+            </div>
+            <div class="topic-item">
+                <label><input type="checkbox" name="topic" value="Measurements"> Measurements</label>
+            </div>
+            <div class="topic-item">
+                <label><input type="checkbox" name="topic" value="Basic addition-subtraction"> Basic addition-subtraction</label>
+            </div>
+            <div class="topic-item">
+                <label><input type="checkbox" name="topic" value="Problem solving"> Problem solving</label>
+            </div>
+            <div class="topic-item">
+                <label><input type="checkbox" name="topic" value="Geometry"> Geometry</label>
+            </div>
+            <div class="topic-item">
+                <label><input type="checkbox" name="topic" value="Multiplication & Division"> Multiplication & Division</label>
+            </div>
+            <div class="topic-item">
+                <label><input type="checkbox" name="topic" value="Fractions and decimals"> Fractions and decimals</label>
+            </div>
+            <div class="topic-item">
+                <label><input type="checkbox" name="topic" value="Data & Graphs"> Data & Graphs</label>
+            </div>
+        </div>
 
+        <div class="topic-counter" id="topicCounter">0 topics selected</div>
+        <div class="error-message" id="topicError"></div>
         
-        <form>
-            <label><input type="checkbox" name="shape" value="Numbers and counting"> Numbers and counting</label><br>
-            <label><input type="checkbox" name="shape" value="Comparing & Sorting"> Comparing & Sorting</label><br>
-            <label><input type="checkbox" name="shape" value="Patterns, Shapes and Space"> Patterns, Shapes and Space</label><br>
-            <label><input type="checkbox" name="shape" value="Measurements"> Measurements</label><br>
-            <label><input type="checkbox" name="shape" value="Basic addition-subtraction"> Basic addition-subtraction</label><br>
-            <label><input type="checkbox" name="shape" value="Problem solving"> Problem solving</label><br>
-            <label><input type="checkbox" name="shape" value="Geometry"> Geometry</label><br>
-            <label><input type="checkbox" name="shape" value="Multiplication & Division"> Multiplication & Division</label><br>
-            <label><input type="checkbox" name="shape" value="Fractions and decimals"> Fractions and decimals</label><br>
-            <label><input type="checkbox" name="shape" value="Data & Graphs"> Data & Graphs</label><br>
-           
-        </form>
-
-      <button class="next-button" id="topicNextBtn">Next</button>
+        <button class="next-button" id="topicNextBtn">Next</button>
+    </div>
 
 <script>
-document.getElementById("topicNextBtn").addEventListener("click", function(event) {
-    event.preventDefault(); // stop form from reloading the page
+// Define all topics
+const all_topics = [
+    "Numbers and counting",
+    "Comparing & Sorting",
+    "Patterns, Shapes and Space",
+    "Measurements",
+    "Basic addition-subtraction",
+    "Problem solving",
+    "Geometry",
+    "Multiplication & Division",
+    "Fractions and decimals",
+    "Data & Graphs"
+];
 
-    const age = localStorage.getItem("childAge");  // retrieve saved age
-
-    // collect selected topics
-    const selected = Array.from(document.querySelectorAll('input[type="checkbox"]:checked'))
-                    .map(cb => cb.value.trim());
-
-    console.log("Age:", age, "Selected topics:", selected); // debug log
-
-    // ---------------- CONDITIONS ----------------
-
-    if (age === "3" && selected.includes("Numbers and counting") && selected.includes("Comparing & Sorting")) {
-        window.location.href = "pg12.html";
-    } 
-    else if (age === "4" && selected.includes("Numbers and counting") && selected.includes("Comparing & Sorting")) {
-        window.location.href = "pg9.html";
-    } 
-    else if (age === "4" && selected.includes("Patterns, Shapes and Space") && selected.includes("Comparing & Sorting")) {
-        window.location.href = "pg13.html";
-    } 
-    else if (age === "4" && selected.includes("Numbers and counting") && selected.includes("Comparing & Sorting") && selected.includes("Patterns, Shapes and Space")) {
-        window.location.href = "pg14.html";
-    } 
-    else if (age === "5" && selected.includes("Comparing & Sorting") && selected.includes("Patterns, Shapes and Space") && selected.includes("Basic addition-subtraction")) {
-        window.location.href = "pg15.html";
-    } 
-    else if (age === "5" && selected.includes("Patterns, Shapes and Space") && selected.includes("Basic addition-subtraction") && selected.includes("Problem solving")) {
-        window.location.href = "pg16.html";
-    } 
-    else if (age === "5" && selected.includes("Measurements") && selected.includes("Basic addition-subtraction") && selected.includes("Problem solving")) {
-        window.location.href = "pg17.html";
-    } 
-    else if (age === "6" && selected.includes("Patterns, Shapes and Space") && selected.includes("Basic addition-subtraction") && selected.includes("Problem solving")) {
-        window.location.href = "pg13.html";
-    } 
-    else if (age === "6" && selected.includes("Basic addition-subtraction") && selected.includes("Problem solving") && selected.includes("Measurements")) {
-        window.location.href = "pg17.html";
-    } 
-    else if (age === "6" && selected.includes("Basic addition-subtraction") && selected.includes("Problem solving") && selected.includes("Multiplication & Division")) {
-        window.location.href = "pg18.html";
-    } 
-    else if (age === "7" && selected.includes("Basic addition-subtraction") && selected.includes("Problem solving") && selected.includes("Multiplication & Division")) {
-        window.location.href = "pg18.html";
-    } 
-    else if (age === "7" && selected.includes("Basic addition-subtraction") && selected.includes("Multiplication & Division") && selected.includes("Geometry")) {
-        window.location.href = "pg19.html";
-    } 
-    else if (age === "7" && selected.includes("Basic addition-subtraction") && selected.includes("Multiplication & Division") && selected.includes("Fractions and decimals")) {
-        window.location.href = "pg20.html";
-    } 
-    else if (age === "7" && selected.includes("Problem solving") && selected.includes("Multiplication & Division") && selected.includes("Fractions and decimals")) {
-        window.location.href = "pg20.html";
-    } 
-    else if (age === "7" && selected.includes("Basic addition-subtraction") && selected.includes("Measurements") && selected.includes("Multiplication & Division")) {
-        window.location.href = "pg18.html";
-    } 
-    else if (age === "8" && selected.includes("Data & Graphs") && selected.includes("Measurements") && selected.includes("Multiplication & Division")) {
-        window.location.href = "pg21.html";
+// Function to get age-appropriate topics
+function getAgeAppropriateTopics(age) {
+    if (age === "3" || age === "4") {
+        return all_topics.slice(0, 3); // First 3 topics
+    } else if (age === "5" || age === "6") {
+        return all_topics.slice(0, 6); // First 6 topics
+    } else if (age === "7" || age === "8") {
+        return all_topics; // All topics
+    } else {
+        return []; // Invalid age
     }
-        else if (age === "8" && selected.includes("Data & Graphs") && selected.includes("Basic addition-subtraction") && selected.includes("Multiplication & Division")) {
-        window.location.href = "pg21.html";
+}
+
+// Function to validate selected topics
+function validateTopics(age, selectedTopics) {
+    const ageAppropriate = getAgeAppropriateTopics(age);
+    
+    // Check if age is valid
+    if (ageAppropriate.length === 0) {
+        return { valid: false, message: "Invalid age. Please select between 3-8." };
+    }
+    
+    // Check if at least one topic is selected
+    if (selectedTopics.length === 0) {
+        return { valid: false, message: "Please select at least one topic" };
+    }
+    
+    // Check if all selected topics are age-appropriate
+    for (const topic of selectedTopics) {
+        if (!ageAppropriate.includes(topic)) {
+            return { 
+                valid: false, 
+                message: `The topic "${topic}" is not recommended for age ${age}. Please select different topics.`
+            };
         }
-    else {
-        // default page
-        window.location.href = "pg9.html";
     }
+    
+    return { valid: true };
+}
+
+// Update topic counter
+function updateTopicCounter() {
+    const selectedCount = document.querySelectorAll('input[name="topic"]:checked').length;
+    document.getElementById("topicCounter").textContent = `${selectedCount} topic${selectedCount !== 1 ? 's' : ''} selected`;
+}
+
+// Add event listeners to checkboxes
+document.querySelectorAll('input[name="topic"]').forEach(checkbox => {
+    checkbox.addEventListener('change', updateTopicCounter);
+});
+
+// Initialize counter
+updateTopicCounter();
+
+// Define redirection rules
+function getRedirectionPage(age, selectedTopics) {
+    // Sort topics for consistent comparison
+    const sortedTopics = [...selectedTopics].sort();
+    
+    // Define redirection rules
+    const rules = [
+        // Age 3 rules
+        { age: "3", topics: ["Numbers and counting"], page: "pg22.html" },
+        { age: "3", topics: ["Comparing & Sorting"], page: "pg23.html" },
+        { age: "3", topics: ["Patterns, Shapes and Space"], page: "pg24.html" },
+        { age: "3", topics: ["Numbers and counting", "Comparing & Sorting"], page: "pg12.html" },
+        { age: "3", topics: ["Numbers and counting", "Patterns, Shapes and Space"], page: "pg25.html" },
+        { age: "3", topics: ["Comparing & Sorting", "Patterns, Shapes and Space"], page: "pg26.html" },
+        { age: "3", topics: ["Numbers and counting", "Comparing & Sorting", "Patterns, Shapes and Space"], page: "pg14.html" },
+        
+        // Age 4 rules
+        { age: "4", topics: ["Numbers and counting"], page: "pg27.html" },
+        { age: "4", topics: ["Comparing & Sorting"], page: "pg28.html" },
+        { age: "4", topics: ["Patterns, Shapes and Space"], page: "pg29.html" },
+        { age: "4", topics: ["Numbers and counting", "Comparing & Sorting"], page: "pg9.html" },
+        { age: "4", topics: ["Numbers and counting", "Patterns, Shapes and Space"], page: "pg30.html" },
+        { age: "4", topics: ["Comparing & Sorting", "Patterns, Shapes and Space"], page: "pg13.html" },
+        { age: "4", topics: ["Numbers and counting", "Comparing & Sorting", "Patterns, Shapes and Space"], page: "pg14.html" },
+        
+        // Age 5 rules
+        { age: "5", topics: ["Numbers and counting"], page: "pg31.html" },
+        { age: "5", topics: ["Comparing & Sorting"], page: "pg32.html" },
+        { age: "5", topics: ["Patterns, Shapes and Space"], page: "pg33.html" },
+        { age: "5", topics: ["Measurements"], page: "pg34.html" },
+        { age: "5", topics: ["Basic addition-subtraction"], page: "pg35.html" },
+        { age: "5", topics: ["Problem solving"], page: "pg36.html" },
+        { age: "5", topics: ["Numbers and counting", "Comparing & Sorting"], page: "pg37.html" },
+        { age: "5", topics: ["Numbers and counting", "Patterns, Shapes and Space"], page: "pg38.html" },
+        { age: "5", topics: ["Comparing & Sorting", "Patterns, Shapes and Space"], page: "pg39.html" },
+        { age: "5", topics: ["Comparing & Sorting", "Patterns, Shapes and Space", "Basic addition-subtraction"], page: "pg15.html" },
+        { age: "5", topics: ["Patterns, Shapes and Space", "Basic addition-subtraction", "Problem solving"], page: "pg16.html" },
+        { age: "5", topics: ["Measurements", "Basic addition-subtraction", "Problem solving"], page: "pg17.html" },
+        { age: "5", topics: ["Numbers and counting", "Comparing & Sorting", "Patterns, Shapes and Space", "Measurements", "Basic addition-subtraction", "Problem solving"], page: "pg40.html" },
+        
+        // Age 6 rules
+        { age: "6", topics: ["Numbers and counting"], page: "pg41.html" },
+        { age: "6", topics: ["Comparing & Sorting"], page: "pg42.html" },
+        { age: "6", topics: ["Patterns, Shapes and Space"], page: "pg43.html" },
+        { age: "6", topics: ["Measurements"], page: "pg44.html" },
+        { age: "6", topics: ["Basic addition-subtraction"], page: "pg45.html" },
+        { age: "6", topics: ["Problem solving"], page: "pg46.html" },
+        { age: "6", topics: ["Patterns, Shapes and Space", "Basic addition-subtraction", "Problem solving"], page: "pg13.html" },
+        { age: "6", topics: ["Basic addition-subtraction", "Problem solving", "Measurements"], page: "pg17.html" },
+        { age: "6", topics: ["Basic addition-subtraction", "Problem solving", "Multiplication & Division"], page: "pg18.html" },
+        { age: "6", topics: ["Numbers and counting", "Comparing & Sorting", "Patterns, Shapes and Space", "Measurements", "Basic addition-subtraction", "Problem solving"], page: "pg47.html" },
+        
+        // Age 7 rules
+        { age: "7", topics: ["Numbers and counting"], page: "pg48.html" },
+        { age: "7", topics: ["Comparing & Sorting"], page: "pg49.html" },
+        { age: "7", topics: ["Patterns, Shapes and Space"], page: "pg50.html" },
+        { age: "7", topics: ["Measurements"], page: "pg51.html" },
+        { age: "7", topics: ["Basic addition-subtraction"], page: "pg52.html" },
+        { age: "7", topics: ["Problem solving"], page: "pg53.html" },
+        { age: "7", topics: ["Geometry"], page: "pg54.html" },
+        { age: "7", topics: ["Multiplication & Division"], page: "pg55.html" },
+        { age: "7", topics: ["Fractions and decimals"], page: "pg56.html" },
+        { age: "7", topics: ["Data & Graphs"], page: "pg57.html" },
+        { age: "7", topics: ["Basic addition-subtraction", "Problem solving", "Multiplication & Division"], page: "pg18.html" },
+        { age: "7", topics: ["Basic addition-subtraction", "Multiplication & Division", "Geometry"], page: "pg19.html" },
+        { age: "7", topics: ["Basic addition-subtraction", "Multiplication & Division", "Fractions and decimals"], page: "pg20.html" },
+        { age: "7", topics: ["Problem solving", "Multiplication & Division", "Fractions and decimals"], page: "pg20.html" },
+        { age: "7", topics: ["Basic addition-subtraction", "Measurements", "Multiplication & Division"], page: "pg18.html" },
+        { age: "7", topics: ["Numbers and counting", "Comparing & Sorting", "Patterns, Shapes and Space", "Measurements", "Basic addition-subtraction", "Problem solving", "Geometry", "Multiplication & Division", "Fractions and decimals", "Data & Graphs"], page: "pg58.html" },
+        
+        // Age 8 rules
+        { age: "8", topics: ["Numbers and counting"], page: "pg59.html" },
+        { age: "8", topics: ["Comparing & Sorting"], page: "pg60.html" },
+        { age: "8", topics: ["Patterns, Shapes and Space"], page: "pg61.html" },
+        { age: "8", topics: ["Measurements"], page: "pg62.html" },
+        { age: "8", topics: ["Basic addition-subtraction"], page: "pg63.html" },
+        { age: "8", topics: ["Problem solving"], page: "pg64.html" },
+        { age: "8", topics: ["Geometry"], page: "pg65.html" },
+        { age: "8", topics: ["Multiplication & Division"], page: "pg66.html" },
+        { age: "8", topics: ["Fractions and decimals"], page: "pg67.html" },
+        { age: "8", topics: ["Data & Graphs"], page: "pg68.html" },
+        { age: "8", topics: ["Data & Graphs", "Measurements", "Multiplication & Division"], page: "pg21.html" },
+        { age: "8", topics: ["Data & Graphs", "Basic addition-subtraction", "Multiplication & Division"], page: "pg21.html" },
+        { age: "8", topics: ["Numbers and counting", "Comparing & Sorting", "Patterns, Shapes and Space", "Measurements", "Basic addition-subtraction", "Problem solving", "Geometry", "Multiplication & Division", "Fractions and decimals", "Data & Graphs"], page: "pg69.html" }
+    ];
+    
+    // Find matching rule
+    for (const rule of rules) {
+        if (rule.age === age && JSON.stringify(rule.topics.sort()) === JSON.stringify(sortedTopics)) {
+            return rule.page;
+        }
+    }
+    
+    // Default redirection based on age if no specific rule matches
+    if (age === "3" || age === "4") {
+        return "pg9.html";
+    } else if (age === "5" || age === "6") {
+        return "pg15.html";
+    } else if (age === "7" || age === "8") {
+        return "pg18.html";
+    } else {
+        return "pg9.html"; // fallback
+    }
+}
+
+document.getElementById("topicNextBtn").addEventListener("click", function(event) {
+    event.preventDefault();
+
+    const age = localStorage.getItem("childAge");
+    const selectedTopics = Array.from(document.querySelectorAll('input[name="topic"]:checked'))
+                            .map(cb => cb.value.trim());
+    
+    const errorElement = document.getElementById("topicError");
+    
+    // Validate topics
+    const validation = validateTopics(age, selectedTopics);
+    
+    if (!validation.valid) {
+        errorElement.textContent = validation.message;
+        errorElement.style.display = "block";
+        return;
+    } else {
+        errorElement.style.display = "none";
+    }
+
+    // Get redirection page and navigate
+    const targetPage = getRedirectionPage(age, selectedTopics);
+    window.location.href = targetPage;
 });
 </script>
 
-
-    </div>
 </body>
 </html>
