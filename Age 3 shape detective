@@ -1,0 +1,750 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Shape Detectives: The Great Shape Hunt!</title>
+    <style>
+        /* --- Basic Setup & Theming --- */
+        @import url('https://fonts.googleapis.com/css2?family=Fredoka:wght@400;600&display=swap');
+
+        :root {
+            --primary-color: #6C63FF;
+            --secondary-color: #FF6584;
+            --success-color: #4CAF50;
+            --background-color: #F0F4F8;
+            --text-color: #333;
+            --white: #FFFFFF;
+            --shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+        }
+
+        body {
+            font-family: 'Fredoka', sans-serif;
+            background-color: var(--background-color);
+            color: var(--text-color);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            margin: 0;
+            overflow: hidden;
+        }
+
+        /* --- Main Game Container --- */
+        .game-container {
+            width: 900px;
+            height: 600px;
+            background-color: var(--white);
+            border-radius: 20px;
+            box-shadow: var(--shadow);
+            position: relative;
+            overflow: hidden;
+        }
+
+        /* --- Game Views (Screens) --- */
+        .game-view {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            padding: 2rem;
+            box-sizing: border-box;
+            transition: opacity 0.5s ease-in-out;
+        }
+
+        .hidden {
+            display: none !important;
+        }
+
+        /* --- Intro Screen --- */
+        #intro-screen {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: var(--white);
+            text-align: center;
+        }
+
+        #intro-screen h1 {
+            font-size: 3rem;
+            margin-bottom: 0.5rem;
+        }
+
+        #intro-screen .character {
+            font-size: 6rem;
+            margin: 1rem 0;
+        }
+
+        #intro-screen p {
+            font-size: 1.2rem;
+            max-width: 600px;
+            line-height: 1.6;
+        }
+
+        .rules-box {
+            background: rgba(255, 255, 255, 0.2);
+            padding: 1.5rem;
+            border-radius: 15px;
+            margin: 1.5rem 0;
+        }
+
+        .advanced-mode-toggle {
+            margin-top: 1rem;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 0.5rem;
+            font-size: 1.1rem;
+        }
+
+        /* --- Buttons --- */
+        .btn {
+            background-color: var(--secondary-color);
+            color: var(--white);
+            border: none;
+            padding: 12px 30px;
+            font-size: 1.2rem;
+            font-family: 'Fredoka', sans-serif;
+            font-weight: 600;
+            border-radius: 50px;
+            cursor: pointer;
+            transition: transform 0.2s, box-shadow 0.2s;
+            margin-top: 1rem;
+        }
+
+        .btn:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 6px 20px rgba(0, 0, 0, 0.15);
+        }
+
+        .btn:active {
+            transform: translateY(0);
+        }
+
+        /* --- Game Screen --- */
+        #game-screen {
+            padding: 0;
+        }
+
+        #prompt-container {
+            background-color: var(--primary-color);
+            color: var(--white);
+            width: 100%;
+            padding: 1.5rem;
+            text-align: center;
+            font-size: 1.5rem;
+            font-weight: 600;
+        }
+
+        #scene-container {
+            position: relative;
+            width: 100%;
+            height: 100%;
+            background-image: url('https://www.transparenttextures.com/patterns/cubes.png'), linear-gradient(to bottom, #dfe9f3 0%, #ffffff 100%);
+        }
+
+        .shape-object {
+            position: absolute;
+            cursor: pointer;
+            font-size: 3rem;
+            transition: transform 0.2s ease, filter 0.2s ease;
+            user-select: none;
+        }
+
+        .shape-object:hover {
+            transform: scale(1.1);
+            filter: brightness(1.2) drop-shadow(0 0 10px rgba(255, 255, 255, 0.8));
+        }
+
+        .shape-object.found {
+            opacity: 0.3;
+            cursor: not-allowed;
+            pointer-events: none;
+        }
+
+        #logbook-button {
+            position: absolute;
+            bottom: 20px;
+            right: 20px;
+            background-color: var(--success-color);
+        }
+
+        /* --- Modal --- */
+        .modal {
+            display: none; 
+            position: fixed; 
+            z-index: 1000; 
+            left: 0;
+            top: 0;
+            width: 100%; 
+            height: 100%; 
+            background-color: rgba(0,0,0,0.5); 
+            justify-content: center;
+            align-items: center;
+        }
+
+        .modal-content {
+            background-color: var(--white);
+            padding: 2rem;
+            border-radius: 20px;
+            text-align: center;
+            box-shadow: 0 5px 25px rgba(0,0,0,0.2);
+            animation: bounce-in 0.5s;
+        }
+
+        @keyframes bounce-in {
+            0% { transform: scale(0.7); opacity: 0; }
+            50% { transform: scale(1.05); }
+            100% { transform: scale(1); opacity: 1; }
+        }
+
+        .modal-content h2 {
+            margin-top: 0;
+            color: var(--primary-color);
+        }
+
+        .answer-buttons {
+            display: flex;
+            gap: 1rem;
+            justify-content: center;
+            margin-top: 1.5rem;
+        }
+
+        .answer-btn {
+            padding: 10px 20px;
+            font-size: 1.1rem;
+            border: 2px solid var(--primary-color);
+            background-color: var(--white);
+            color: var(--primary-color);
+            border-radius: 10px;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .answer-btn:hover {
+            background-color: var(--primary-color);
+            color: var(--white);
+        }
+
+        /* --- Logbook Screen --- */
+        #logbook-screen h2 {
+            color: var(--primary-color);
+        }
+        
+        .logbook-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 1.5rem;
+            margin-top: 1.5rem;
+            width: 100%;
+        }
+
+        .logbook-page {
+            border: 2px dashed #ccc;
+            border-radius: 15px;
+            padding: 1rem;
+            min-height: 150px;
+        }
+
+        .logbook-page h3 {
+            margin-top: 0;
+            border-bottom: 2px solid #eee;
+            padding-bottom: 0.5rem;
+        }
+
+        .logbook-items {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 0.5rem;
+            margin-top: 1rem;
+        }
+
+        .logbook-item {
+            font-size: 2.5rem;
+        }
+
+        /* --- Grouping Screen --- */
+        #grouping-screen h2 {
+            color: var(--primary-color);
+        }
+        
+        .grouping-zones {
+            display: flex;
+            justify-content: space-around;
+            width: 100%;
+            margin-top: 2rem;
+        }
+
+        .drop-zone {
+            width: 200px;
+            min-height: 200px;
+            border: 3px dashed #aaa;
+            border-radius: 15px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            padding: 1rem;
+            background-color: rgba(0,0,0,0.02);
+        }
+
+        .drop-zone h3 {
+            margin-top: 0;
+        }
+
+        .drop-zone.drag-over {
+            background-color: rgba(108, 99, 255, 0.1);
+            border-color: var(--primary-color);
+        }
+
+        #shapes-to-sort {
+            display: flex;
+            gap: 1rem;
+            margin-top: 2rem;
+            padding: 1rem;
+            background-color: #f0f0f0;
+            border-radius: 15px;
+            min-height: 100px;
+            justify-content: center;
+            flex-wrap: wrap;
+        }
+
+        .draggable-shape {
+            font-size: 3rem;
+            cursor: grab;
+            transition: transform 0.2s;
+        }
+
+        .draggable-shape:active {
+            cursor: grabbing;
+        }
+
+        .draggable-shape.dragging {
+            opacity: 0.5;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="game-container">
+        <!-- Intro Screen -->
+        <div id="intro-screen" class="game-view">
+            <div class="character">🦊</div>
+            <h1>Shape Detectives!</h1>
+            <div class="rules-box">
+                <p><strong>Welcome, rookie! I'm Detective Sharp.</strong></p>
+                <p>Our mission is to find the hiding shapes! Look around the room, click on an object, and tell me what shape it is. Let's fill up our Shape Detective Logbook!</p>
+            </div>
+            <div class="advanced-mode-toggle">
+                <input type="checkbox" id="advanced-mode">
+                <label for="advanced-mode">👉 Advanced Mode (for ages 5-6)</label>
+            </div>
+            <button class="btn" id="start-game-btn">Let's Go!</button>
+        </div>
+
+        <!-- Main Game Screen -->
+        <div id="game-screen" class="game-view hidden">
+            <div id="prompt-container">
+                Find a: <span id="target-shape-name">Circle</span> <span id="target-shape-icon">⭕</span>
+            </div>
+            <div id="scene-container">
+                <!-- Shapes will be dynamically added here -->
+            </div>
+            <button class="btn" id="logbook-button">📖 My Logbook</button>
+        </div>
+
+        <!-- Logbook Screen -->
+        <div id="logbook-screen" class="game-view hidden">
+            <h2>📖 My Shape Detective Logbook</h2>
+            <div class="logbook-grid">
+                <div class="logbook-page" data-shape="circle">
+                    <h3>⭕ Circles</h3>
+                    <div class="logbook-items" id="logbook-circles"></div>
+                </div>
+                <div class="logbook-page" data-shape="square">
+                    <h3>⬜ Squares</h3>
+                    <div class="logbook-items" id="logbook-squares"></div>
+                </div>
+                <div class="logbook-page" data-shape="triangle">
+                    <h3>🔺 Triangles</h3>
+                    <div class="logbook-items" id="logbook-triangles"></div>
+                </div>
+                <div class="logbook-page" data-shape="rectangle">
+                    <h3>▬ Rectangles</h3>
+                    <div class="logbook-items" id="logbook-rectangles"></div>
+                </div>
+            </div>
+            <button class="btn" id="close-logbook-btn">Back to the Game</button>
+        </div>
+        
+        <!-- Grouping Game Screen -->
+        <div id="grouping-screen" class="game-view hidden">
+            <h2>🎯 Bonus Challenge: Group the Shapes!</h2>
+            <p>Drag the shapes you found into the correct box based on how many sides they have!</p>
+            <div class="grouping-zones">
+                <div class="drop-zone" data-sides="3">
+                    <h3>3 Sides</h3>
+                    <div class="zone-items"></div>
+                </div>
+                <div class="drop-zone" data-sides="4">
+                    <h3>4 Sides</h3>
+                    <div class="zone-items"></div>
+                </div>
+                <div class="drop-zone" data-sides="more">
+                    <h3>More than 4</h3>
+                    <div class="zone-items"></div>
+                </div>
+            </div>
+            <div id="shapes-to-sort">
+                <!-- Draggable shapes will be added here -->
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal for Answering -->
+    <div id="answer-modal" class="modal">
+        <div class="modal-content">
+            <h2>You found a...?</h2>
+            <div id="modal-question-icon" style="font-size: 4rem; margin: 1rem 0;"></div>
+            <div class="answer-buttons" id="answer-buttons">
+                <!-- Buttons will be dynamically added -->
+            </div>
+        </div>
+    </div>
+    
+    <!-- Modal for Side Counting -->
+    <div id="side-modal" class="modal">
+        <div class="modal-content">
+            <h2>How many sides?</h2>
+            <p>A <span id="side-question-shape-name"></span> has...</p>
+            <div class="answer-buttons" id="side-answer-buttons">
+                <!-- Buttons will be dynamically added -->
+            </div>
+        </div>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            // --- DOM Elements ---
+            const introScreen = document.getElementById('intro-screen');
+            const gameScreen = document.getElementById('game-screen');
+            const logbookScreen = document.getElementById('logbook-screen');
+            const groupingScreen = document.getElementById('grouping-screen');
+            const startBtn = document.getElementById('start-game-btn');
+            const advancedModeCheckbox = document.getElementById('advanced-mode');
+            const sceneContainer = document.getElementById('scene-container');
+            const targetShapeNameEl = document.getElementById('target-shape-name');
+            const targetShapeIconEl = document.getElementById('target-shape-icon');
+            const logbookButton = document.getElementById('logbook-button');
+            const closeLogbookBtn = document.getElementById('close-logbook-btn');
+            const answerModal = document.getElementById('answer-modal');
+            const sideModal = document.getElementById('side-modal');
+
+            // --- Game State ---
+            const gameState = {
+                advancedMode: false,
+                currentTargetShape: null,
+                foundShapes: [],
+                sceneShapes: [],
+                allPossibleShapes: ['circle', 'square', 'triangle', 'rectangle', 'pentagon', 'hexagon'],
+                shapeIcons: {
+                    circle: '⭕', square: '⬜', triangle: '🔺', rectangle: '▬', pentagon: '⬠', hexagon: '⬡'
+                },
+                shapeNames: {
+                    circle: 'Circle', square: 'Square', triangle: 'Triangle', rectangle: 'Rectangle', pentagon: 'Pentagon', hexagon: 'Hexagon'
+                }
+            };
+
+            // --- Scene Data ---
+            // In a real game, this could be loaded from a JSON file for multiple levels
+            const sceneData = [
+                { id: 'clock', shape: 'circle', icon: '🕐', name: 'Clock', sides: 0, top: '10px', left: '50px' },
+                { id: 'book', shape: 'rectangle', icon: '📕', name: 'Book', sides: 4, top: '120px', left: '150px' },
+                { id: 'ruler', shape: 'rectangle', icon: '📏', name: 'Ruler', sides: 4, top: '220px', left: '250px' },
+                { id: 'window', shape: 'square', icon: '🪟', name: 'Window', sides: 4, top: '50px', left: '400px' },
+                { id: 'pizza-slice', shape: 'triangle', icon: '🍕', name: 'Pizza Slice', sides: 3, top: '180px', left: '450px' },
+                { id: 'ball', shape: 'circle', icon: '⚽', name: 'Ball', sides: 0, top: '350px', left: '100px' },
+                { id: 'pencil-holder', shape: 'hexagon', icon: '✏️', name: 'Pencil Holder', sides: 6, top: '320px', left: '500px' },
+                { id: 'sign', shape: 'pentagon', icon: '🚸', name: 'Sign', sides: 5, top: '100px', left: '650px' },
+            ];
+
+            // --- Event Listeners ---
+            startBtn.addEventListener('click', startGame);
+            logbookButton.addEventListener('click', () => showScreen(logbookScreen));
+            closeLogbookBtn.addEventListener('click', () => showScreen(gameScreen));
+            advancedModeCheckbox.addEventListener('change', (e) => gameState.advancedMode = e.target.checked);
+            
+            // --- Screen Management ---
+            function showScreen(screen) {
+                [introScreen, gameScreen, logbookScreen, groupingScreen].forEach(s => s.classList.add('hidden'));
+                screen.classList.remove('hidden');
+            }
+
+            // --- Game Logic ---
+            function startGame() {
+                gameState.advancedMode = advancedModeCheckbox.checked;
+                gameState.foundShapes = [];
+                gameState.sceneShapes = JSON.parse(JSON.stringify(sceneData)); // Deep copy
+                clearLogbook();
+                setupScene();
+                showScreen(gameScreen);
+            }
+
+            function setupScene() {
+                sceneContainer.innerHTML = ''; // Clear previous scene
+                gameState.sceneShapes.forEach(shapeData => {
+                    const shapeEl = document.createElement('div');
+                    shapeEl.className = 'shape-object';
+                    shapeEl.id = shapeData.id;
+                    shapeEl.dataset.shape = shapeData.shape;
+                    shapeEl.dataset.sides = shapeData.sides;
+                    shapeEl.dataset.name = shapeData.name;
+                    shapeEl.style.top = shapeData.top;
+                    shapeEl.style.left = shapeData.left;
+                    shapeEl.textContent = shapeData.icon;
+                    shapeEl.addEventListener('click', handleObjectClick);
+                    sceneContainer.appendChild(shapeEl);
+                });
+                selectNewTargetShape();
+            }
+            
+            function selectNewTargetShape() {
+                const remainingShapes = gameState.sceneShapes.filter(s => !gameState.foundShapes.find(f => f.id === s.id));
+                if (remainingShapes.length === 0) {
+                    onLevelComplete();
+                    return;
+                }
+                const randomShape = remainingShapes[Math.floor(Math.random() * remainingShapes.length)];
+                gameState.currentTargetShape = randomShape;
+                targetShapeNameEl.textContent = gameState.shapeNames[randomShape.shape];
+                targetShapeIconEl.textContent = gameState.shapeIcons[randomShape.shape];
+            }
+
+            function handleObjectClick(event) {
+                const clickedShape = event.target;
+                const clickedShapeData = gameState.sceneShapes.find(s => s.id === clickedShape.id);
+
+                if (clickedShape.dataset.shape === gameState.currentTargetShape.shape) {
+                    showAnswerModal(clickedShapeData);
+                } else {
+                    // Wrong answer feedback
+                    clickedShape.style.animation = 'shake 0.5s';
+                    setTimeout(() => clickedShape.style.animation = '', 500);
+                }
+            }
+
+            function showAnswerModal(shapeData) {
+                const modalIcon = document.getElementById('modal-question-icon');
+                const answerButtonsContainer = document.getElementById('answer-buttons');
+                
+                modalIcon.textContent = shapeData.icon;
+                answerButtonsContainer.innerHTML = ''; // Clear old buttons
+
+                const correctAnswer = shapeData.shape;
+                const wrongAnswers = gameState.allPossibleShapes.filter(s => s !== correctAnswer).slice(0, 2);
+                const allAnswers = [correctAnswer, ...wrongAnswers].sort(() => Math.random() - 0.5);
+
+                allAnswers.forEach(answer => {
+                    const btn = document.createElement('button');
+                    btn.className = 'answer-btn';
+                    btn.textContent = gameState.shapeIcons[answer] + ' ' + gameState.shapeNames[answer];
+                    btn.onclick = () => handleAnswerClick(answer === correctAnswer, shapeData);
+                    answerButtonsContainer.appendChild(btn);
+                });
+
+                answerModal.style.display = 'flex';
+            }
+
+            function handleAnswerClick(isCorrect, shapeData) {
+                answerModal.style.display = 'none';
+                if (isCorrect) {
+                    onCorrectAnswer(shapeData);
+                } else {
+                    // "Try again" feedback
+                    const modalContent = answerModal.querySelector('.modal-content');
+                    modalContent.style.animation = 'shake 0.5s';
+                    setTimeout(() => modalContent.style.animation = 'bounce-in 0.5s', 500);
+                }
+            }
+
+            function onCorrectAnswer(shapeData) {
+                // Add to found list
+                gameState.foundShapes.push(shapeData);
+                
+                // Update UI
+                const foundEl = document.getElementById(shapeData.id);
+                foundEl.classList.add('found');
+                updateLogbook(shapeData);
+
+                // Success message
+                alert(`Great job! You found a ${gameState.shapeNames[shapeData.shape]}!`);
+
+                // Advanced Mode Logic
+                if (gameState.advancedMode) {
+                    askSideCount(shapeData);
+                } else {
+                    selectNewTargetShape();
+                }
+            }
+
+            function askSideCount(shapeData) {
+                const sideQuestionNameEl = document.getElementById('side-question-shape-name');
+                const sideAnswerButtonsContainer = document.getElementById('side-answer-buttons');
+                
+                sideQuestionNameEl.textContent = gameState.shapeNames[shapeData.shape];
+                sideAnswerButtonsContainer.innerHTML = '';
+
+                const correctSides = shapeData.sides;
+                const wrongSides = [3, 4, 5, 6, 8].filter(s => s !== correctSides).slice(0, 2);
+                const allAnswers = [correctSides, ...wrongSides].sort(() => Math.random() - 0.5);
+
+                allAnswers.forEach(answer => {
+                    const btn = document.createElement('button');
+                    btn.className = 'answer-btn';
+                    btn.textContent = answer;
+                    btn.onclick = () => {
+                        sideModal.style.display = 'none';
+                        if (answer === correctSides) {
+                            alert(`Correct! A ${gameState.shapeNames[shapeData.shape]} has ${correctSides} sides!`);
+                        } else {
+                            alert(`Oops! A ${gameState.shapeNames[shapeData.shape]} actually has ${correctSides} sides. Let's remember that!`);
+                        }
+                        selectNewTargetShape();
+                    };
+                    sideAnswerButtonsContainer.appendChild(btn);
+                });
+                
+                sideModal.style.display = 'flex';
+            }
+
+            function onLevelComplete() {
+                alert("Amazing! You found all the shapes!");
+                if (gameState.advancedMode) {
+                    startGroupingGame();
+                } else {
+                    // Could loop to next level or show a final screen
+                    alert("Case closed! You're a true Shape Detective!");
+                    showScreen(introScreen);
+                }
+            }
+
+            // --- Logbook Functions ---
+            function updateLogbook(shapeData) {
+                const logbookContainer = document.getElementById(`logbook-${shapeData.shape}s`);
+                const item = document.createElement('span');
+                item.className = 'logbook-item';
+                item.textContent = shapeData.icon;
+                item.title = shapeData.name;
+                logbookContainer.appendChild(item);
+            }
+
+            function clearLogbook() {
+                document.querySelectorAll('.logbook-items').forEach(container => container.innerHTML = '');
+            }
+
+            // --- Grouping Game Functions ---
+            function startGroupingGame() {
+                showScreen(groupingScreen);
+                setupGroupingGame();
+            }
+
+            function setupGroupingGame() {
+                const shapesToSortContainer = document.getElementById('shapes-to-sort');
+                shapesToSortContainer.innerHTML = '';
+
+                gameState.foundShapes.forEach(shapeData => {
+                    const draggableEl = document.createElement('span');
+                    draggableEl.className = 'draggable-shape';
+                    draggableEl.draggable = true;
+                    draggableEl.dataset.sides = shapeData.sides;
+                    draggableEl.textContent = shapeData.icon;
+                    draggableEl.id = `drag-${shapeData.id}`;
+                    
+                    // Drag events
+                    draggableEl.addEventListener('dragstart', handleDragStart);
+                    draggableEl.addEventListener('dragend', handleDragEnd);
+                    
+                    shapesToSortContainer.appendChild(draggableEl);
+                });
+
+                // Drop zone events
+                document.querySelectorAll('.drop-zone').forEach(zone => {
+                    zone.addEventListener('dragover', handleDragOver);
+                    zone.addEventListener('drop', handleDrop);
+                    zone.addEventListener('dragleave', handleDragLeave);
+                });
+            }
+
+            let draggedElement = null;
+
+            function handleDragStart(e) {
+                draggedElement = e.target;
+                e.target.classList.add('dragging');
+            }
+
+            function handleDragEnd(e) {
+                e.target.classList.remove('dragging');
+            }
+
+            function handleDragOver(e) {
+                e.preventDefault();
+                e.currentTarget.classList.add('drag-over');
+            }
+
+            function handleDragLeave(e) {
+                e.currentTarget.classList.remove('drag-over');
+            }
+
+            function handleDrop(e) {
+                e.preventDefault();
+                const dropZone = e.currentTarget;
+                dropZone.classList.remove('drag-over');
+                
+                if (draggedElement) {
+                    const zoneSides = dropZone.dataset.sides;
+                    const shapeSides = parseInt(draggedElement.dataset.sides);
+                    
+                    let isCorrect = false;
+                    if (zoneSides === 'more' && shapeSides > 4) isCorrect = true;
+                    if (parseInt(zoneSides) === shapeSides) isCorrect = true;
+
+                    if (isCorrect) {
+                        dropZone.querySelector('.zone-items').appendChild(draggedElement);
+                        checkGroupingComplete();
+                    } else {
+                        // Animate it back
+                        draggedElement.style.animation = 'shake 0.5s';
+                        setTimeout(() => draggedElement.style.animation = '', 500);
+                    }
+                }
+            }
+
+            function checkGroupingComplete() {
+                const totalShapes = gameState.foundShapes.length;
+                const sortedShapes = document.querySelectorAll('.drop-zone .draggable-shape').length;
+                
+                if (totalShapes === sortedShapes) {
+                    setTimeout(() => {
+                        alert("🎉 Case Closed! You've sorted all the shapes perfectly! You're a master detective! 🎉");
+                        showScreen(introScreen);
+                    }, 500);
+                }
+            }
+
+            // Utility for shake animation
+            const style = document.createElement('style');
+            style.textContent = `
+                @keyframes shake {
+                    0%, 100% { transform: translateX(0); }
+                    25% { transform: translateX(-10px); }
+                    75% { transform: translateX(10px); }
+                }
+            `;
+            document.head.appendChild(style);
+
+        });
+    </script>
+</body>
+</html>
