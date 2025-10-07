@@ -1,0 +1,906 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Shape Detectives: The Great Shape Hunt!</title>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Fredoka:wght@300;400;500;600;700&display=swap');
+
+        /* --- NEW: Vibrant Color Palette --- */
+        :root {
+            --primary: #00BCD4; /* Teal */
+            --secondary: #FF9800; /* Orange */
+            --primary-dark: #0097A7;
+            --secondary-dark: #F57C00;
+            --success-color: #4CAF50;
+            --error-color: #F44336;
+            --background-color: #E0F7FA; /* Light Teal */
+            --text-color: #263238;
+            --white: #FFFFFF;
+            --shadow: 0 8px 25px rgba(0, 0, 0, 0.12);
+            --border-radius: 20px;
+        }
+
+        body {
+            font-family: 'Fredoka', sans-serif;
+            background-color: var(--background-color);
+            color: var(--text-color);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            margin: 0;
+            overflow: hidden;
+        }
+
+        .game-container {
+            width: 95vw;
+            height: 95vh;
+            max-width: 1200px;
+            max-height: 800px;
+            background-color: var(--white);
+            border-radius: var(--border-radius);
+            box-shadow: var(--shadow);
+            position: relative;
+            overflow: hidden;
+        }
+
+        /* --- Game Views --- */
+        .game-view {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            display: flex;
+            flex-direction: column;
+            padding: 1.5rem;
+            box-sizing: border-box;
+        }
+        
+        .hidden {
+            display: none !important;
+        }
+
+        /* --- Header & Navigation --- */
+        .view-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 1.5rem;
+        }
+
+        .view-title {
+            font-size: clamp(2rem, 5vw, 2.5rem);
+            font-weight: 600;
+            color: var(--primary);
+        }
+
+        .icon-btn {
+            background: none;
+            border: none;
+            font-size: clamp(1.5rem, 3vw, 1.8rem);
+            cursor: pointer;
+            padding: 0.5rem;
+            border-radius: 10px;
+            transition: background-color 0.2s, transform 0.2s;
+        }
+        .icon-btn:hover {
+            background-color: rgba(0,0,0,0.05);
+            transform: scale(1.1);
+        }
+
+        /* --- Buttons --- */
+        .btn {
+            font-family: 'Fredoka', sans-serif;
+            font-weight: 600;
+            border: none;
+            padding: 12px 28px;
+            font-size: clamp(1rem, 2.5vw, 1.2rem);
+            border-radius: 50px;
+            cursor: pointer;
+            transition: transform 0.2s, box-shadow 0.2s;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+        }
+        .btn:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 6px 20px rgba(0,0,0,0.15);
+        }
+        .btn-primary {
+            background: linear-gradient(135deg, var(--primary), var(--primary-dark));
+            color: var(--white);
+        }
+        .btn-secondary {
+            background-color: var(--white);
+            color: var(--primary);
+            border: 2px solid var(--primary);
+        }
+        .btn-secondary.selected {
+            background-color: var(--primary);
+            color: var(--white);
+        }
+
+        /* --- Profile Selection Screen --- */
+        #profile-screen {
+            align-items: center;
+            justify-content: center;
+            text-align: center;
+        }
+        #profile-screen h1 {
+            font-size: clamp(2.5rem, 6vw, 3rem);
+            margin-bottom: 2rem;
+            background: linear-gradient(135deg, var(--primary), var(--secondary));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+        .profile-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+            gap: 1.5rem;
+            width: 100%;
+            max-width: 700px;
+        }
+        .profile-card {
+            background-color: var(--white);
+            border: 3px solid #E0E0E0;
+            border-radius: 15px;
+            padding: 1.5rem;
+            cursor: pointer;
+            transition: all 0.3s;
+            text-align: center;
+        }
+        .profile-card:hover {
+            border-color: var(--primary);
+            transform: translateY(-5px);
+            box-shadow: var(--shadow);
+        }
+        .profile-card .avatar {
+            font-size: clamp(3rem, 7vw, 4rem);
+            margin-bottom: 0.5rem;
+        }
+        .profile-card .name {
+            font-weight: 600;
+            font-size: clamp(1rem, 2.5vw, 1.1rem);
+        }
+        .add-profile-card {
+            border: 3px dashed #BDBDBD;
+            background-color: transparent;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            color: #9E9E9E;
+        }
+        .add-profile-card:hover {
+            border-color: var(--primary);
+            color: var(--primary);
+        }
+
+        /* --- Main Menu Screen --- */
+        #main-menu-screen {
+            align-items: center;
+            justify-content: center;
+        }
+        .menu-content {
+            text-align: center;
+        }
+        .menu-content .character {
+            font-size: clamp(5rem, 12vw, 8rem);
+            margin-bottom: 1rem;
+        }
+        .menu-content h2 {
+            font-size: clamp(1.5rem, 4vw, 2rem);
+            margin-bottom: 2rem;
+        }
+        .menu-buttons {
+            display: flex;
+            flex-direction: column;
+            gap: 1rem;
+            align-items: center;
+        }
+        .menu-buttons .btn {
+            width: clamp(200px, 40vw, 250px);
+        }
+
+        /* --- Level Select Screen --- */
+        #level-select-screen .content {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            width: 100%;
+            flex-grow: 1;
+        }
+        .level-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(100px, 1fr));
+            gap: 1.5rem;
+            margin-top: 2rem;
+            width: 100%;
+        }
+        .level-tile {
+            aspect-ratio: 1;
+            background-color: #E0E0E0;
+            border-radius: 15px;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            font-size: clamp(1.5rem, 3vw, 2rem);
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s;
+            position: relative;
+        }
+        .level-tile.unlocked {
+            background: linear-gradient(135deg, var(--primary), var(--primary-dark));
+            color: var(--white);
+            box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+            animation: unlock-pulse 0.6s ease-out;
+        }
+        @keyframes unlock-pulse {
+            0% { transform: scale(1); } 50% { transform: scale(1.1); } 100% { transform: scale(1); }
+        }
+        .level-tile.unlocked:hover {
+            transform: scale(1.05);
+        }
+        .level-tile.locked {
+            background-color: #CFD8DC;
+            color: #90A4AE;
+            cursor: not-allowed;
+        }
+        .level-tile .star {
+            position: absolute;
+            top: 5px;
+            right: 5px;
+            font-size: 1.2rem;
+        }
+
+        /* --- Game Screen --- */
+        #game-screen {
+            padding: 0;
+        }
+        #game-header {
+            background: linear-gradient(135deg, var(--primary), var(--primary-dark));
+            color: var(--white);
+            padding: 1rem 2rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        #game-prompt {
+            font-size: clamp(1.2rem, 3vw, 1.5rem);
+            font-weight: 600;
+        }
+        #scene-container {
+            position: relative;
+            width: 100%;
+            height: calc(100% - 70px);
+            background-image: url('https://www.transparenttextures.com/patterns/cubes.png'), linear-gradient(to bottom, #dfe9f3 0%, #ffffff 100%);
+        }
+        .shape-object {
+            position: absolute;
+            cursor: pointer;
+            /* FIX: Made shapes larger and more responsive */
+            font-size: clamp(3.5rem, 8vw, 5rem);
+            transition: transform 0.2s ease, filter 0.2s ease;
+            user-select: none;
+            /* FIX: Added a subtle border to define the click area */
+            filter: drop-shadow(0 2px 4px rgba(0,0,0,0.1));
+        }
+        .shape-object:hover {
+            transform: scale(1.15);
+            filter: brightness(1.2) drop-shadow(0 0 15px rgba(255, 255, 255, 0.9));
+        }
+        .shape-object.found {
+            /* FIX: Better 'found' animation */
+            animation: found-pop 0.5s ease-out forwards;
+        }
+        @keyframes found-pop {
+            0% { transform: scale(1); opacity: 1; }
+            50% { transform: scale(1.3); opacity: 1; }
+            100% { transform: scale(0.5); opacity: 0.2; pointer-events: none; }
+        }
+        .shape-object.incorrect-click {
+            animation: incorrect-shake 0.5s;
+        }
+        @keyframes incorrect-shake {
+            0%, 100% { transform: translateX(0); }
+            10%, 30%, 50%, 70%, 90% { transform: translateX(-8px); }
+            20%, 40%, 60%, 80% { transform: translateX(8px); }
+        }
+
+        /* --- Progress Screen --- */
+        #progress-screen .content {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            width: 100%;
+            flex-grow: 1;
+        }
+        .progress-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(100px, 1fr));
+            gap: 1.5rem;
+            margin-top: 2rem;
+            width: 100%;
+        }
+        .progress-tile {
+            aspect-ratio: 1;
+            border-radius: 15px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            font-size: clamp(2rem, 5vw, 3rem);
+            background-color: #E8F5E9;
+            border: 2px solid var(--success-color);
+        }
+        .progress-tile.incomplete {
+            background-color: #FFEBEE;
+            border: 2px solid var(--error-color);
+        }
+
+        /* --- Modals & Notifications --- */
+        .modal {
+            display: none; 
+            position: fixed; 
+            z-index: 1000; 
+            left: 0;
+            top: 0;
+            width: 100%; 
+            height: 100%; 
+            background-color: rgba(0,0,0,0.6); 
+            justify-content: center;
+            align-items: center;
+        }
+        .modal-content {
+            background-color: var(--white);
+            padding: 2.5rem;
+            border-radius: var(--border-radius);
+            text-align: center;
+            box-shadow: 0 10px 40px rgba(0,0,0,0.2);
+            animation: bounce-in 0.5s;
+            max-width: 500px;
+            width: 90%;
+        }
+        @keyframes bounce-in {
+            0% { transform: scale(0.7); opacity: 0; }
+            50% { transform: scale(1.05); }
+            100% { transform: scale(1); opacity: 1; }
+        }
+        .modal-content h2 {
+            margin-top: 0;
+            font-size: clamp(1.5rem, 4vw, 2rem);
+            color: var(--primary);
+        }
+        .modal-content .icon {
+            font-size: clamp(4rem, 10vw, 5rem);
+            margin: 1rem 0;
+        }
+        .answer-buttons {
+            display: flex;
+            gap: 1rem;
+            justify-content: center;
+            margin-top: 1.5rem;
+            flex-wrap: wrap;
+        }
+        .answer-btn {
+            padding: 12px 20px;
+            font-size: clamp(1rem, 2.5vw, 1.1rem);
+            border: 2px solid var(--primary);
+            background-color: var(--white);
+            color: var(--primary);
+            border-radius: 10px;
+            cursor: pointer;
+            transition: all 0.2s;
+            font-family: 'Fredoka', sans-serif;
+        }
+        .answer-btn:hover {
+            background-color: var(--primary);
+            color: var(--white);
+        }
+        
+        /* --- Create Profile Modal Specifics --- */
+        #new-profile-name-input {
+            width: 80%;
+            padding: 12px;
+            font-size: 1.2rem;
+            font-family: 'Fredoka', sans-serif;
+            border: 2px solid #ccc;
+            border-radius: 10px;
+            margin: 1rem 0;
+            text-align: center;
+        }
+        .age-group-selection {
+            margin: 1.5rem 0;
+        }
+        .age-group-selection p {
+            margin-bottom: 1rem;
+            font-size: 1.1rem;
+        }
+        .modal-actions {
+            display: flex;
+            gap: 1rem;
+            justify-content: center;
+            margin-top: 1.5rem;
+        }
+
+        /* --- Notification Toast --- */
+        .notification {
+            position: fixed;
+            top: 20px;
+            left: 50%;
+            transform: translateX(-50%) translateY(-100px);
+            background-color: var(--success-color);
+            color: var(--white);
+            padding: 1rem 2rem;
+            border-radius: 50px;
+            font-size: clamp(1rem, 2.5vw, 1.2rem);
+            font-weight: 600;
+            box-shadow: var(--shadow);
+            z-index: 2000;
+            opacity: 0;
+            transition: transform 0.5s ease, opacity 0.5s ease;
+        }
+        .notification.show {
+            transform: translateX(-50%) translateY(0);
+            opacity: 1;
+        }
+        .notification.error {
+            background-color: var(--error-color);
+        }
+
+        /* --- Grouping Screen (for older kids) --- */
+        #grouping-screen h2 { color: var(--primary); }
+        .grouping-zones { display: flex; justify-content: space-around; width: 100%; margin-top: 2rem; }
+        .drop-zone { width: 200px; min-height: 200px; border: 3px dashed var(--primary); border-radius: 15px; display: flex; flex-direction: column; align-items: center; padding: 1rem; background-color: rgba(0, 188, 212, 0.05); }
+        .drop-zone h3 { margin-top: 0; }
+        .drop-zone.drag-over { background-color: rgba(0, 188, 212, 0.2); }
+        #shapes-to-sort { display: flex; gap: 1rem; margin-top: 2rem; padding: 1rem; background-color: #f0f0f0; border-radius: 15px; min-height: 100px; justify-content: center; flex-wrap: wrap; }
+        .draggable-shape { font-size: clamp(2.5rem, 6vw, 3rem); cursor: grab; transition: transform 0.2s; }
+        .draggable-shape:active { cursor: grabbing; }
+        .draggable-shape.dragging { opacity: 0.5; }
+    </style>
+</head>
+<body>
+
+    <div class="game-container">
+        <!-- Profile Selection Screen -->
+        <div id="profile-screen" class="game-view">
+            <h1>Shape Detectives</h1>
+            <div class="profile-grid" id="profile-grid">
+                <!-- Profiles will be injected here -->
+            </div>
+        </div>
+
+        <!-- Main Menu Screen -->
+        <div id="main-menu-screen" class="game-view hidden">
+            <div class="menu-content">
+                <div class="character">🦊</div>
+                <h2>Welcome back, <span id="menu-profile-name">Detective</span>!</h2>
+                <div class="menu-buttons">
+                    <!-- ONCLICK: menu-play-btn -->
+                    <button class="btn btn-primary" id="menu-play-btn">▶️ Play</button>
+                    <!-- ONCLICK: menu-progress-btn -->
+                    <button class="btn btn-secondary" id="menu-progress-btn">📈 My Progress</button>
+                    <!-- ONCLICK: menu-switch-profile-btn -->
+                    <button class="btn btn-secondary" id="menu-switch-profile-btn">👤 Switch Profile</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Level Select Screen -->
+        <div id="level-select-screen" class="game-view hidden">
+            <div class="view-header">
+                <!-- ONCLICK: level-select-back-btn -->
+                <button class="icon-btn" id="level-select-back-btn">⬅️ Back</button>
+                <h1 class="view-title" id="level-select-title">Choose a Level</h1>
+                <div></div>
+            </div>
+            <div class="content">
+                <div class="level-grid" id="level-grid">
+                    <!-- Level tiles will be injected here -->
+                </div>
+            </div>
+        </div>
+
+        <!-- Game Screen -->
+        <div id="game-screen" class="game-view hidden">
+            <div id="game-header">
+                <div id="game-prompt">Find a: <span id="target-shape-name">Circle</span> <span id="target-shape-icon">⭕</span></div>
+                <!-- ONCLICK: game-pause-btn -->
+                <button class="icon-btn" id="game-pause-btn">⏸️</button>
+            </div>
+            <div id="scene-container">
+                <!-- Shapes will be dynamically added here -->
+            </div>
+        </div>
+
+        <!-- Progress Screen -->
+        <div id="progress-screen" class="game-view hidden">
+            <div class="view-header">
+                <!-- ONCLICK: progress-back-btn -->
+                <button class="icon-btn" id="progress-back-btn">⬅️ Back</button>
+                <h1 class="view-title" id="progress-title">My Progress</h1>
+                <div></div>
+            </div>
+            <div class="content">
+                <div class="progress-grid" id="progress-grid">
+                    <!-- Progress tiles will be injected here -->
+                </div>
+            </div>
+        </div>
+        
+        <!-- Grouping Game Screen -->
+        <div id="grouping-screen" class="game-view hidden">
+            <div class="view-header">
+                 <div></div>
+                 <h1 class="view-title">Bonus Challenge!</h1>
+                 <div></div>
+            </div>
+            <div style="text-align:center; padding: 1rem;">
+                <h2>🎯 Group the Shapes!</h2>
+                <p>Drag the shapes you found into the correct box based on how many sides they have!</p>
+            </div>
+            <div class="grouping-zones">
+                <div class="drop-zone" data-sides="3"><h3>3 Sides</h3><div class="zone-items"></div></div>
+                <div class="drop-zone" data-sides="4"><h3>4 Sides</h3><div class="zone-items"></div></div>
+                <div class="drop-zone" data-sides="more"><h3>More than 4</h3><div class="zone-items"></div></div>
+            </div>
+            <div id="shapes-to-sort"></div>
+        </div>
+    </div>
+
+    <!-- Modal for Answering -->
+    <div id="answer-modal" class="modal">
+        <div class="modal-content">
+            <h2>You found a...?</h2>
+            <div class="icon" id="modal-question-icon"></div>
+            <div class="answer-buttons" id="answer-buttons"></div>
+        </div>
+    </div>
+    
+    <!-- Modal for Side Counting -->
+    <div id="side-modal" class="modal">
+        <div class="modal-content">
+            <h2>How many sides?</h2>
+            <p>A <span id="side-question-shape-name"></span> has...</p>
+            <div class="answer-buttons" id="side-answer-buttons"></div>
+        </div>
+    </div>
+
+    <!-- Modal for Creating a Profile -->
+    <div id="create-profile-modal" class="modal">
+        <div class="modal-content">
+            <h2>Create a New Detective</h2>
+            <input type="text" id="new-profile-name-input" placeholder="Enter detective's name..." maxlength="20">
+            <div class="age-group-selection">
+                <p>Choose an Age Group:</p>
+                <!-- ONCLICK: age-group-btn -->
+                <button class="btn btn-secondary age-group-btn" data-age="younger">Ages 3-5</button>
+                <!-- ONCLICK: age-group-btn -->
+                <button class="btn btn-secondary age-group-btn" data-age="older">Ages 5-6</button>
+            </div>
+            <div class="modal-actions">
+                <!-- ONCLICK: confirm-create-profile-btn -->
+                <button class="btn btn-primary" id="confirm-create-profile-btn">Create Profile</button>
+                <!-- ONCLICK: cancel-create-profile-btn -->
+                <button class="btn btn-secondary" id="cancel-create-profile-btn">Cancel</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Notification Toast -->
+    <div id="notification" class="notification"></div>
+
+    <script>
+    document.addEventListener('DOMContentLoaded', () => {
+        // --- DOM Elements ---
+        const views = {
+            profile: document.getElementById('profile-screen'),
+            mainMenu: document.getElementById('main-menu-screen'),
+            levelSelect: document.getElementById('level-select-screen'),
+            game: document.getElementById('game-screen'),
+            progress: document.getElementById('progress-screen'),
+            grouping: document.getElementById('grouping-screen')
+        };
+        const modals = {
+            answer: document.getElementById('answer-modal'),
+            side: document.getElementById('side-modal'),
+            createProfile: document.getElementById('create-profile-modal')
+        };
+        const notificationEl = document.getElementById('notification');
+
+        // --- Game State & Data ---
+        const gameState = {
+            currentProfile: null, currentLevel: null, currentLevelData: null, foundShapes: [],
+            ageGroup: 'younger', isAdvancedMode: false, newProfileAgeGroup: 'younger',
+        };
+
+        const shapeData = {
+            circle: { name: 'Circle', icon: '⭕' }, square: { name: 'Square', icon: '⬜' }, triangle: { name: 'Triangle', icon: '🔺' },
+            rectangle: { name: 'Rectangle', icon: '▬' }, pentagon: { name: 'Pentagon', icon: '⬠' },
+            hexagon: { name: 'Hexagon', icon: '⬡' }, octagon: { name: 'Octagon', icon: '🛑' }, star: { name: 'Star', icon: '⭐' }
+        };
+
+        const levelsData = {
+            younger: [
+                { id: 1, name: "The Toy Room", difficulty: 1, shapes: ['circle', 'square', 'triangle', 'rectangle'], objects: [
+                    { id: 'ball', shape: 'circle', icon: '⚽', sides: 0, top: '15%', left: '20%' }, { id: 'block', shape: 'square', icon: '🟦', sides: 4, top: '25%', left: '70%' },
+                    { id: 'cheese', shape: 'triangle', icon: '🧀', sides: 3, top: '65%', left: '30%' }, { id: 'book', shape: 'rectangle', icon: '📒', sides: 4, top: '60%', left: '75%' },
+                ]},
+                { id: 2, name: "The Kitchen", difficulty: 1, shapes: ['circle', 'square', 'triangle', 'rectangle'], objects: [
+                    { id: 'plate', shape: 'circle', icon: '🍽️', sides: 0, top: '10%', left: '25%' }, { id: 'napkin', shape: 'square', icon: '🪷', sides: 4, top: '20%', left: '60%' },
+                    { id: 'pizza-slice', shape: 'triangle', icon: '🍕', sides: 3, top: '70%', left: '40%' }, { id: 'fridge', shape: 'rectangle', icon: '🚪', sides: 4, top: '40%', left: '75%' },
+                    { id: 'clock', shape: 'circle', icon: '🕐', sides: 0, top: '60%', left: '10%' },
+                ]},
+                { id: 3, name: "The Park", difficulty: 2, shapes: ['circle', 'square', 'triangle', 'rectangle'], objects: [
+                    { id: 'sun', shape: 'circle', icon: '☀️', sides: 0, top: '5%', left: '80%' }, { id: 'picnic-blanket', shape: 'square', icon: '🟥', sides: 4, top: '60%', left: '10%' },
+                    { id: 'tent', shape: 'triangle', icon: '⛺', sides: 3, top: '40%', left: '50%' }, { id: 'bench', shape: 'rectangle', icon: '🪑', sides: 4, top: '70%', left: '60%' },
+                    { id: 'ball', shape: 'circle', icon: '⚽', sides: 0, top: '70%', left: '20%' }, { id: 'sign', shape: 'square', icon: '🪧', sides: 4, top: '15%', left: '15%' },
+                ]},
+                { id: 4, name: "The Beach", difficulty: 2, shapes: ['circle', 'square', 'triangle', 'rectangle'], objects: [
+                    { id: 'beach-ball', shape: 'circle', icon: '🏐', sides: 0, top: '20%', left: '25%' }, { id: 'sand-castle', shape: 'square', icon: '🏰', sides: 4, top: '60%', left: '70%' },
+                    { id: 'sailboat', shape: 'triangle', icon: '⛵', sides: 3, top: '30%', left: '60%' }, { id: 'towel', shape: 'rectangle', icon: '🏖️', sides: 4, top: '70%', left: '20%' },
+                    { id: 'shell', shape: 'triangle', icon: '🐚', sides: 3, top: '65%', left: '50%' }, { id: 'umbrella', shape: 'circle', icon: '⛱️', sides: 0, top: '10%', left: '40%' }, { id: 'bucket', shape: 'rectangle', icon: '🪣', sides: 4, top: '75%', left: '80%' },
+                ]},
+                { id: 5, name: "The Garden", difficulty: 3, shapes: ['circle', 'square', 'triangle', 'rectangle'], objects: [
+                    { id: 'flower', shape: 'circle', icon: '🌼', sides: 0, top: '30%', left: '40%' }, { id: 'stepping-stone', shape: 'square', icon: '🟩', sides: 4, top: '65%', left: '25%' },
+                    { id: 'carrot', shape: 'triangle', icon: '🥕', sides: 3, top: '70%', left: '60%' }, { id: 'fence', shape: 'rectangle', icon: '🛖', sides: 4, top: '15%', left: '10%' },
+                    { id: 'watering-can', shape: 'rectangle', icon: '🚿', sides: 4, top: '50%', left: '70%' }, { id: 'sun', shape: 'circle', icon: '☀️', sides: 0, top: '5%', left: '80%' },
+                    { id: 'plant-label', shape: 'rectangle', icon: '🏷️', sides: 4, top: '45%', left: '20%' }, { id: 'wheelbarrow', shape: 'circle', icon: '🪒', sides: 0, top: '75%', left: '40%' },
+                ]},
+            ],
+            older: [
+                { id: 1, name: "The Classroom", difficulty: 1, shapes: ['circle', 'square', 'triangle', 'rectangle', 'pentagon', 'hexagon'], objects: [
+                    { id: 'clock', shape: 'circle', icon: '🕐', sides: 0, top: '10%', left: '10%' }, { id: 'window', shape: 'square', icon: '🪟', sides: 4, top: '15%', left: '60%' },
+                    { id: 'ruler-triangle', shape: 'triangle', icon: '📐', sides: 3, top: '60%', left: '20%' }, { id: 'whiteboard', shape: 'rectangle', icon: '🔲', sides: 4, top: '20%', left: '35%' },
+                    { id: 'sign', shape: 'pentagon', icon: '🚸', sides: 5, top: '70%', left: '70%' }, { id: 'pencil-holder', shape: 'hexagon', icon: '✏️', sides: 6, top: '65%', left: '45%' },
+                ]},
+                { id: 2, name: "The Science Lab", difficulty: 2, shapes: ['circle', 'square', 'triangle', 'rectangle', 'pentagon', 'hexagon', 'octagon'], objects: [
+                    { id: 'petri-dish', shape: 'circle', icon: '🧫', sides: 0, top: '15%', left: '20%' }, { id: 'cube', shape: 'square', icon: '🟪', sides: 4, top: '10%', left: '70%' },
+                    { id: 'beaker', shape: 'triangle', icon: '⚗️', sides: 3, top: '60%', left: '15%' }, { id: 'microscope-slide', shape: 'rectangle', icon: '🧪', sides: 4, top: '65%', left: '60%' },
+                    { id: 'molecule', shape: 'pentagon', icon: '💠', sides: 5, top: '40%', left: '40%' }, { id: 'nut', shape: 'hexagon', icon: '🔩', sides: 6, top: '30%', left: '75%' },
+                    { id: 'stop-sign', shape: 'octagon', icon: '🛑', sides: 8, top: '70%', left: '40%' }, { id: 'flask', shape: 'circle', icon: '🧪', sides: 0, top: '50%', left: '10%' },
+                ]},
+                { id: 3, name: "The City", difficulty: 2, shapes: ['circle', 'square', 'triangle', 'rectangle', 'pentagon', 'hexagon', 'octagon', 'star'], objects: [
+                    { id: 'wheel', shape: 'circle', icon: '🛞', sides: 0, top: '70%', left: '20%' }, { id: 'building', shape: 'square', icon: '🏢', sides: 4, top: '10%', left: '50%' },
+                    { id: 'road-sign', shape: 'triangle', icon: '🚸', sides: 3, top: '40%', left: '10%' }, { id: 'bus', shape: 'rectangle', icon: '🚌', sides: 4, top: '60%', left: '60%' },
+                    { id: 'house', shape: 'pentagon', icon: '🏠', sides: 5, top: '20%', left: '75%' }, { id: 'manhole', shape: 'hexagon', icon: '⬡', sides: 6, top: '70%', left: '70%' },
+                    { id: 'traffic-light', shape: 'octagon', icon: '🚦', sides: 8, top: '15%', left: '20%' }, { id: 'badge', shape: 'star', icon: '⭐', sides: 10, top: '30%', left: '35%' },
+                ]},
+                { id: 4, name: "Space Station", difficulty: 3, shapes: ['circle', 'square', 'triangle', 'rectangle', 'pentagon', 'hexagon', 'octagon', 'star'], objects: [
+                    { id: 'planet', shape: 'circle', icon: '🪐', sides: 0, top: '10%', left: '70%' }, { id: 'solar-panel', shape: 'square', icon: '🟦', sides: 4, top: '50%', left: '20%' },
+                    { id: 'ship-nose', shape: 'triangle', icon: '🚀', sides: 3, top: '30%', left: '40%' }, { id: 'door', shape: 'rectangle', icon: '🚪', sides: 4, top: '65%', left: '50%' },
+                    { id: 'module', shape: 'pentagon', icon: '🔮', sides: 5, top: '60%', left: '75%' }, { id: 'comms-dish', shape: 'hexagon', icon: '📡', sides: 6, top: '15%', left: '15%' },
+                    { id: 'control-panel', shape: 'octagon', icon: '🎛️', sides: 8, top: '70%', left: '10%' }, { id: 'star-map', shape: 'star', icon: '🌟', sides: 10, top: '40%', left: '60%' },
+                    { id: 'porthole', shape: 'circle', icon: '🔵', sides: 0, top: '35%', left: '25%' },
+                ]},
+                { id: 5, name: "The Art Studio", difficulty: 3, shapes: ['circle', 'square', 'triangle', 'rectangle', 'pentagon', 'hexagon', 'octagon', 'star'], objects: [
+                    { id: 'palette', shape: 'circle', icon: '🎨', sides: 0, top: '60%', left: '60%' }, { id: 'canvas', shape: 'square', icon: '🖼️', sides: 4, top: '15%', left: '15%' },
+                    { id: 'easel', shape: 'triangle', icon: '🖼️', sides: 3, top: '20%', left: '50%' }, { id: 'paint-brush', shape: 'rectangle', icon: '🖌️', sides: 4, top: '70%', left: '20%' },
+                    { id: 'paper-cut', shape: 'pentagon', icon: '📃', sides: 5, top: '40%', left: '70%' }, { id: 'crayon-box', shape: 'hexagon', icon: '🖍️', sides: 6, top: '65%', left: '40%' },
+                    { id: 'stencil', shape: 'octagon', icon: '⭐', sides: 8, top: '30%', left: '25%' }, { id: 'star-sticker', shape: 'star', icon: '⭐', sides: 10, top: '10%', left: '80%' },
+                    { id: 'clay', shape: 'circle', icon: '🔴', sides: 0, top: '50%', left: '10%' }, { id: 'frame', shape: 'rectangle', icon: '🖼️', sides: 4, top: '45%', left: '35%' },
+                ]},
+            ]
+        };
+
+        // --- Local Storage & Profile Management ---
+        function getProfiles() { const stored = localStorage.getItem('shapeDetectiveProfiles'); return stored ? JSON.parse(stored) : {}; }
+        function saveProfiles(profiles) { localStorage.setItem('shapeDetectiveProfiles', JSON.stringify(profiles)); }
+        function createProfile(name, avatar, ageGroup) {
+            const profiles = getProfiles(); const profileId = 'profile_' + Date.now();
+            profiles[profileId] = { id: profileId, name, avatar, ageGroup, progress: {} };
+            saveProfiles(profiles); return profileId;
+        }
+
+        // --- Screen Management ---
+        function switchView(viewName) { Object.values(views).forEach(view => view.classList.add('hidden')); views[viewName].classList.remove('hidden'); }
+        function showNotification(message, duration = 2000, isError = false) {
+            notificationEl.textContent = message; notificationEl.classList.toggle('error', isError);
+            notificationEl.classList.add('show'); setTimeout(() => notificationEl.classList.remove('show'), duration);
+        }
+
+        // --- Screen Rendering Logic ---
+        function renderProfileScreen() {
+            const grid = document.getElementById('profile-grid'); grid.innerHTML = ''; const profiles = getProfiles();
+            Object.values(profiles).forEach(profile => {
+                const card = document.createElement('div'); card.className = 'profile-card';
+                card.innerHTML = `<div class="avatar">${profile.avatar}</div><div class="name">${profile.name}</div>`;
+                card.onclick = () => selectProfile(profile.id); grid.appendChild(card);
+            });
+            const addCard = document.createElement('div'); addCard.className = 'profile-card add-profile-card';
+            addCard.innerHTML = `<div class="avatar">➕</div><div class="name">New Profile</div>`;
+            addCard.onclick = showCreateProfileModal; grid.appendChild(addCard);
+        }
+        function showCreateProfileModal() {
+            gameState.newProfileAgeGroup = 'younger'; document.getElementById('new-profile-name-input').value = '';
+            document.querySelectorAll('.age-group-btn').forEach(btn => { btn.classList.remove('selected'); if(btn.dataset.age === 'younger') btn.classList.add('selected'); });
+            modals.createProfile.style.display = 'flex';
+        }
+        function selectProfile(profileId) {
+            const profiles = getProfiles(); if (!profiles[profileId]) return;
+            gameState.currentProfile = profiles[profileId]; gameState.ageGroup = gameState.currentProfile.ageGroup;
+            gameState.isAdvancedMode = gameState.ageGroup === 'older';
+            document.getElementById('menu-profile-name').textContent = gameState.currentProfile.name; switchView('mainMenu');
+        }
+        function renderLevelSelect() {
+            const grid = document.getElementById('level-grid'); grid.innerHTML = '';
+            const levels = levelsData[gameState.ageGroup]; const progress = gameState.currentProfile.progress[gameState.ageGroup] || {};
+            levels.forEach(level => {
+                const tile = document.createElement('div'); tile.className = 'level-tile';
+                const isCompleted = progress[level.id]; const isUnlocked = level.id === 1 || progress[level.id - 1];
+                if (isUnlocked) { tile.classList.add('unlocked'); tile.onclick = () => startLevel(level.id); } else { tile.classList.add('locked'); }
+                tile.innerHTML = isCompleted ? `<span class="star">⭐</span>${level.id}` : level.id; grid.appendChild(tile);
+            });
+        }
+        function renderProgress() {
+            const grid = document.getElementById('progress-grid'); grid.innerHTML = '';
+            const levels = levelsData[gameState.ageGroup]; const progress = gameState.currentProfile.progress[gameState.ageGroup] || {};
+            levels.forEach(level => {
+                const tile = document.createElement('div'); tile.className = 'progress-tile';
+                if (progress[level.id]) { tile.innerHTML = '✅'; } else { tile.classList.add('incomplete'); tile.innerHTML = '❌'; }
+                grid.appendChild(tile);
+            });
+        }
+
+        // --- Game Logic ---
+        function startLevel(levelId) {
+            gameState.currentLevel = levelId; gameState.currentLevelData = levelsData[gameState.ageGroup].find(l => l.id === levelId);
+            gameState.foundShapes = []; setupScene(); switchView('game');
+        }
+        function setupScene() {
+            const sceneContainer = document.getElementById('scene-container'); sceneContainer.innerHTML = '';
+            gameState.currentLevelData.objects.forEach(shapeData => {
+                const shapeEl = document.createElement('div'); shapeEl.className = 'shape-object'; shapeEl.id = shapeData.id;
+                shapeEl.dataset.shape = shapeData.shape; shapeEl.dataset.sides = shapeData.sides; shapeEl.textContent = shapeData.icon;
+                shapeEl.style.top = shapeData.top; shapeEl.style.left = shapeData.left;
+                shapeEl.addEventListener('click', handleObjectClick); sceneContainer.appendChild(shapeEl);
+            }); selectNewTargetShape();
+        }
+        function selectNewTargetShape() {
+            const remainingObjects = gameState.currentLevelData.objects.filter(obj => !gameState.foundShapes.find(f => f.id === obj.id));
+            if (remainingObjects.length === 0) { onLevelComplete(); return; }
+            const randomObject = remainingObjects[Math.floor(Math.random() * remainingObjects.length)]; const targetShape = randomObject.shape;
+            document.getElementById('target-shape-name').textContent = shapeData[targetShape].name;
+            document.getElementById('target-shape-icon').textContent = shapeData[targetShape].icon;
+        }
+        function handleObjectClick(event) {
+            const clickedShape = event.target; const clickedShapeData = gameState.currentLevelData.objects.find(s => s.id === clickedShape.id);
+            const targetShapeName = document.getElementById('target-shape-name').textContent.toLowerCase();
+            if (clickedShape.dataset.shape === targetShapeName) {
+                showAnswerModal(clickedShapeData);
+            } else {
+                clickedShape.classList.add('incorrect-click');
+                setTimeout(() => clickedShape.classList.remove('incorrect-click'), 500);
+                showNotification("Oops, that's not it. Try again!", 1500, true);
+            }
+        }
+        function showAnswerModal(shapeData) {
+            const modalIcon = document.getElementById('modal-question-icon'); const answerButtonsContainer = document.getElementById('answer-buttons');
+            modalIcon.textContent = shapeData.icon; answerButtonsContainer.innerHTML = '';
+            const correctAnswer = shapeData.shape;
+            const numWrongAnswers = Math.min(gameState.currentLevelData.difficulty, gameState.currentLevelData.shapes.length - 1);
+            const wrongAnswers = gameState.currentLevelData.shapes.filter(s => s !== correctAnswer).sort(() => Math.random() - 0.5).slice(0, numWrongAnswers);
+            const allAnswers = [correctAnswer, ...wrongAnswers].sort(() => Math.random() - 0.5);
+            allAnswers.forEach(answer => {
+                const btn = document.createElement('button'); btn.className = 'answer-btn';
+                btn.textContent = shapeData[answer].icon + ' ' + shapeData[answer].name;
+                btn.onclick = () => handleAnswerClick(answer === correctAnswer, shapeData);
+                answerButtonsContainer.appendChild(btn);
+            }); modals.answer.style.display = 'flex';
+        }
+        function handleAnswerClick(isCorrect, shapeData) {
+            modals.answer.style.display = 'none';
+            if (isCorrect) { onCorrectAnswer(shapeData); } else {
+                const modalContent = modals.answer.querySelector('.modal-content');
+                modalContent.style.animation = 'incorrect-shake 0.5s';
+                setTimeout(() => modalContent.style.animation = 'bounce-in 0.5s', 500);
+            }
+        }
+        function onCorrectAnswer(shapeData) {
+            gameState.foundShapes.push(shapeData); const foundEl = document.getElementById(shapeData.id);
+            foundEl.classList.add('found'); // This now triggers the 'found-pop' animation
+            showNotification(`Great job! You found a ${shapeData[shapeData.shape].name}!`);
+            if (gameState.isAdvancedMode) { askSideCount(shapeData); } else { selectNewTargetShape(); }
+        }
+        function askSideCount(shapeData) {
+            const sideQuestionNameEl = document.getElementById('side-question-shape-name'); const sideAnswerButtonsContainer = document.getElementById('side-answer-buttons');
+            sideQuestionNameEl.textContent = shapeData[shapeData.shape].name; sideAnswerButtonsContainer.innerHTML = '';
+            const correctSides = shapeData.sides; const wrongSides = [3, 4, 5, 6, 8, 10].filter(s => s !== correctSides && s > 0).sort(() => Math.random() - 0.5).slice(0, 2);
+            const allAnswers = [correctSides, ...wrongSides].sort(() => Math.random() - 0.5);
+            allAnswers.forEach(answer => {
+                const btn = document.createElement('button'); btn.className = 'answer-btn'; btn.textContent = answer;
+                btn.onclick = () => {
+                    modals.side.style.display = 'none';
+                    if (answer === correctSides) { showNotification(`Correct! A ${shapeData[shapeData.shape].name} has ${correctSides} sides!`); }
+                    else { showNotification(`Oops! A ${shapeData[shapeData.shape].name} has ${correctSides} sides. Let's remember that!`, 2500, true); }
+                    selectNewTargetShape();
+                }; sideAnswerButtonsContainer.appendChild(btn);
+            }); modals.side.style.display = 'flex';
+        }
+        function onLevelComplete() {
+            showNotification(`🎉 Level ${gameState.currentLevel} Complete! 🎉`, 3000);
+            const profiles = getProfiles();
+            if (!profiles[gameState.currentProfile.id].progress[gameState.ageGroup]) { profiles[gameState.currentProfile.id].progress[gameState.ageGroup] = {}; }
+            profiles[gameState.currentProfile.id].progress[gameState.ageGroup][gameState.currentLevel] = true;
+            saveProfiles(profiles); gameState.currentProfile = profiles[gameState.currentProfile.id];
+            if (gameState.isAdvancedMode) { startGroupingGame(); } else { setTimeout(() => { renderLevelSelect(); switchView('levelSelect'); }, 3000); }
+        }
+        // --- Grouping Game (Older Kids) ---
+        function startGroupingGame() { switchView('grouping'); setupGroupingGame(); }
+        function setupGroupingGame() {
+            const shapesToSortContainer = document.getElementById('shapes-to-sort'); shapesToSortContainer.innerHTML = '';
+            gameState.foundShapes.forEach(shapeData => {
+                const draggableEl = document.createElement('span'); draggableEl.className = 'draggable-shape'; draggableEl.draggable = true;
+                draggableEl.dataset.sides = shapeData.sides; draggableEl.textContent = shapeData.icon; draggableEl.id = `drag-${shapeData.id}`;
+                draggableEl.addEventListener('dragstart', handleDragStart); draggableEl.addEventListener('dragend', handleDragEnd);
+                shapesToSortContainer.appendChild(draggableEl);
+            });
+            document.querySelectorAll('.drop-zone').forEach(zone => {
+                zone.addEventListener('dragover', handleDragOver); zone.addEventListener('drop', handleDrop); zone.addEventListener('dragleave', handleDragLeave);
+            });
+        }
+        let draggedElement = null;
+        function handleDragStart(e) { draggedElement = e.target; e.target.classList.add('dragging'); }
+        function handleDragEnd(e) { e.target.classList.remove('dragging'); }
+        function handleDragOver(e) { e.preventDefault(); e.currentTarget.classList.add('drag-over'); }
+        function handleDragLeave(e) { e.currentTarget.classList.remove('drag-over'); }
+        function handleDrop(e) {
+            e.preventDefault(); const dropZone = e.currentTarget; dropZone.classList.remove('drag-over');
+            if (draggedElement) {
+                const zoneSides = dropZone.dataset.sides; const shapeSides = parseInt(draggedElement.dataset.sides);
+                let isCorrect = (zoneSides === 'more' && shapeSides > 4) || (parseInt(zoneSides) === shapeSides);
+                if (isCorrect) { dropZone.querySelector('.zone-items').appendChild(draggedElement); checkGroupingComplete(); }
+                else { draggedElement.style.animation = 'incorrect-shake 0.5s'; setTimeout(() => draggedElement.style.animation = '', 500); }
+            }
+        }
+        function checkGroupingComplete() {
+            const totalShapes = gameState.foundShapes.length; const sortedShapes = document.querySelectorAll('.drop-zone .draggable-shape').length;
+            if (totalShapes === sortedShapes) {
+                setTimeout(() => { showNotification("🎉 Case Closed! You're a master detective! 🎉", 3000);
+                    setTimeout(() => { renderLevelSelect(); switchView('levelSelect'); }, 3000);
+                }, 500);
+            }
+        }
+
+        // --- EVENT LISTENERS (AUDITED AND COMMENTED) ---
+        // Main Menu Buttons
+        document.getElementById('menu-play-btn').addEventListener('click', () => { renderLevelSelect(); switchView('levelSelect'); });
+        document.getElementById('menu-progress-btn').addEventListener('click', () => { renderProgress(); switchView('progress'); });
+        document.getElementById('menu-switch-profile-btn').addEventListener('click', () => { renderProfileScreen(); switchView('profile'); });
+        
+        // Navigation Back Buttons
+        document.getElementById('level-select-back-btn').addEventListener('click', () => switchView('mainMenu'));
+        document.getElementById('progress-back-btn').addEventListener('click', () => switchView('mainMenu'));
+        
+        // Game Screen Button
+        document.getElementById('game-pause-btn').addEventListener('click', () => { if (confirm('Are you sure you want to quit this level?')) { switchView('levelSelect'); } });
+        
+        // Create Profile Modal Buttons
+        document.getElementById('confirm-create-profile-btn').addEventListener('click', () => {
+            const nameInput = document.getElementById('new-profile-name-input'); const name = nameInput.value.trim();
+            if (!name) { showNotification('Please enter a name for your detective!', 2000, true); nameInput.focus(); return; }
+            const avatars = ['🦊', '🐻', '🐰', '🦁', '🐸', '🐧']; const avatar = avatars[Math.floor(Math.random() * avatars.length)];
+            const profileId = createProfile(name, avatar, gameState.newProfileAgeGroup); modals.createProfile.style.display = 'none';
+            selectProfile(profileId); showNotification('Profile created successfully!');
+        });
+        document.getElementById('cancel-create-profile-btn').addEventListener('click', () => { modals.createProfile.style.display = 'none'; });
+        
+        // Age Group Selection Buttons
+        document.querySelectorAll('.age-group-btn').forEach(btn => {
+            btn.addEventListener('click', (e) => { document.querySelectorAll('.age-group-btn').forEach(b => b.classList.remove('selected')); e.target.classList.add('selected'); gameState.newProfileAgeGroup = e.target.dataset.age; });
+        });
+
+        // Modal Background Click to Close
+        [modals.answer, modals.side, modals.createProfile].forEach(modal => {
+            modal.addEventListener('click', (e) => { if (e.target === modal) { modal.style.display = 'none'; } });
+        });
+
+        // --- Initial Load ---
+        renderProfileScreen();
+    });
+    </script>
+</body>
+</html>
