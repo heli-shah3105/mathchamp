@@ -1,0 +1,1328 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Pattern Pals: Shape Adventures!</title>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Fredoka:wght@300;400;500;600;700&display=swap');
+
+        /* --- Bright Color Palette for Toddlers --- */
+        :root {
+            --primary: #FF6B6B; /* Coral Red */
+            --secondary: #4ECDC4; /* Turquoise */
+            --accent: #FFE66D; /* Yellow */
+            --purple: #A8E6CF; /* Light Green */
+            --pink: #FFB6C1; /* Light Pink */
+            --orange: #FFA500; /* Orange */
+            --blue: #87CEEB; /* Sky Blue */
+            --background-color: #FFF5F5; /* Very Light Pink */
+            --text-color: #2C3E50;
+            --white: #FFFFFF;
+            --shadow: 0 6px 20px rgba(0, 0, 0, 0.1);
+            --border-radius: 25px;
+        }
+
+        body {
+            font-family: 'Fredoka', sans-serif;
+            background: linear-gradient(135deg, #FFF5F5 0%, #F0F8FF 100%);
+            color: var(--text-color);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            margin: 0;
+            overflow: hidden;
+            position: relative;
+        }
+
+        /* Animated background shapes */
+        body::before {
+            content: '';
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            background-image: 
+                radial-gradient(circle at 20% 80%, rgba(255, 107, 107, 0.1) 0%, transparent 50%),
+                radial-gradient(circle at 80% 20%, rgba(78, 205, 196, 0.1) 0%, transparent 50%),
+                radial-gradient(circle at 40% 40%, rgba(255, 230, 109, 0.1) 0%, transparent 50%);
+            pointer-events: none;
+        }
+
+        .game-container {
+            width: 95vw;
+            height: 95vh;
+            max-width: 1200px;
+            max-height: 800px;
+            background-color: var(--white);
+            border-radius: var(--border-radius);
+            box-shadow: var(--shadow);
+            position: relative;
+            overflow: hidden;
+            display: flex;
+            flex-direction: column;
+        }
+
+        /* --- Game Views --- */
+        .game-view {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            display: flex;
+            flex-direction: column;
+            padding: 1.5rem;
+            box-sizing: border-box;
+        }
+        
+        .hidden {
+            display: none !important;
+        }
+
+        /* --- Header --- */
+        .view-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 1rem;
+            padding: 0.5rem;
+        }
+
+        .view-title {
+            font-size: clamp(1.8rem, 4vw, 2.2rem);
+            font-weight: 600;
+            color: var(--primary);
+            text-align: center;
+            flex-grow: 1;
+        }
+
+        .icon-btn {
+            background: var(--white);
+            border: 3px solid var(--primary);
+            font-size: clamp(1.5rem, 3vw, 1.8rem);
+            cursor: pointer;
+            padding: 0.5rem 1rem;
+            border-radius: 15px;
+            transition: all 0.3s;
+            color: var(--primary);
+        }
+        .icon-btn:hover {
+            background-color: var(--primary);
+            color: var(--white);
+            transform: scale(1.05);
+        }
+
+        /* --- Buttons --- */
+        .btn {
+            font-family: 'Fredoka', sans-serif;
+            font-weight: 600;
+            border: none;
+            padding: 15px 30px;
+            font-size: clamp(1.1rem, 2.5vw, 1.3rem);
+            border-radius: 50px;
+            cursor: pointer;
+            transition: all 0.3s;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+        }
+        .btn:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 6px 20px rgba(0,0,0,0.15);
+        }
+        .btn-primary {
+            background: linear-gradient(135deg, var(--primary), #FF8787);
+            color: var(--white);
+        }
+        .btn-secondary {
+            background-color: var(--white);
+            color: var(--secondary);
+            border: 3px solid var(--secondary);
+        }
+        .btn-accent {
+            background: linear-gradient(135deg, var(--accent), #FFD93D);
+            color: var(--text-color);
+        }
+
+        /* --- Welcome Screen --- */
+        #welcome-screen {
+            align-items: center;
+            justify-content: center;
+            text-align: center;
+            background: linear-gradient(135deg, rgba(255, 107, 107, 0.05) 0%, rgba(78, 205, 196, 0.05) 100%);
+        }
+        #welcome-screen h1 {
+            font-size: clamp(2.5rem, 6vw, 3.5rem);
+            margin-bottom: 1rem;
+            background: linear-gradient(135deg, var(--primary), var(--secondary));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            animation: float 3s ease-in-out infinite;
+        }
+        @keyframes float {
+            0%, 100% { transform: translateY(0); }
+            50% { transform: translateY(-10px); }
+        }
+        .welcome-character {
+            font-size: clamp(6rem, 15vw, 10rem);
+            margin: 1rem 0;
+            animation: bounce 2s ease-in-out infinite;
+        }
+        @keyframes bounce {
+            0%, 100% { transform: translateY(0) scale(1); }
+            50% { transform: translateY(-20px) scale(1.05); }
+        }
+        .welcome-buttons {
+            display: flex;
+            gap: 1rem;
+            justify-content: center;
+            margin-top: 2rem;
+            flex-wrap: wrap;
+        }
+
+        /* --- Level Select Screen --- */
+        #level-select-screen .content {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            width: 100%;
+            flex-grow: 1;
+        }
+        .level-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
+            gap: 1.5rem;
+            margin-top: 2rem;
+            width: 100%;
+            max-width: 600px;
+        }
+        .level-tile {
+            aspect-ratio: 1;
+            background: linear-gradient(135deg, var(--secondary), #6EDDD6);
+            border-radius: 20px;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            font-size: clamp(2rem, 4vw, 2.5rem);
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s;
+            position: relative;
+            color: var(--white);
+            box-shadow: 0 4px 15px rgba(78, 205, 196, 0.3);
+        }
+        .level-tile:hover {
+            transform: scale(1.1) rotate(5deg);
+            box-shadow: 0 8px 25px rgba(78, 205, 196, 0.4);
+        }
+        .level-tile .level-icon {
+            font-size: clamp(2.5rem, 5vw, 3rem);
+            margin-bottom: 0.5rem;
+        }
+        .level-tile .level-number {
+            font-size: clamp(1rem, 2vw, 1.2rem);
+        }
+
+        /* --- Game Screen --- */
+        #game-screen {
+            padding: 0;
+        }
+        #game-header {
+            background: linear-gradient(135deg, var(--primary), #FF8787);
+            color: var(--white);
+            padding: 1rem 2rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-radius: 0 0 25px 25px;
+        }
+        #game-prompt {
+            font-size: clamp(1.3rem, 3vw, 1.6rem);
+            font-weight: 600;
+            text-align: center;
+            flex-grow: 1;
+        }
+        #game-area {
+            flex-grow: 1;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            padding: 2rem;
+            background: linear-gradient(to bottom, rgba(255, 245, 245, 0.5) 0%, rgba(240, 248, 255, 0.5) 100%);
+        }
+
+        /* Pattern Display */
+        .pattern-display {
+            display: flex;
+            gap: 1rem;
+            margin-bottom: 2rem;
+            padding: 1.5rem;
+            background-color: var(--white);
+            border-radius: 20px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+        }
+        .pattern-item {
+            width: clamp(60px, 10vw, 80px);
+            height: clamp(60px, 10vw, 80px);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: clamp(2.5rem, 5vw, 3.5rem);
+            background-color: var(--white);
+            border: 3px solid var(--secondary);
+            border-radius: 15px;
+            transition: all 0.3s;
+        }
+        .pattern-item.empty {
+            border: 3px dashed var(--accent);
+            background-color: rgba(255, 230, 109, 0.2);
+            cursor: pointer;
+            animation: pulse 2s ease-in-out infinite;
+        }
+        @keyframes pulse {
+            0%, 100% { transform: scale(1); }
+            50% { transform: scale(1.05); }
+        }
+        .pattern-item.empty:hover {
+            background-color: rgba(255, 230, 109, 0.4);
+            transform: scale(1.1);
+        }
+
+        /* Shape Options */
+        .shape-options {
+            display: flex;
+            gap: 1.5rem;
+            margin-top: 2rem;
+            flex-wrap: wrap;
+            justify-content: center;
+        }
+        .shape-option {
+            width: clamp(70px, 12vw, 90px);
+            height: clamp(70px, 12vw, 90px);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: clamp(3rem, 6vw, 4rem);
+            background-color: var(--white);
+            border: 3px solid var(--purple);
+            border-radius: 15px;
+            cursor: pointer;
+            transition: all 0.3s;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+        }
+        .shape-option:hover {
+            transform: translateY(-5px) scale(1.1);
+            box-shadow: 0 8px 20px rgba(0,0,0,0.15);
+        }
+        .shape-option.selected {
+            background-color: var(--purple);
+            transform: scale(1.15);
+            animation: wiggle 0.5s;
+        }
+        @keyframes wiggle {
+            0%, 100% { transform: rotate(0deg) scale(1.15); }
+            25% { transform: rotate(-10deg) scale(1.15); }
+            75% { transform: rotate(10deg) scale(1.15); }
+        }
+
+        /* Shape Matching Game */
+        .shape-matching-container {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 2rem;
+            width: 100%;
+            max-width: 800px;
+        }
+        .shape-column {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 1rem;
+        }
+        .shape-column h3 {
+            font-size: clamp(1.3rem, 3vw, 1.5rem);
+            color: var(--primary);
+            margin: 0;
+        }
+        .match-shape {
+            width: clamp(80px, 15vw, 100px);
+            height: clamp(80px, 15vw, 100px);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: clamp(3.5rem, 7vw, 4.5rem);
+            background-color: var(--white);
+            border: 3px solid var(--secondary);
+            border-radius: 15px;
+            cursor: pointer;
+            transition: all 0.3s;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+        }
+        .match-shape:hover {
+            transform: scale(1.1);
+            box-shadow: 0 8px 20px rgba(0,0,0,0.15);
+        }
+        .match-shape.matched {
+            background-color: var(--accent);
+            animation: match-pop 0.5s;
+            pointer-events: none;
+        }
+        @keyframes match-pop {
+            0% { transform: scale(1); }
+            50% { transform: scale(1.3); }
+            100% { transform: scale(1); }
+        }
+
+        /* Free Play Area */
+        .free-play-area {
+            width: 100%;
+            max-width: 800px;
+            min-height: 300px;
+            background-color: var(--white);
+            border: 3px dashed var(--secondary);
+            border-radius: 20px;
+            padding: 1.5rem;
+            display: flex;
+            flex-wrap: wrap;
+            gap: 1rem;
+            align-content: flex-start;
+            justify-content: center;
+        }
+        .free-play-shape {
+            width: clamp(60px, 10vw, 80px);
+            height: clamp(60px, 10vw, 80px);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: clamp(2.5rem, 5vw, 3.5rem);
+            background-color: var(--white);
+            border: 3px solid var(--primary);
+            border-radius: 15px;
+            cursor: move;
+            transition: all 0.3s;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+        }
+        .free-play-shape:hover {
+            transform: scale(1.1);
+        }
+
+        /* --- Success Animation --- */
+        .success-animation {
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            font-size: clamp(5rem, 10vw, 8rem);
+            z-index: 1000;
+            animation: success-burst 1s ease-out forwards;
+            pointer-events: none;
+        }
+        @keyframes success-burst {
+            0% { transform: translate(-50%, -50%) scale(0) rotate(0deg); opacity: 1; }
+            50% { transform: translate(-50%, -50%) scale(1.5) rotate(180deg); opacity: 1; }
+            100% { transform: translate(-50%, -50%) scale(2) rotate(360deg); opacity: 0; }
+        }
+
+        /* --- Notification Toast --- */
+        .notification {
+            position: fixed;
+            top: 20px;
+            left: 50%;
+            transform: translateX(-50%) translateY(-100px);
+            background: linear-gradient(135deg, var(--success-color), #66BB6A);
+            color: var(--white);
+            padding: 1rem 2rem;
+            border-radius: 50px;
+            font-size: clamp(1.1rem, 2.5vw, 1.3rem);
+            font-weight: 600;
+            box-shadow: var(--shadow);
+            z-index: 2000;
+            opacity: 0;
+            transition: all 0.5s ease;
+        }
+        .notification.show {
+            transform: translateX(-50%) translateY(0);
+            opacity: 1;
+        }
+        .notification.error {
+            background: linear-gradient(135deg, var(--error-color), #EF5350);
+        }
+
+        /* --- Progress Stars --- */
+        .progress-stars {
+            display: flex;
+            gap: 0.5rem;
+            margin-top: 1rem;
+        }
+        .star {
+            font-size: clamp(2rem, 4vw, 2.5rem);
+            color: #DDD;
+            transition: all 0.3s;
+        }
+        .star.filled {
+            color: var(--accent);
+            animation: star-pop 0.5s;
+        }
+        @keyframes star-pop {
+            0% { transform: scale(1); }
+            50% { transform: scale(1.3); }
+            100% { transform: scale(1); }
+        }
+
+        /* --- Helper Character --- */
+        .helper-character {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            font-size: clamp(3rem, 6vw, 4rem);
+            cursor: pointer;
+            transition: all 0.3s;
+            animation: helper-bounce 3s ease-in-out infinite;
+        }
+        @keyframes helper-bounce {
+            0%, 100% { transform: translateY(0); }
+            50% { transform: translateY(-10px); }
+        }
+        .helper-character:hover {
+            transform: scale(1.1);
+        }
+        .helper-speech {
+            position: absolute;
+            bottom: 100%;
+            right: 0;
+            background: var(--white);
+            padding: 0.5rem 1rem;
+            border-radius: 15px;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+            font-size: clamp(0.9rem, 2vw, 1.1rem);
+            white-space: nowrap;
+            opacity: 0;
+            transition: opacity 0.3s;
+            pointer-events: none;
+        }
+        .helper-character:hover .helper-speech {
+            opacity: 1;
+        }
+
+        /* --- Math Question Styles --- */
+        .math-question-container {
+            background-color: var(--white);
+            border-radius: 20px;
+            padding: 2rem;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+            text-align: center;
+            max-width: 600px;
+            width: 100%;
+        }
+        
+        .math-question {
+            font-size: clamp(1.8rem, 4vw, 2.2rem);
+            margin-bottom: 1.5rem;
+            color: var(--primary);
+        }
+        
+        .math-options {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 1rem;
+            margin-top: 1.5rem;
+        }
+        
+        .math-option {
+            padding: 1rem;
+            background-color: var(--white);
+            border: 3px solid var(--secondary);
+            border-radius: 15px;
+            font-size: clamp(1.4rem, 3vw, 1.8rem);
+            cursor: pointer;
+            transition: all 0.3s;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+        }
+        
+        .math-option:hover {
+            transform: translateY(-5px) scale(1.05);
+            box-shadow: 0 8px 20px rgba(0,0,0,0.15);
+        }
+        
+        .math-option.selected {
+            background-color: var(--secondary);
+            color: var(--white);
+        }
+        
+        .math-option.correct {
+            background-color: var(--accent);
+            animation: correct-answer 0.5s;
+        }
+        
+        @keyframes correct-answer {
+            0% { transform: scale(1); }
+            50% { transform: scale(1.1); }
+            100% { transform: scale(1); }
+        }
+        
+        .math-option.incorrect {
+            background-color: var(--pink);
+            animation: incorrect-answer 0.5s;
+        }
+        
+        @keyframes incorrect-answer {
+            0%, 100% { transform: translateX(0); }
+            25% { transform: translateX(-10px); }
+            75% { transform: translateX(10px); }
+        }
+    </style>
+</head>
+<body>
+
+    <div class="game-container">
+        <!-- Welcome Screen -->
+        <div id="welcome-screen" class="game-view">
+            <h1>Pattern Pals</h1>
+            <div class="welcome-character">🌟</div>
+            <h2 style="font-size: clamp(1.5rem, 3vw, 1.8rem); color: var(--secondary); margin: 1rem 0;">Let's Play with Shapes!</h2>
+            <div class="welcome-buttons">
+                <button class="btn btn-primary" id="start-playing-btn">🎮 Start Playing</button>
+                <button class="btn btn-secondary" id="free-play-btn">🎨 Free Play</button>
+            </div>
+        </div>
+
+        <!-- Level Select Screen -->
+        <div id="level-select-screen" class="game-view hidden">
+            <div class="view-header">
+                <button class="icon-btn" id="level-select-back-btn">⬅️</button>
+                <h1 class="view-title">Choose an Activity</h1>
+                <div></div>
+            </div>
+            <div class="content">
+                <div class="level-grid" id="level-grid">
+                    <!-- Level tiles will be injected here -->
+                </div>
+            </div>
+        </div>
+
+        <!-- Game Screen -->
+        <div id="game-screen" class="game-view hidden">
+            <div id="game-header">
+                <div></div>
+                <div id="game-prompt">Complete the Pattern!</div>
+                <button class="icon-btn" id="game-back-btn">⬅️</button>
+            </div>
+            <div id="game-area">
+                <!-- Game content will be dynamically added here -->
+            </div>
+        </div>
+    </div>
+
+    <!-- Helper Character -->
+    <div class="helper-character" id="helper-character">
+        🐻
+        <div class="helper-speech">Need help? Click me!</div>
+    </div>
+
+    <!-- Notification Toast -->
+    <div id="notification" class="notification"></div>
+
+    <script>
+    document.addEventListener('DOMContentLoaded', () => {
+        // --- DOM Elements ---
+        const views = {
+            welcome: document.getElementById('welcome-screen'),
+            levelSelect: document.getElementById('level-select-screen'),
+            game: document.getElementById('game-screen')
+        };
+        const notificationEl = document.getElementById('notification');
+        const helperCharacter = document.getElementById('helper-character');
+
+        // --- Game State ---
+        const gameState = {
+            currentLevel: null,
+            currentPattern: [],
+            currentGameType: null,
+            selectedShape: null,
+            score: 0,
+            attempts: 0,
+            currentQuestion: null,
+            correctAnswers: 0,
+            questionsAnswered: 0
+        };
+
+        // --- Shape Data ---
+        const shapes = {
+            circle: { icon: '⭕', color: '#FF6B6B' },
+            square: { icon: '⬜', color: '#4ECDC4' },
+            triangle: { icon: '🔺', color: '#FFE66D' },
+            star: { icon: '⭐', color: '#A8E6CF' },
+            heart: { icon: '❤️', color: '#FFB6C1' },
+            diamond: { icon: '💎', color: '#87CEEB' }
+        };
+
+        // --- Math Questions ---
+        const mathQuestions = [
+            {
+                question: "If you have 5 apples and you give 2 to your friend, how many apples do you have left?",
+                options: ["2", "3", "7", "8"],
+                correct: 1
+            },
+            {
+                question: "What is 15 - 8?",
+                options: ["5", "6", "7", "8"],
+                correct: 2
+            },
+            {
+                question: "If you have 4 groups of 3 pencils, how many pencils do you have in total?",
+                options: ["7", "12", "15", "16"],
+                correct: 1
+            },
+            {
+                question: "What is 24 ÷ 6?",
+                options: ["3", "4", "5", "6"],
+                correct: 1
+            },
+            {
+                question: "If you buy 2 toys for $7 each, how much money do you spend?",
+                options: ["$9", "$12", "$14", "$16"],
+                correct: 2
+            },
+            {
+                question: "What is 9 + 7?",
+                options: ["15", "16", "17", "18"],
+                correct: 0
+            },
+            {
+                question: "If you have 18 cookies and want to share them equally among 3 friends, how many cookies does each friend get?",
+                options: ["4", "5", "6", "7"],
+                correct: 2
+            },
+            {
+                question: "What is 5 × 4?",
+                options: ["15", "20", "25", "30"],
+                correct: 1
+            },
+            {
+                question: "If you have 3 boxes with 6 chocolates in each, and you eat 4 chocolates, how many are left?",
+                options: ["12", "14", "16", "18"],
+                correct: 1
+            },
+            {
+                question: "What is 36 ÷ 4?",
+                options: ["7", "8", "9", "10"],
+                correct: 2
+            }
+        ];
+
+        // --- Level Data ---
+        const levels = [
+            {
+                id: 1,
+                name: "Simple Patterns",
+                icon: "🔵",
+                type: "pattern",
+                difficulty: "easy",
+                patterns: [
+                    ['circle', 'square', 'circle', 'square', 'circle'],
+                    ['triangle', 'star', 'triangle', 'star', 'triangle'],
+                    ['heart', 'diamond', 'heart', 'diamond', 'heart']
+                ]
+            },
+            {
+                id: 2,
+                name: "Shape Matching",
+                icon: "🎯",
+                type: "matching",
+                difficulty: "easy"
+            },
+            {
+                id: 3,
+                name: "Growing Patterns",
+                icon: "📈",
+                type: "pattern",
+                difficulty: "medium",
+                patterns: [
+                    ['circle', 'circle', 'square', 'circle', 'circle', 'square', 'circle'],
+                    ['star', 'star', 'star', 'triangle', 'star', 'star', 'star', 'triangle'],
+                    ['heart', 'diamond', 'heart', 'diamond', 'heart', 'diamond', 'heart']
+                ]
+            },
+            {
+                id: 4,
+                name: "Color Patterns",
+                icon: "🌈",
+                type: "pattern",
+                difficulty: "easy",
+                patterns: [
+                    ['circle', 'square', 'triangle', 'circle', 'square', 'triangle'],
+                    ['star', 'heart', 'diamond', 'star', 'heart', 'diamond']
+                ]
+            },
+            {
+                id: 5,
+                name: "What's Next?",
+                icon: "❓",
+                type: "pattern",
+                difficulty: "medium",
+                patterns: [
+                    ['circle', 'square', 'square', 'triangle', 'circle', 'square', 'square'],
+                    ['star', 'heart', 'heart', 'diamond', 'star', 'heart', 'heart']
+                ]
+            },
+            {
+                id: 6,
+                name: "Mix & Match",
+                icon: "🔀",
+                type: "matching",
+                difficulty: "medium"
+            },
+            {
+                id: 7,
+                name: "Math Challenges",
+                icon: "🧮",
+                type: "math",
+                difficulty: "medium"
+            },
+            {
+                id: 8,
+                name: "Advanced Patterns",
+                icon: "🧩",
+                type: "pattern",
+                difficulty: "hard",
+                patterns: [
+                    ['circle', 'square', 'triangle', 'circle', 'square', 'triangle', 'star'],
+                    ['heart', 'heart', 'diamond', 'heart', 'heart', 'diamond', 'star'],
+                    ['star', 'triangle', 'square', 'star', 'triangle', 'square', 'circle']
+                ]
+            }
+        ];
+
+        // --- Screen Management ---
+        function switchView(viewName) {
+            Object.values(views).forEach(view => view.classList.add('hidden'));
+            views[viewName].classList.remove('hidden');
+        }
+
+        function showNotification(message, duration = 2000, isError = false) {
+            notificationEl.textContent = message;
+            notificationEl.classList.toggle('error', isError);
+            notificationEl.classList.add('show');
+            setTimeout(() => notificationEl.classList.remove('show'), duration);
+        }
+
+        function showSuccessAnimation() {
+            const successEl = document.createElement('div');
+            successEl.className = 'success-animation';
+            successEl.textContent = '🎉';
+            document.body.appendChild(successEl);
+            setTimeout(() => successEl.remove(), 1000);
+        }
+
+        // --- Level Selection ---
+        function renderLevelSelect() {
+            const grid = document.getElementById('level-grid');
+            grid.innerHTML = '';
+            
+            levels.forEach(level => {
+                const tile = document.createElement('div');
+                tile.className = 'level-tile';
+                tile.innerHTML = `
+                    <div class="level-icon">${level.icon}</div>
+                    <div class="level-number">${level.name}</div>
+                `;
+                tile.onclick = () => startLevel(level);
+                grid.appendChild(tile);
+            });
+        }
+
+        // --- Game Logic ---
+        function startLevel(level) {
+            gameState.currentLevel = level;
+            gameState.currentGameType = level.type;
+            gameState.score = 0;
+            gameState.attempts = 0;
+            gameState.correctAnswers = 0;
+            gameState.questionsAnswered = 0;
+            
+            switchView('game');
+            
+            if (level.type === 'pattern') {
+                startPatternGame(level);
+            } else if (level.type === 'matching') {
+                startMatchingGame(level);
+            } else if (level.type === 'math') {
+                startMathGame(level);
+            }
+        }
+
+        function startPatternGame(level) {
+            const gameArea = document.getElementById('game-area');
+            gameArea.innerHTML = '';
+            
+            // Select a random pattern
+            const patterns = level.patterns;
+            const pattern = patterns[Math.floor(Math.random() * patterns.length)];
+            gameState.currentPattern = pattern;
+            
+            // Update prompt
+            document.getElementById('game-prompt').textContent = "Complete the pattern!";
+            
+            // Create pattern display
+            const patternDisplay = document.createElement('div');
+            patternDisplay.className = 'pattern-display';
+            
+            // Show pattern with one missing
+            const missingIndex = Math.floor(Math.random() * 2) + pattern.length - 2;
+            pattern.forEach((shape, index) => {
+                const item = document.createElement('div');
+                item.className = 'pattern-item';
+                
+                if (index === missingIndex) {
+                    item.classList.add('empty');
+                    item.dataset.correctShape = shape;
+                    item.onclick = () => placeShape(item);
+                } else {
+                    item.textContent = shapes[shape].icon;
+                    item.style.borderColor = shapes[shape].color;
+                }
+                
+                patternDisplay.appendChild(item);
+            });
+            
+            gameArea.appendChild(patternDisplay);
+            
+            // Create shape options
+            const shapeOptions = document.createElement('div');
+            shapeOptions.className = 'shape-options';
+            
+            // Get unique shapes from pattern plus some distractors
+            const uniqueShapes = [...new Set(pattern)];
+            const allShapes = Object.keys(shapes);
+            const distractors = allShapes.filter(s => !uniqueShapes.includes(s)).slice(0, 2);
+            const options = [...uniqueShapes, ...distractors].sort(() => Math.random() - 0.5);
+            
+            options.forEach(shape => {
+                const option = document.createElement('div');
+                option.className = 'shape-option';
+                option.textContent = shapes[shape].icon;
+                option.dataset.shape = shape;
+                option.style.borderColor = shapes[shape].color;
+                option.onclick = () => selectShape(option, shape);
+                shapeOptions.appendChild(option);
+            });
+            
+            gameArea.appendChild(shapeOptions);
+        }
+
+        function selectShape(element, shape) {
+            // Remove previous selection
+            document.querySelectorAll('.shape-option').forEach(opt => {
+                opt.classList.remove('selected');
+            });
+            
+            // Add selection to clicked shape
+            element.classList.add('selected');
+            gameState.selectedShape = shape;
+            
+            // Play selection sound effect (visual feedback)
+            element.style.animation = 'wiggle 0.5s';
+            setTimeout(() => element.style.animation = '', 500);
+        }
+
+        function placeShape(emptySlot) {
+            if (!gameState.selectedShape) {
+                showNotification("First pick a shape! 🤔", 1500, true);
+                helperTalk("Try clicking on a shape first!");
+                return;
+            }
+            
+            const correctShape = emptySlot.dataset.correctShape;
+            
+            if (gameState.selectedShape === correctShape) {
+                // Correct answer
+                emptySlot.textContent = shapes[correctShape].icon;
+                emptySlot.style.borderColor = shapes[correctShape].color;
+                emptySlot.classList.remove('empty');
+                emptySlot.classList.add('correct');
+                
+                showNotification("Great job! 🎉");
+                showSuccessAnimation();
+                gameState.score++;
+                
+                // Check if pattern is complete
+                const remainingEmpty = document.querySelectorAll('.pattern-item.empty');
+                if (remainingEmpty.length === 0) {
+                    setTimeout(() => {
+                        showNotification("Pattern complete! Amazing! 🌟", 3000);
+                        setTimeout(() => {
+                            startPatternGame(gameState.currentLevel);
+                        }, 2000);
+                    }, 500);
+                }
+            } else {
+                // Wrong answer
+                showNotification("Oops, try again! 🤗", 1500, true);
+                emptySlot.style.animation = 'incorrect-shake 0.5s';
+                setTimeout(() => emptySlot.style.animation = '', 500);
+                gameState.attempts++;
+                
+                helperTalk("Look carefully at the pattern!");
+            }
+            
+            // Reset selection
+            document.querySelectorAll('.shape-option').forEach(opt => {
+                opt.classList.remove('selected');
+            });
+            gameState.selectedShape = null;
+        }
+
+        function startMatchingGame(level) {
+            const gameArea = document.getElementById('game-area');
+            gameArea.innerHTML = '';
+            
+            // Update prompt
+            document.getElementById('game-prompt').textContent = "Match the shapes!";
+            
+            // Create matching container
+            const matchingContainer = document.createElement('div');
+            matchingContainer.className = 'shape-matching-container';
+            
+            // Left column - shapes to match
+            const leftColumn = document.createElement('div');
+            leftColumn.className = 'shape-column';
+            leftColumn.innerHTML = '<h3>Find these</h3>';
+            
+            // Right column - shapes to choose from
+            const rightColumn = document.createElement('div');
+            rightColumn.className = 'shape-column';
+            rightColumn.innerHTML = '<h3>Click here</h3>';
+            
+            // Select random shapes
+            const shapeKeys = Object.keys(shapes);
+            const selectedShapes = shapeKeys.slice(0, Math.min(4, shapeKeys.length));
+            const shuffledShapes = [...selectedShapes].sort(() => Math.random() - 0.5);
+            
+            // Create left column shapes
+            selectedShapes.forEach(shape => {
+                const shapeEl = document.createElement('div');
+                shapeEl.className = 'match-shape';
+                shapeEl.textContent = shapes[shape].icon;
+                shapeEl.dataset.shape = shape;
+                shapeEl.style.borderColor = shapes[shape].color;
+                leftColumn.appendChild(shapeEl);
+            });
+            
+            // Create right column shapes
+            shuffledShapes.forEach(shape => {
+                const shapeEl = document.createElement('div');
+                shapeEl.className = 'match-shape';
+                shapeEl.textContent = shapes[shape].icon;
+                shapeEl.dataset.shape = shape;
+                shapeEl.style.borderColor = shapes[shape].color;
+                shapeEl.onclick = () => checkMatch(shapeEl);
+                rightColumn.appendChild(shapeEl);
+            });
+            
+            matchingContainer.appendChild(leftColumn);
+            matchingContainer.appendChild(rightColumn);
+            gameArea.appendChild(matchingContainer);
+        }
+
+        function checkMatch(clickedShape) {
+            const shape = clickedShape.dataset.shape;
+            
+            // Find if there's an unmatched shape in left column
+            const leftShapes = document.querySelectorAll('.shape-column:first-child .match-shape:not(.matched)');
+            let foundMatch = false;
+            
+            leftShapes.forEach(leftShape => {
+                if (leftShape.dataset.shape === shape) {
+                    // Match found!
+                    leftShape.classList.add('matched');
+                    clickedShape.classList.add('matched');
+                    foundMatch = true;
+                    
+                    showNotification("Perfect match! 🎯");
+                    showSuccessAnimation();
+                    gameState.score++;
+                    
+                    // Check if all matches are complete
+                    const remainingLeft = document.querySelectorAll('.shape-column:first-child .match-shape:not(.matched)');
+                    if (remainingLeft.length === 0) {
+                        setTimeout(() => {
+                            showNotification("All matched! You're a star! ⭐", 3000);
+                            setTimeout(() => {
+                                startMatchingGame(gameState.currentLevel);
+                            }, 2000);
+                        }, 500);
+                    }
+                }
+            });
+            
+            if (!foundMatch) {
+                showNotification("Try another one! 🤔", 1500, true);
+                clickedShape.style.animation = 'incorrect-shake 0.5s';
+                setTimeout(() => clickedShape.style.animation = '', 500);
+            }
+        }
+
+        function startMathGame(level) {
+            const gameArea = document.getElementById('game-area');
+            gameArea.innerHTML = '';
+            
+            // Update prompt
+            document.getElementById('game-prompt').textContent = "Solve the math problem!";
+            
+            // Get a random question
+            const randomIndex = Math.floor(Math.random() * mathQuestions.length);
+            gameState.currentQuestion = mathQuestions[randomIndex];
+            
+            // Create math question container
+            const mathContainer = document.createElement('div');
+            mathContainer.className = 'math-question-container';
+            
+            // Add question
+            const questionEl = document.createElement('div');
+            questionEl.className = 'math-question';
+            questionEl.textContent = gameState.currentQuestion.question;
+            mathContainer.appendChild(questionEl);
+            
+            // Add options
+            const optionsEl = document.createElement('div');
+            optionsEl.className = 'math-options';
+            
+            gameState.currentQuestion.options.forEach((option, index) => {
+                const optionEl = document.createElement('div');
+                optionEl.className = 'math-option';
+                optionEl.textContent = option;
+                optionEl.dataset.index = index;
+                optionEl.onclick = () => checkMathAnswer(optionEl, index);
+                optionsEl.appendChild(optionEl);
+            });
+            
+            mathContainer.appendChild(optionsEl);
+            gameArea.appendChild(mathContainer);
+        }
+
+        function checkMathAnswer(element, index) {
+            // Disable all options to prevent multiple clicks
+            document.querySelectorAll('.math-option').forEach(opt => {
+                opt.style.pointerEvents = 'none';
+            });
+            
+            gameState.questionsAnswered++;
+            
+            if (index === gameState.currentQuestion.correct) {
+                // Correct answer
+                element.classList.add('correct');
+                showNotification("Correct! Great job! 🎉");
+                showSuccessAnimation();
+                gameState.correctAnswers++;
+                
+                // Move to next question after a delay
+                setTimeout(() => {
+                    if (gameState.questionsAnswered < 5) {
+                        startMathGame(gameState.currentLevel);
+                    } else {
+                        // Game completed
+                        const percentage = Math.round((gameState.correctAnswers / gameState.questionsAnswered) * 100);
+                        showNotification(`Quiz completed! You got ${gameState.correctAnswers} out of ${gameState.questionsAnswered} correct (${percentage}%)! 🌟`, 4000);
+                        setTimeout(() => {
+                            switchView('levelSelect');
+                        }, 3000);
+                    }
+                }, 1500);
+            } else {
+                // Wrong answer
+                element.classList.add('incorrect');
+                showNotification("Oops, that's not right. Try again next time! 🤔", 2000, true);
+                
+                // Show correct answer
+                setTimeout(() => {
+                    document.querySelectorAll('.math-option').forEach(opt => {
+                        if (parseInt(opt.dataset.index) === gameState.currentQuestion.correct) {
+                            opt.classList.add('correct');
+                        }
+                    });
+                    
+                    // Move to next question after a delay
+                    setTimeout(() => {
+                        if (gameState.questionsAnswered < 5) {
+                            startMathGame(gameState.currentLevel);
+                        } else {
+                            // Game completed
+                            const percentage = Math.round((gameState.correctAnswers / gameState.questionsAnswered) * 100);
+                            showNotification(`Quiz completed! You got ${gameState.correctAnswers} out of ${gameState.questionsAnswered} correct (${percentage}%)! 🌟`, 4000);
+                            setTimeout(() => {
+                                switchView('levelSelect');
+                            }, 3000);
+                        }
+                    }, 2000);
+                }, 1000);
+            }
+        }
+
+        function startFreePlay() {
+            switchView('game');
+            document.getElementById('game-prompt').textContent = "Create your own patterns!";
+            
+            const gameArea = document.getElementById('game-area');
+            gameArea.innerHTML = '';
+            
+            // Create free play area
+            const freePlayArea = document.createElement('div');
+            freePlayArea.className = 'free-play-area';
+            freePlayArea.id = 'free-play-area';
+            
+            // Add some shapes to start
+            const shapeKeys = Object.keys(shapes);
+            for (let i = 0; i < 8; i++) {
+                const shape = shapeKeys[Math.floor(Math.random() * shapeKeys.length)];
+                const shapeEl = document.createElement('div');
+                shapeEl.className = 'free-play-shape';
+                shapeEl.textContent = shapes[shape].icon;
+                shapeEl.style.borderColor = shapes[shape].color;
+                shapeEl.draggable = true;
+                
+                // Add drag events
+                shapeEl.addEventListener('dragstart', handleDragStart);
+                shapeEl.addEventListener('dragend', handleDragEnd);
+                
+                freePlayArea.appendChild(shapeEl);
+            }
+            
+            gameArea.appendChild(freePlayArea);
+            
+            // Add shape palette
+            const shapePalette = document.createElement('div');
+            shapePalette.className = 'shape-options';
+            shapePalette.style.marginTop = '2rem';
+            
+            shapeKeys.forEach(shape => {
+                const option = document.createElement('div');
+                option.className = 'shape-option';
+                option.textContent = shapes[shape].icon;
+                option.style.borderColor = shapes[shape].color;
+                option.onclick = () => addShapeToFreePlay(shape);
+                shapePalette.appendChild(option);
+            });
+            
+            gameArea.appendChild(shapePalette);
+            
+            // Setup drag and drop for free play area
+            const dropZone = document.getElementById('free-play-area');
+            dropZone.addEventListener('dragover', handleDragOver);
+            dropZone.addEventListener('drop', handleDrop);
+            dropZone.addEventListener('dragleave', handleDragLeave);
+        }
+
+        function addShapeToFreePlay(shape) {
+            const freePlayArea = document.getElementById('free-play-area');
+            const shapeEl = document.createElement('div');
+            shapeEl.className = 'free-play-shape';
+            shapeEl.textContent = shapes[shape].icon;
+            shapeEl.style.borderColor = shapes[shape].color;
+            shapeEl.draggable = true;
+            
+            shapeEl.addEventListener('dragstart', handleDragStart);
+            shapeEl.addEventListener('dragend', handleDragEnd);
+            
+            freePlayArea.appendChild(shapeEl);
+            
+            // Add animation
+            shapeEl.style.animation = 'bounce 0.5s';
+            setTimeout(() => shapeEl.style.animation = '', 500);
+        }
+
+        // Drag and Drop for Free Play
+        let draggedElement = null;
+
+        function handleDragStart(e) {
+            draggedElement = e.target;
+            e.target.style.opacity = '0.5';
+        }
+
+        function handleDragEnd(e) {
+            e.target.style.opacity = '';
+        }
+
+        function handleDragOver(e) {
+            e.preventDefault();
+            e.currentTarget.style.backgroundColor = 'rgba(78, 205, 196, 0.1)';
+        }
+
+        function handleDragLeave(e) {
+            e.currentTarget.style.backgroundColor = '';
+        }
+
+        function handleDrop(e) {
+            e.preventDefault();
+            e.currentTarget.style.backgroundColor = '';
+            
+            if (draggedElement && e.currentTarget.classList.contains('free-play-shape')) {
+                // Swap shapes
+                const tempHTML = e.currentTarget.innerHTML;
+                const tempColor = e.currentTarget.style.borderColor;
+                
+                e.currentTarget.innerHTML = draggedElement.innerHTML;
+                e.currentTarget.style.borderColor = draggedElement.style.borderColor;
+                
+                draggedElement.innerHTML = tempHTML;
+                draggedElement.style.borderColor = tempColor;
+            }
+        }
+
+        // Helper Character Functions
+        function helperTalk(message) {
+            const speech = helperCharacter.querySelector('.helper-speech');
+            speech.textContent = message;
+            speech.style.opacity = '1';
+            setTimeout(() => speech.style.opacity = '0', 3000);
+        }
+
+        // --- Event Listeners ---
+        document.getElementById('start-playing-btn').addEventListener('click', () => {
+            renderLevelSelect();
+            switchView('levelSelect');
+        });
+
+        document.getElementById('free-play-btn').addEventListener('click', () => {
+            startFreePlay();
+        });
+
+        document.getElementById('level-select-back-btn').addEventListener('click', () => {
+            switchView('welcome');
+        });
+
+        document.getElementById('game-back-btn').addEventListener('click', () => {
+            switchView('levelSelect');
+        });
+
+        helperCharacter.addEventListener('click', () => {
+            const encouragements = [
+                "You're doing great! 🌟",
+                "Keep trying! 💪",
+                "Math is fun! 🧮",
+                "You can do it! 🎯",
+                "Nice work! 👏"
+            ];
+            helperTalk(encouragements[Math.floor(Math.random() * encouragements.length)]);
+        });
+
+        // Add incorrect shake animation
+        const style = document.createElement('style');
+        style.textContent = `
+            @keyframes incorrect-shake {
+                0%, 100% { transform: translateX(0); }
+                25% { transform: translateX(-10px); }
+                75% { transform: translateX(10px); }
+            }
+        `;
+        document.head.appendChild(style);
+
+        // --- Initialize ---
+        // Show welcome message
+        setTimeout(() => {
+            helperTalk("Hi! I'm your helper bear! Let's play!");
+        }, 1000);
+    });
+    </script>
+</body>
+</html>
