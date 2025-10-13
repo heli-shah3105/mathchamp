@@ -1,0 +1,1274 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Size Detectives: The Great Sorting Adventure!</title>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Fredoka:wght@300;400;500;600;700&display=swap');
+
+        /* --- Vibrant Color Palette --- */
+        :root {
+            --primary: #9C27B0; /* Purple */
+            --secondary: #FF9800; /* Orange */
+            --primary-dark: #7B1FA2;
+            --secondary-dark: #F57C00;
+            --success-color: #4CAF50;
+            --error-color: #F44336;
+            --background-color: #F3E5F5; /* Light Purple */
+            --text-color: #263238;
+            --white: #FFFFFF;
+            --shadow: 0 8px 25px rgba(0, 0, 0, 0.12);
+            --border-radius: 20px;
+        }
+
+        body {
+            font-family: 'Fredoka', sans-serif;
+            background-color: var(--background-color);
+            color: var(--text-color);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            margin: 0;
+            overflow: hidden;
+        }
+
+        .game-container {
+            width: 95vw;
+            height: 95vh;
+            max-width: 1200px;
+            max-height: 800px;
+            background-color: var(--white);
+            border-radius: var(--border-radius);
+            box-shadow: var(--shadow);
+            position: relative;
+            overflow: hidden;
+        }
+
+        /* --- Game Views --- */
+        .game-view {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            display: flex;
+            flex-direction: column;
+            padding: 1.5rem;
+            box-sizing: border-box;
+        }
+        
+        .hidden {
+            display: none !important;
+        }
+
+        /* --- Header & Navigation --- */
+        .view-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 1.5rem;
+        }
+
+        .view-title {
+            font-size: clamp(2rem, 5vw, 2.5rem);
+            font-weight: 600;
+            color: var(--primary);
+        }
+
+        .icon-btn {
+            background: none;
+            border: none;
+            font-size: clamp(1.5rem, 3vw, 1.8rem);
+            cursor: pointer;
+            padding: 0.5rem;
+            border-radius: 10px;
+            transition: background-color 0.2s, transform 0.2s;
+        }
+        .icon-btn:hover {
+            background-color: rgba(0,0,0,0.05);
+            transform: scale(1.1);
+        }
+
+        /* --- Buttons --- */
+        .btn {
+            font-family: 'Fredoka', sans-serif;
+            font-weight: 600;
+            border: none;
+            padding: 12px 28px;
+            font-size: clamp(1rem, 2.5vw, 1.2rem);
+            border-radius: 50px;
+            cursor: pointer;
+            transition: transform 0.2s, box-shadow 0.2s;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+        }
+        .btn:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 6px 20px rgba(0,0,0,0.15);
+        }
+        .btn-primary {
+            background: linear-gradient(135deg, var(--primary), var(--primary-dark));
+            color: var(--white);
+        }
+        .btn-secondary {
+            background-color: var(--white);
+            color: var(--primary);
+            border: 2px solid var(--primary);
+        }
+        .btn-secondary.selected {
+            background-color: var(--primary);
+            color: var(--white);
+        }
+
+        /* --- Profile Selection Screen --- */
+        #profile-screen {
+            align-items: center;
+            justify-content: center;
+            text-align: center;
+        }
+        #profile-screen h1 {
+            font-size: clamp(2.5rem, 6vw, 3rem);
+            margin-bottom: 2rem;
+            background: linear-gradient(135deg, var(--primary), var(--secondary));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+        .profile-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+            gap: 1.5rem;
+            width: 100%;
+            max-width: 700px;
+        }
+        .profile-card {
+            background-color: var(--white);
+            border: 3px solid #E0E0E0;
+            border-radius: 15px;
+            padding: 1.5rem;
+            cursor: pointer;
+            transition: all 0.3s;
+            text-align: center;
+        }
+        .profile-card:hover {
+            border-color: var(--primary);
+            transform: translateY(-5px);
+            box-shadow: var(--shadow);
+        }
+        .profile-card .avatar {
+            font-size: clamp(3rem, 7vw, 4rem);
+            margin-bottom: 0.5rem;
+        }
+        .profile-card .name {
+            font-weight: 600;
+            font-size: clamp(1rem, 2.5vw, 1.1rem);
+        }
+        .add-profile-card {
+            border: 3px dashed #BDBDBD;
+            background-color: transparent;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            color: #9E9E9E;
+        }
+        .add-profile-card:hover {
+            border-color: var(--primary);
+            color: var(--primary);
+        }
+
+        /* --- Main Menu Screen --- */
+        #main-menu-screen {
+            align-items: center;
+            justify-content: center;
+        }
+        .menu-content {
+            text-align: center;
+        }
+        .menu-content .character {
+            font-size: clamp(5rem, 12vw, 8rem);
+            margin-bottom: 1rem;
+        }
+        .menu-content h2 {
+            font-size: clamp(1.5rem, 4vw, 2rem);
+            margin-bottom: 2rem;
+        }
+        .menu-buttons {
+            display: flex;
+            flex-direction: column;
+            gap: 1rem;
+            align-items: center;
+        }
+        .menu-buttons .btn {
+            width: clamp(200px, 40vw, 250px);
+        }
+
+        /* --- Level Select Screen --- */
+        #level-select-screen .content {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            width: 100%;
+            flex-grow: 1;
+        }
+        .level-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(100px, 1fr));
+            gap: 1.5rem;
+            margin-top: 2rem;
+            width: 100%;
+        }
+        .level-tile {
+            aspect-ratio: 1;
+            background-color: #E0E0E0;
+            border-radius: 15px;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            font-size: clamp(1.5rem, 3vw, 2rem);
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s;
+            position: relative;
+        }
+        .level-tile.unlocked {
+            background: linear-gradient(135deg, var(--primary), var(--primary-dark));
+            color: var(--white);
+            box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+            animation: unlock-pulse 0.6s ease-out;
+        }
+        @keyframes unlock-pulse {
+            0% { transform: scale(1); } 50% { transform: scale(1.1); } 100% { transform: scale(1); }
+        }
+        .level-tile.unlocked:hover {
+            transform: scale(1.05);
+        }
+        .level-tile.locked {
+            background-color: #CFD8DC;
+            color: #90A4AE;
+            cursor: not-allowed;
+        }
+        .level-tile .star {
+            position: absolute;
+            top: 5px;
+            right: 5px;
+            font-size: 1.2rem;
+        }
+
+        /* --- Game Screen --- */
+        #game-screen {
+            padding: 0;
+        }
+        #game-header {
+            background: linear-gradient(135deg, var(--primary), var(--primary-dark));
+            color: var(--white);
+            padding: 1rem 2rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        #game-prompt {
+            font-size: clamp(1.2rem, 3vw, 1.5rem);
+            font-weight: 600;
+        }
+        #scene-container {
+            position: relative;
+            width: 100%;
+            height: calc(100% - 70px);
+            background-image: url('https://www.transparenttextures.com/patterns/cubes.png'), linear-gradient(to bottom, #f3e5f5 0%, #ffffff 100%);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            padding: 2rem;
+            box-sizing: border-box;
+        }
+        .comparison-container {
+            display: flex;
+            justify-content: space-around;
+            align-items: center;
+            width: 100%;
+            margin-bottom: 2rem;
+        }
+        .object-item {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            cursor: pointer;
+            transition: transform 0.2s ease;
+            user-select: none;
+        }
+        .object-item:hover {
+            transform: scale(1.05);
+        }
+        .object-item.selected {
+            animation: bounce 0.5s;
+        }
+        @keyframes bounce {
+            0%, 100% { transform: translateY(0); }
+            50% { transform: translateY(-15px); }
+        }
+        .object-icon {
+            font-size: clamp(4rem, 10vw, 6rem);
+            margin-bottom: 0.5rem;
+        }
+        .object-label {
+            font-size: clamp(1rem, 2.5vw, 1.2rem);
+            font-weight: 500;
+        }
+        .sorting-container {
+            display: flex;
+            justify-content: space-around;
+            width: 100%;
+            margin-top: 2rem;
+        }
+        .sorting-zone {
+            width: 150px;
+            min-height: 200px;
+            border: 3px dashed var(--primary);
+            border-radius: 15px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            padding: 1rem;
+            background-color: rgba(156, 39, 176, 0.05);
+            transition: background-color 0.3s;
+        }
+        .sorting-zone.drag-over {
+            background-color: rgba(156, 39, 176, 0.2);
+        }
+        .sorting-zone h3 {
+            margin-top: 0;
+            margin-bottom: 1rem;
+            color: var(--primary);
+        }
+        .sortable-objects {
+            display: flex;
+            gap: 1rem;
+            margin-top: 2rem;
+            flex-wrap: wrap;
+            justify-content: center;
+        }
+        .sortable-object {
+            font-size: clamp(3rem, 8vw, 4rem);
+            cursor: grab;
+            transition: transform 0.2s;
+        }
+        .sortable-object:active {
+            cursor: grabbing;
+        }
+        .sortable-object.dragging {
+            opacity: 0.5;
+        }
+        .sortable-object.incorrect {
+            animation: incorrect-shake 0.5s;
+        }
+        @keyframes incorrect-shake {
+            0%, 100% { transform: translateX(0); }
+            10%, 30%, 50%, 70%, 90% { transform: translateX(-8px); }
+            20%, 40%, 60%, 80% { transform: translateX(8px); }
+        }
+
+        /* --- Progress Screen --- */
+        #progress-screen .content {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            width: 100%;
+            flex-grow: 1;
+        }
+        .progress-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(100px, 1fr));
+            gap: 1.5rem;
+            margin-top: 2rem;
+            width: 100%;
+        }
+        .progress-tile {
+            aspect-ratio: 1;
+            border-radius: 15px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            font-size: clamp(2rem, 5vw, 3rem);
+            background-color: #E8F5E9;
+            border: 2px solid var(--success-color);
+        }
+        .progress-tile.incomplete {
+            background-color: #FFEBEE;
+            border: 2px solid var(--error-color);
+        }
+
+        /* --- Modals & Notifications --- */
+        .modal {
+            display: none; 
+            position: fixed; 
+            z-index: 1000; 
+            left: 0;
+            top: 0;
+            width: 100%; 
+            height: 100%; 
+            background-color: rgba(0,0,0,0.6); 
+            justify-content: center;
+            align-items: center;
+        }
+        .modal-content {
+            background-color: var(--white);
+            padding: 2.5rem;
+            border-radius: var(--border-radius);
+            text-align: center;
+            box-shadow: 0 10px 40px rgba(0,0,0,0.2);
+            animation: bounce-in 0.5s;
+            max-width: 500px;
+            width: 90%;
+        }
+        @keyframes bounce-in {
+            0% { transform: scale(0.7); opacity: 0; }
+            50% { transform: scale(1.05); }
+            100% { transform: scale(1); opacity: 1; }
+        }
+        .modal-content h2 {
+            margin-top: 0;
+            font-size: clamp(1.5rem, 4vw, 2rem);
+            color: var(--primary);
+        }
+        .modal-content .icon {
+            font-size: clamp(4rem, 10vw, 5rem);
+            margin: 1rem 0;
+        }
+        .answer-buttons {
+            display: flex;
+            gap: 1rem;
+            justify-content: center;
+            margin-top: 1.5rem;
+            flex-wrap: wrap;
+        }
+        .answer-btn {
+            padding: 12px 20px;
+            font-size: clamp(1rem, 2.5vw, 1.1rem);
+            border: 2px solid var(--primary);
+            background-color: var(--white);
+            color: var(--primary);
+            border-radius: 10px;
+            cursor: pointer;
+            transition: all 0.2s;
+            font-family: 'Fredoka', sans-serif;
+        }
+        .answer-btn:hover {
+            background-color: var(--primary);
+            color: var(--white);
+        }
+        
+        /* --- Create Profile Modal Specifics --- */
+        #new-profile-name-input {
+            width: 80%;
+            padding: 12px;
+            font-size: 1.2rem;
+            font-family: 'Fredoka', sans-serif;
+            border: 2px solid #ccc;
+            border-radius: 10px;
+            margin: 1rem 0;
+            text-align: center;
+        }
+        .modal-actions {
+            display: flex;
+            gap: 1rem;
+            justify-content: center;
+            margin-top: 1.5rem;
+        }
+
+        /* --- Notification Toast --- */
+        .notification {
+            position: fixed;
+            top: 20px;
+            left: 50%;
+            transform: translateX(-50%) translateY(-100px);
+            background-color: var(--success-color);
+            color: var(--white);
+            padding: 1rem 2rem;
+            border-radius: 50px;
+            font-size: clamp(1rem, 2.5vw, 1.2rem);
+            font-weight: 600;
+            box-shadow: var(--shadow);
+            z-index: 2000;
+            opacity: 0;
+            transition: transform 0.5s ease, opacity 0.5s ease;
+        }
+        .notification.show {
+            transform: translateX(-50%) translateY(0);
+            opacity: 1;
+        }
+        .notification.error {
+            background-color: var(--error-color);
+        }
+
+        /* --- Comparison Buttons --- */
+        .comparison-buttons {
+            display: flex;
+            gap: 1rem;
+            margin-top: 1rem;
+        }
+        .comparison-btn {
+            padding: 10px 20px;
+            font-size: clamp(1rem, 2.5vw, 1.1rem);
+            border: 2px solid var(--primary);
+            background-color: var(--white);
+            color: var(--primary);
+            border-radius: 10px;
+            cursor: pointer;
+            transition: all 0.2s;
+            font-family: 'Fredoka', sans-serif;
+            font-weight: 600;
+        }
+        .comparison-btn:hover {
+            background-color: var(--primary);
+            color: var(--white);
+        }
+    </style>
+</head>
+<body>
+
+    <div class="game-container">
+        <!-- Profile Selection Screen -->
+        <div id="profile-screen" class="game-view">
+            <h1>Size Detectives</h1>
+            <div class="profile-grid" id="profile-grid">
+                <!-- Profiles will be injected here -->
+            </div>
+        </div>
+
+        <!-- Main Menu Screen -->
+        <div id="main-menu-screen" class="game-view hidden">
+            <div class="menu-content">
+                <div class="character">🐘</div>
+                <h2>Welcome back, <span id="menu-profile-name">Detective</span>!</h2>
+                <div class="menu-buttons">
+                    <!-- ONCLICK: menu-play-btn -->
+                    <button class="btn btn-primary" id="menu-play-btn">▶️ Play</button>
+                    <!-- ONCLICK: menu-progress-btn -->
+                    <button class="btn btn-secondary" id="menu-progress-btn">📈 My Progress</button>
+                    <!-- ONCLICK: menu-switch-profile-btn -->
+                    <button class="btn btn-secondary" id="menu-switch-profile-btn">👤 Switch Profile</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Level Select Screen -->
+        <div id="level-select-screen" class="game-view hidden">
+            <div class="view-header">
+                <!-- ONCLICK: level-select-back-btn -->
+                <button class="icon-btn" id="level-select-back-btn">⬅️ Back</button>
+                <h1 class="view-title" id="level-select-title">Choose a Level</h1>
+                <div></div>
+            </div>
+            <div class="content">
+                <div class="level-grid" id="level-grid">
+                    <!-- Level tiles will be injected here -->
+                </div>
+            </div>
+        </div>
+
+        <!-- Game Screen -->
+        <div id="game-screen" class="game-view hidden">
+            <div id="game-header">
+                <div id="game-prompt">Which is bigger?</div>
+                <!-- ONCLICK: game-pause-btn -->
+                <button class="icon-btn" id="game-pause-btn">⏸️</button>
+            </div>
+            <div id="scene-container">
+                <!-- Game content will be dynamically added here -->
+            </div>
+        </div>
+
+        <!-- Progress Screen -->
+        <div id="progress-screen" class="game-view hidden">
+            <div class="view-header">
+                <!-- ONCLICK: progress-back-btn -->
+                <button class="icon-btn" id="progress-back-btn">⬅️ Back</button>
+                <h1 class="view-title" id="progress-title">My Progress</h1>
+                <div></div>
+            </div>
+            <div class="content">
+                <div class="progress-grid" id="progress-grid">
+                    <!-- Progress tiles will be injected here -->
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal for Answering -->
+    <div id="answer-modal" class="modal">
+        <div class="modal-content">
+            <h2>Great job!</h2>
+            <div class="icon" id="modal-question-icon">🎉</div>
+            <p id="modal-message">You're getting good at this!</p>
+            <div class="modal-actions">
+                <button class="btn btn-primary" id="continue-btn">Continue</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal for Creating a Profile -->
+    <div id="create-profile-modal" class="modal">
+        <div class="modal-content">
+            <h2>Create a New Detective</h2>
+            <input type="text" id="new-profile-name-input" placeholder="Enter detective's name..." maxlength="20">
+            <div class="modal-actions">
+                <!-- ONCLICK: confirm-create-profile-btn -->
+                <button class="btn btn-primary" id="confirm-create-profile-btn">Create Profile</button>
+                <!-- ONCLICK: cancel-create-profile-btn -->
+                <button class="btn btn-secondary" id="cancel-create-profile-btn">Cancel</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Notification Toast -->
+    <div id="notification" class="notification"></div>
+
+    <script>
+    document.addEventListener('DOMContentLoaded', () => {
+        // --- DOM Elements ---
+        const views = {
+            profile: document.getElementById('profile-screen'),
+            mainMenu: document.getElementById('main-menu-screen'),
+            levelSelect: document.getElementById('level-select-screen'),
+            game: document.getElementById('game-screen'),
+            progress: document.getElementById('progress-screen')
+        };
+        const modals = {
+            answer: document.getElementById('answer-modal'),
+            createProfile: document.getElementById('create-profile-modal')
+        };
+        const notificationEl = document.getElementById('notification');
+
+        // --- Game State & Data ---
+        const gameState = {
+            currentProfile: null, 
+            currentLevel: null, 
+            currentLevelData: null, 
+            completedTasks: [],
+            ageGroup: 'younger', // Default age group
+            isAdvancedMode: false, 
+            gameType: 'comparison', // 'comparison' or 'sorting'
+            currentQuestion: null,
+            selectedObject: null
+        };
+
+        const objectData = {
+            // Animals with different sizes
+            elephant: { name: 'Elephant', icon: '🐘', size: 5, weight: 5, height: 5 },
+            mouse: { name: 'Mouse', icon: '🐭', size: 1, weight: 1, height: 1 },
+            giraffe: { name: 'Giraffe', icon: '🦒', size: 5, weight: 4, height: 5 },
+            rabbit: { name: 'Rabbit', icon: '🐰', size: 2, weight: 2, height: 2 },
+            whale: { name: 'Whale', icon: '🐋', size: 5, weight: 5, height: 4 },
+            bird: { name: 'Bird', icon: '🐦', size: 1, weight: 1, height: 1 },
+            lion: { name: 'Lion', icon: '🦁', size: 4, weight: 4, height: 3 },
+            cat: { name: 'Cat', icon: '🐱', size: 2, weight: 2, height: 2 },
+            
+            // Objects with different sizes
+            building: { name: 'Building', icon: '🏢', size: 5, weight: 5, height: 5 },
+            house: { name: 'House', icon: '🏠', size: 4, weight: 4, height: 4 },
+            car: { name: 'Car', icon: '🚗', size: 3, weight: 3, height: 2 },
+            bicycle: { name: 'Bicycle', icon: '🚲', size: 2, weight: 2, height: 2 },
+            ball: { name: 'Ball', icon: '⚽', size: 1, weight: 1, height: 1 },
+            
+            // Food items with different sizes
+            watermelon: { name: 'Watermelon', icon: '🍉', size: 4, weight: 4, height: 3 },
+            apple: { name: 'Apple', icon: '🍎', size: 2, weight: 2, height: 2 },
+            grape: { name: 'Grape', icon: '🍇', size: 1, weight: 1, height: 1 },
+            pizza: { name: 'Pizza', icon: '🍕', size: 3, weight: 3, height: 1 },
+            strawberry: { name: 'Strawberry', icon: '🍓', size: 1, weight: 1, height: 1 },
+            
+            // Nature items with different sizes
+            tree: { name: 'Tree', icon: '🌳', size: 5, weight: 4, height: 5 },
+            flower: { name: 'Flower', icon: '🌸', size: 1, weight: 1, height: 2 },
+            mountain: { name: 'Mountain', icon: '⛰️', size: 5, weight: 5, height: 5 },
+            rock: { name: 'Rock', icon: '🪨', size: 2, weight: 3, height: 1 },
+            sun: { name: 'Sun', icon: '☀️', size: 5, weight: 5, height: 5 },
+            moon: { name: 'Moon', icon: '🌙', size: 4, weight: 4, height: 4 }
+        };
+
+        const levelsData = {
+            younger: [
+                { 
+                    id: 1, 
+                    name: "Big and Small Animals", 
+                    difficulty: 1, 
+                    gameType: 'comparison',
+                    objects: ['elephant', 'mouse', 'giraffe', 'rabbit'],
+                    comparisonType: 'size',
+                    questions: [
+                        { prompt: "Which is bigger?", correct: 'bigger' },
+                        { prompt: "Which is smaller?", correct: 'smaller' }
+                    ]
+                },
+                { 
+                    id: 2, 
+                    name: "Food Sizes", 
+                    difficulty: 1, 
+                    gameType: 'comparison',
+                    objects: ['watermelon', 'apple', 'grape', 'strawberry'],
+                    comparisonType: 'size',
+                    questions: [
+                        { prompt: "Which is bigger?", correct: 'bigger' },
+                        { prompt: "Which is smaller?", correct: 'smaller' }
+                    ]
+                },
+                { 
+                    id: 3, 
+                    name: "Sorting Animals", 
+                    difficulty: 2, 
+                    gameType: 'sorting',
+                    objects: ['elephant', 'mouse', 'giraffe', 'rabbit', 'lion', 'cat'],
+                    sortingType: 'size',
+                    categories: ['Small', 'Medium', 'Large']
+                },
+                { 
+                    id: 4, 
+                    name: "Sorting Objects", 
+                    difficulty: 2, 
+                    gameType: 'sorting',
+                    objects: ['building', 'house', 'car', 'bicycle', 'ball'],
+                    sortingType: 'size',
+                    categories: ['Small', 'Medium', 'Large']
+                },
+                { 
+                    id: 5, 
+                    name: "Nature Sizes", 
+                    difficulty: 3, 
+                    gameType: 'sorting',
+                    objects: ['tree', 'flower', 'mountain', 'rock', 'sun', 'moon'],
+                    sortingType: 'size',
+                    categories: ['Small', 'Medium', 'Large']
+                }
+            ],
+            older: [
+                { 
+                    id: 1, 
+                    name: "Animal Heights", 
+                    difficulty: 1, 
+                    gameType: 'comparison',
+                    objects: ['giraffe', 'elephant', 'lion', 'rabbit'],
+                    comparisonType: 'height',
+                    questions: [
+                        { prompt: "Which is taller?", correct: 'taller' },
+                        { prompt: "Which is shorter?", correct: 'shorter' }
+                    ]
+                },
+                { 
+                    id: 2, 
+                    name: "Object Weights", 
+                    difficulty: 1, 
+                    gameType: 'comparison',
+                    objects: ['building', 'car', 'bicycle', 'ball'],
+                    comparisonType: 'weight',
+                    questions: [
+                        { prompt: "Which is heavier?", correct: 'heavier' },
+                        { prompt: "Which is lighter?", correct: 'lighter' }
+                    ]
+                },
+                { 
+                    id: 3, 
+                    name: "Sorting by Height", 
+                    difficulty: 2, 
+                    gameType: 'sorting',
+                    objects: ['giraffe', 'elephant', 'lion', 'rabbit', 'cat', 'bird'],
+                    sortingType: 'height',
+                    categories: ['Short', 'Medium', 'Tall']
+                },
+                { 
+                    id: 4, 
+                    name: "Sorting by Weight", 
+                    difficulty: 2, 
+                    gameType: 'sorting',
+                    objects: ['whale', 'elephant', 'lion', 'cat', 'mouse', 'bird'],
+                    sortingType: 'weight',
+                    categories: ['Light', 'Medium', 'Heavy']
+                },
+                { 
+                    id: 5, 
+                    name: "Multi-Attribute Sorting", 
+                    difficulty: 3, 
+                    gameType: 'sorting',
+                    objects: ['building', 'tree', 'car', 'house', 'bicycle', 'ball'],
+                    sortingType: 'size',
+                    categories: ['Small', 'Medium', 'Large']
+                }
+            ]
+        };
+
+        // --- Local Storage & Profile Management ---
+        function getProfiles() { 
+            const stored = localStorage.getItem('sizeDetectiveProfiles'); 
+            return stored ? JSON.parse(stored) : {}; 
+        }
+        function saveProfiles(profiles) { 
+            localStorage.setItem('sizeDetectiveProfiles', JSON.stringify(profiles)); 
+        }
+        function createProfile(name, avatar) {
+            const profiles = getProfiles(); 
+            const profileId = 'profile_' + Date.now();
+            profiles[profileId] = { 
+                id: profileId, 
+                name, 
+                avatar, 
+                ageGroup: 'younger', // Default age group
+                progress: {} 
+            };
+            saveProfiles(profiles); 
+            return profileId;
+        }
+
+        // --- Screen Management ---
+        function switchView(viewName) { 
+            Object.values(views).forEach(view => view.classList.add('hidden')); 
+            views[viewName].classList.remove('hidden'); 
+        }
+        function showNotification(message, duration = 2000, isError = false) {
+            notificationEl.textContent = message; 
+            notificationEl.classList.toggle('error', isError);
+            notificationEl.classList.add('show'); 
+            setTimeout(() => notificationEl.classList.remove('show'), duration); 
+        }
+
+        // --- Screen Rendering Logic ---
+        function renderProfileScreen() {
+            const grid = document.getElementById('profile-grid'); 
+            grid.innerHTML = ''; 
+            const profiles = getProfiles();
+            
+            Object.values(profiles).forEach(profile => {
+                const card = document.createElement('div'); 
+                card.className = 'profile-card';
+                card.innerHTML = `<div class="avatar">${profile.avatar}</div><div class="name">${profile.name}</div>`;
+                card.onclick = () => selectProfile(profile.id); 
+                grid.appendChild(card);
+            });
+            
+            const addCard = document.createElement('div'); 
+            addCard.className = 'profile-card add-profile-card';
+            addCard.innerHTML = `<div class="avatar">➕</div><div class="name">New Profile</div>`;
+            addCard.onclick = showCreateProfileModal; 
+            grid.appendChild(addCard);
+        }
+        
+        function showCreateProfileModal() {
+            document.getElementById('new-profile-name-input').value = '';
+            modals.createProfile.style.display = 'flex';
+        }
+        
+        function selectProfile(profileId) {
+            const profiles = getProfiles(); 
+            if (!profiles[profileId]) return;
+            
+            gameState.currentProfile = profiles[profileId]; 
+            gameState.ageGroup = gameState.currentProfile.ageGroup;
+            gameState.isAdvancedMode = gameState.ageGroup === 'older';
+            
+            document.getElementById('menu-profile-name').textContent = gameState.currentProfile.name; 
+            switchView('mainMenu');
+        }
+        
+        function renderLevelSelect() {
+            const grid = document.getElementById('level-grid'); 
+            grid.innerHTML = '';
+            const levels = levelsData[gameState.ageGroup]; 
+            const progress = gameState.currentProfile.progress[gameState.ageGroup] || {};
+            
+            levels.forEach(level => {
+                const tile = document.createElement('div'); 
+                tile.className = 'level-tile';
+                const isCompleted = progress[level.id]; 
+                const isUnlocked = level.id === 1 || progress[level.id - 1];
+                
+                if (isUnlocked) { 
+                    tile.classList.add('unlocked'); 
+                    tile.onclick = () => startLevel(level.id); 
+                } else { 
+                    tile.classList.add('locked'); 
+                }
+                
+                tile.innerHTML = isCompleted ? `<span class="star">⭐</span>${level.id}` : level.id; 
+                grid.appendChild(tile);
+            });
+        }
+        
+        function renderProgress() {
+            const grid = document.getElementById('progress-grid'); 
+            grid.innerHTML = '';
+            const levels = levelsData[gameState.ageGroup]; 
+            const progress = gameState.currentProfile.progress[gameState.ageGroup] || {};
+            
+            levels.forEach(level => {
+                const tile = document.createElement('div'); 
+                tile.className = 'progress-tile';
+                if (progress[level.id]) { 
+                    tile.innerHTML = '✅'; 
+                } else { 
+                    tile.classList.add('incomplete'); 
+                    tile.innerHTML = '❌'; 
+                }
+                grid.appendChild(tile);
+            });
+        }
+
+        // --- Game Logic ---
+        function startLevel(levelId) {
+            gameState.currentLevel = levelId; 
+            gameState.currentLevelData = levelsData[gameState.ageGroup].find(l => l.id === levelId);
+            gameState.completedTasks = []; 
+            gameState.gameType = gameState.currentLevelData.gameType;
+            
+            if (gameState.gameType === 'comparison') {
+                setupComparisonGame();
+            } else {
+                setupSortingGame();
+            }
+            
+            switchView('game');
+        }
+        
+        function setupComparisonGame() {
+            const sceneContainer = document.getElementById('scene-container');
+            sceneContainer.innerHTML = '';
+            
+            // Create comparison container
+            const comparisonContainer = document.createElement('div');
+            comparisonContainer.className = 'comparison-container';
+            
+            // Generate a random comparison question
+            const objects = gameState.currentLevelData.objects;
+            const object1 = objects[Math.floor(Math.random() * objects.length)];
+            let object2 = objects[Math.floor(Math.random() * objects.length)];
+            while (object2 === object1) {
+                object2 = objects[Math.floor(Math.random() * objects.length)];
+            }
+            
+            // Store current question
+            gameState.currentQuestion = {
+                object1: object1,
+                object2: object2,
+                type: gameState.currentLevelData.comparisonType,
+                question: gameState.currentLevelData.questions[Math.floor(Math.random() * gameState.currentLevelData.questions.length)]
+            };
+            
+            // Update prompt
+            document.getElementById('game-prompt').textContent = gameState.currentQuestion.question.prompt;
+            
+            // Create object elements
+            const object1El = document.createElement('div');
+            object1El.className = 'object-item';
+            object1El.dataset.object = object1;
+            object1El.innerHTML = `
+                <div class="object-icon">${objectData[object1].icon}</div>
+                <div class="object-label">${objectData[object1].name}</div>
+            `;
+            object1El.onclick = () => selectObject(object1);
+            
+            const object2El = document.createElement('div');
+            object2El.className = 'object-item';
+            object2El.dataset.object = object2;
+            object2El.innerHTML = `
+                <div class="object-icon">${objectData[object2].icon}</div>
+                <div class="object-label">${objectData[object2].name}</div>
+            `;
+            object2El.onclick = () => selectObject(object2);
+            
+            comparisonContainer.appendChild(object1El);
+            comparisonContainer.appendChild(object2El);
+            
+            sceneContainer.appendChild(comparisonContainer);
+            
+            // Create comparison buttons
+            const buttonsContainer = document.createElement('div');
+            buttonsContainer.className = 'comparison-buttons';
+            
+            const btn1 = document.createElement('button');
+            btn1.className = 'comparison-btn';
+            btn1.textContent = 'Check Answer';
+            btn1.onclick = checkComparisonAnswer;
+            
+            buttonsContainer.appendChild(btn1);
+            sceneContainer.appendChild(buttonsContainer);
+        }
+        
+        function selectObject(objectId) {
+            // Remove previous selection
+            document.querySelectorAll('.object-item').forEach(item => {
+                item.classList.remove('selected');
+            });
+            
+            // Add selection to clicked object
+            const selectedEl = document.querySelector(`[data-object="${objectId}"]`);
+            selectedEl.classList.add('selected');
+            
+            gameState.selectedObject = objectId;
+        }
+        
+        function checkComparisonAnswer() {
+            if (!gameState.selectedObject) {
+                showNotification("Please select an object first!", 1500, true);
+                return;
+            }
+            
+            const question = gameState.currentQuestion;
+            const obj1 = question.object1;
+            const obj2 = question.object2;
+            const selected = gameState.selectedObject;
+            
+            let isCorrect = false;
+            
+            if (question.question.correct === 'bigger' || question.question.correct === 'taller' || question.question.correct === 'heavier') {
+                // Check if selected object is bigger/taller/heavier
+                if (selected === obj1 && objectData[obj1][question.type] > objectData[obj2][question.type]) {
+                    isCorrect = true;
+                } else if (selected === obj2 && objectData[obj2][question.type] > objectData[obj1][question.type]) {
+                    isCorrect = true;
+                }
+            } else {
+                // Check if selected object is smaller/shorter/lighter
+                if (selected === obj1 && objectData[obj1][question.type] < objectData[obj2][question.type]) {
+                    isCorrect = true;
+                } else if (selected === obj2 && objectData[obj2][question.type] < objectData[obj1][question.type]) {
+                    isCorrect = true;
+                }
+            }
+            
+            if (isCorrect) {
+                showNotification("Correct! Great job!");
+                gameState.completedTasks.push(question);
+                
+                // Show success modal
+                const modalIcon = document.getElementById('modal-question-icon');
+                const modalMessage = document.getElementById('modal-message');
+                modalIcon.textContent = '🎉';
+                modalMessage.textContent = `You're right! The ${objectData[selected].name} is ${question.question.correct}!`;
+                modals.answer.style.display = 'flex';
+                
+                // Check if level is complete
+                if (gameState.completedTasks.length >= 3) {
+                    setTimeout(() => {
+                        onLevelComplete();
+                    }, 2000);
+                } else {
+                    // Setup next question
+                    setTimeout(() => {
+                        setupComparisonGame();
+                    }, 2000);
+                }
+            } else {
+                showNotification("Oops, that's not right. Try again!", 1500, true);
+                
+                // Shake animation for incorrect answer
+                const selectedEl = document.querySelector(`[data-object="${selected}"]`);
+                selectedEl.classList.add('incorrect-shake');
+                setTimeout(() => selectedEl.classList.remove('incorrect-shake'), 500);
+            }
+        }
+        
+        function setupSortingGame() {
+            const sceneContainer = document.getElementById('scene-container');
+            sceneContainer.innerHTML = '';
+            
+            // Create title
+            const title = document.createElement('h2');
+            title.textContent = `Sort objects by ${gameState.currentLevelData.sortingType}`;
+            title.style.color = 'var(--primary)';
+            title.style.marginBottom = '1rem';
+            sceneContainer.appendChild(title);
+            
+            // Create sorting zones
+            const sortingContainer = document.createElement('div');
+            sortingContainer.className = 'sorting-container';
+            
+            gameState.currentLevelData.categories.forEach(category => {
+                const zone = document.createElement('div');
+                zone.className = 'sorting-zone';
+                zone.dataset.category = category;
+                zone.innerHTML = `<h3>${category}</h3><div class="zone-items"></div>`;
+                
+                // Add drag and drop events
+                zone.addEventListener('dragover', handleDragOver);
+                zone.addEventListener('drop', handleDrop);
+                zone.addEventListener('dragleave', handleDragLeave);
+                
+                sortingContainer.appendChild(zone);
+            });
+            
+            sceneContainer.appendChild(sortingContainer);
+            
+            // Create sortable objects
+            const objectsContainer = document.createElement('div');
+            objectsContainer.className = 'sortable-objects';
+            
+            gameState.currentLevelData.objects.forEach(objectId => {
+                const objectEl = document.createElement('span');
+                objectEl.className = 'sortable-object';
+                objectEl.draggable = true;
+                objectEl.dataset.object = objectId;
+                objectEl.dataset.size = objectData[objectId][gameState.currentLevelData.sortingType];
+                objectEl.textContent = objectData[objectId].icon;
+                
+                // Add drag events
+                objectEl.addEventListener('dragstart', handleDragStart);
+                objectEl.addEventListener('dragend', handleDragEnd);
+                
+                objectsContainer.appendChild(objectEl);
+            });
+            
+            sceneContainer.appendChild(objectsContainer);
+        }
+        
+        let draggedElement = null;
+        
+        function handleDragStart(e) {
+            draggedElement = e.target;
+            e.target.classList.add('dragging');
+        }
+        
+        function handleDragEnd(e) {
+            e.target.classList.remove('dragging');
+        }
+        
+        function handleDragOver(e) {
+            e.preventDefault();
+            e.currentTarget.classList.add('drag-over');
+        }
+        
+        function handleDragLeave(e) {
+            e.currentTarget.classList.remove('drag-over');
+        }
+        
+        function handleDrop(e) {
+            e.preventDefault();
+            const dropZone = e.currentTarget;
+            dropZone.classList.remove('drag-over');
+            
+            if (draggedElement) {
+                const category = dropZone.dataset.category;
+                const objectSize = parseInt(draggedElement.dataset.size);
+                
+                let isCorrect = false;
+                
+                // Check if the object belongs to this category
+                if (gameState.currentLevelData.sortingType === 'size' || 
+                    gameState.currentLevelData.sortingType === 'height' || 
+                    gameState.currentLevelData.sortingType === 'weight') {
+                    
+                    if (category === 'Small' || category === 'Short' || category === 'Light') {
+                        isCorrect = objectSize <= 2;
+                    } else if (category === 'Medium') {
+                        isCorrect = objectSize === 3;
+                    } else if (category === 'Large' || category === 'Tall' || category === 'Heavy') {
+                        isCorrect = objectSize >= 4;
+                    }
+                }
+                
+                if (isCorrect) {
+                    dropZone.querySelector('.zone-items').appendChild(draggedElement);
+                    showNotification("Correct!");
+                    checkSortingComplete();
+                } else {
+                    draggedElement.classList.add('incorrect');
+                    setTimeout(() => draggedElement.classList.remove('incorrect'), 500);
+                    showNotification("Oops, that's not the right place!", 1500, true);
+                }
+            }
+        }
+        
+        function checkSortingComplete() {
+            const totalObjects = gameState.currentLevelData.objects.length;
+            const sortedObjects = document.querySelectorAll('.zone-items .sortable-object').length;
+            
+            if (totalObjects === sortedObjects) {
+                setTimeout(() => {
+                    showNotification("🎉 Level Complete! 🎉", 3000);
+                    onLevelComplete();
+                }, 500);
+            }
+        }
+        
+        function onLevelComplete() {
+            showNotification(`🎉 Level ${gameState.currentLevel} Complete! 🎉`, 3000);
+            
+            const profiles = getProfiles();
+            if (!profiles[gameState.currentProfile.id].progress[gameState.ageGroup]) { 
+                profiles[gameState.currentProfile.id].progress[gameState.ageGroup] = {}; 
+            }
+            profiles[gameState.currentProfile.id].progress[gameState.ageGroup][gameState.currentLevel] = true;
+            saveProfiles(profiles); 
+            gameState.currentProfile = profiles[gameState.currentProfile.id];
+            
+            setTimeout(() => { 
+                renderLevelSelect(); 
+                switchView('levelSelect'); 
+            }, 3000);
+        }
+
+        // --- EVENT LISTENERS ---
+        // Main Menu Buttons
+        document.getElementById('menu-play-btn').addEventListener('click', () => { 
+            renderLevelSelect(); 
+            switchView('levelSelect'); 
+        });
+        document.getElementById('menu-progress-btn').addEventListener('click', () => { 
+            renderProgress(); 
+            switchView('progress'); 
+        });
+        document.getElementById('menu-switch-profile-btn').addEventListener('click', () => { 
+            renderProfileScreen(); 
+            switchView('profile'); 
+        });
+        
+        // Navigation Back Buttons
+        document.getElementById('level-select-back-btn').addEventListener('click', () => switchView('mainMenu'));
+        document.getElementById('progress-back-btn').addEventListener('click', () => switchView('mainMenu'));
+        
+        // Game Screen Button
+        document.getElementById('game-pause-btn').addEventListener('click', () => { 
+            if (confirm('Are you sure you want to quit this level?')) { 
+                switchView('levelSelect'); 
+            } 
+        });
+        
+        // Create Profile Modal Buttons
+        document.getElementById('confirm-create-profile-btn').addEventListener('click', () => {
+            const nameInput = document.getElementById('new-profile-name-input'); 
+            const name = nameInput.value.trim();
+            if (!name) { 
+                showNotification('Please enter a name for your detective!', 2000, true); 
+                nameInput.focus(); 
+                return; 
+            }
+            const avatars = ['🐘', '🦒', '🦁', '🐻', '🐰', '🐸']; 
+            const avatar = avatars[Math.floor(Math.random() * avatars.length)];
+            const profileId = createProfile(name, avatar); 
+            modals.createProfile.style.display = 'none';
+            selectProfile(profileId); 
+            showNotification('Profile created successfully!');
+        });
+        document.getElementById('cancel-create-profile-btn').addEventListener('click', () => { 
+            modals.createProfile.style.display = 'none'; 
+        });
+        
+        // Continue button in answer modal
+        document.getElementById('continue-btn').addEventListener('click', () => {
+            modals.answer.style.display = 'none';
+        });
+
+        // Modal Background Click to Close
+        [modals.answer, modals.createProfile].forEach(modal => {
+            modal.addEventListener('click', (e) => { 
+                if (e.target === modal) { 
+                    modal.style.display = 'none'; 
+                } 
+            });
+        });
+
+        // --- Initial Load ---
+        renderProfileScreen();
+    });
+    </script>
+</body>
+</html>
