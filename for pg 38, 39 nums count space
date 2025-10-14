@@ -1,0 +1,1903 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Space Sorters: Cosmic Sorting Adventure!</title>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Fredoka:wght@300;400;500;600;700&display=swap');
+
+        /* --- Space Theme Color Palette --- */
+        :root {
+            --primary: #6366F1; /* Indigo */
+            --secondary: #8B5CF6; /* Purple */
+            --accent: #F59E0B; /* Amber */
+            --success: #10B981; /* Emerald */
+            --warning: #F97316; /* Orange */
+            --danger: #EF4444; /* Red */
+            --space-blue: #1E40AF; /* Dark Blue */
+            --space-purple: #4C1D95; /* Deep Purple */
+            --star-yellow: #FDE047; /* Yellow */
+            --background-color: #0F172A; /* Space Dark */
+            --text-color: #F1F5F9; /* Light Gray */
+            --white: #FFFFFF;
+            --shadow: 0 6px 20px rgba(0, 0, 0, 0.3);
+            --border-radius: 25px;
+        }
+
+        body {
+            font-family: 'Fredoka', sans-serif;
+            background: linear-gradient(135deg, #0F172A 0%, #1E293B 50%, #334155 100%);
+            color: var(--text-color);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            margin: 0;
+            overflow: hidden;
+            position: relative;
+        }
+
+        /* Animated space background */
+        body::before {
+            content: '';
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            background-image: 
+                radial-gradient(circle at 20% 80%, rgba(99, 102, 241, 0.1) 0%, transparent 50%),
+                radial-gradient(circle at 80% 20%, rgba(139, 92, 246, 0.1) 0%, transparent 50%),
+                radial-gradient(circle at 40% 40%, rgba(245, 158, 11, 0.05) 0%, transparent 50%);
+            pointer-events: none;
+        }
+
+        /* Stars background */
+        .stars {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+        }
+
+        .star {
+            position: absolute;
+            background-color: var(--star-yellow);
+            border-radius: 50%;
+            animation: twinkle 3s infinite;
+        }
+
+        @keyframes twinkle {
+            0%, 100% { opacity: 0.3; }
+            50% { opacity: 1; }
+        }
+
+        .game-container {
+            width: 95vw;
+            height: 95vh;
+            max-width: 1200px;
+            max-height: 800px;
+            background: linear-gradient(135deg, rgba(30, 64, 175, 0.2) 0%, rgba(76, 29, 149, 0.2) 100%);
+            border: 2px solid var(--primary);
+            border-radius: var(--border-radius);
+            box-shadow: var(--shadow);
+            position: relative;
+            overflow: hidden;
+            display: flex;
+            flex-direction: column;
+            backdrop-filter: blur(5px);
+        }
+
+        /* --- Game Views --- */
+        .game-view {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            display: flex;
+            flex-direction: column;
+            padding: 1.5rem;
+            box-sizing: border-box;
+        }
+        
+        .hidden {
+            display: none !important;
+        }
+
+        /* --- Header --- */
+        .view-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 1rem;
+            padding: 0.5rem;
+        }
+
+        .view-title {
+            font-size: clamp(1.8rem, 4vw, 2.2rem);
+            font-weight: 600;
+            color: var(--primary);
+            text-align: center;
+            flex-grow: 1;
+            text-shadow: 0 0 10px rgba(99, 102, 241, 0.5);
+        }
+
+        .icon-btn {
+            background: linear-gradient(135deg, var(--space-blue), var(--space-purple));
+            border: 2px solid var(--primary);
+            font-size: clamp(1.5rem, 3vw, 1.8rem);
+            cursor: pointer;
+            padding: 0.5rem 1rem;
+            border-radius: 15px;
+            transition: all 0.3s;
+            color: var(--white);
+            box-shadow: 0 4px 10px rgba(0,0,0,0.3);
+        }
+        .icon-btn:hover {
+            background: linear-gradient(135deg, var(--primary), var(--secondary));
+            transform: scale(1.05);
+            box-shadow: 0 6px 15px rgba(99, 102, 241, 0.5);
+        }
+
+        /* --- Buttons --- */
+        .btn {
+            font-family: 'Fredoka', sans-serif;
+            font-weight: 600;
+            border: none;
+            padding: 15px 30px;
+            font-size: clamp(1.1rem, 2.5vw, 1.3rem);
+            border-radius: 50px;
+            cursor: pointer;
+            transition: all 0.3s;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.2);
+        }
+        .btn:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 6px 20px rgba(0,0,0,0.3);
+        }
+        .btn-primary {
+            background: linear-gradient(135deg, var(--primary), var(--secondary));
+            color: var(--white);
+        }
+        .btn-secondary {
+            background: linear-gradient(135deg, var(--accent), var(--warning));
+            color: var(--text-color);
+        }
+        .btn-success {
+            background: linear-gradient(135deg, var(--success), #34D399);
+            color: var(--white);
+        }
+
+        /* --- Welcome Screen --- */
+        #welcome-screen {
+            align-items: center;
+            justify-content: center;
+            text-align: center;
+            background: radial-gradient(circle at center, rgba(99, 102, 241, 0.1) 0%, transparent 70%);
+        }
+        #welcome-screen h1 {
+            font-size: clamp(2.5rem, 6vw, 3.5rem);
+            margin-bottom: 1rem;
+            background: linear-gradient(135deg, var(--primary), var(--accent));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            animation: float 3s ease-in-out infinite;
+            text-shadow: 0 0 20px rgba(99, 102, 241, 0.3);
+        }
+        @keyframes float {
+            0%, 100% { transform: translateY(0); }
+            50% { transform: translateY(-10px); }
+        }
+        .welcome-character {
+            font-size: clamp(6rem, 15vw, 10rem);
+            margin: 1rem 0;
+            animation: bounce 2s ease-in-out infinite;
+            filter: drop-shadow(0 0 20px rgba(245, 158, 11, 0.5));
+        }
+        @keyframes bounce {
+            0%, 100% { transform: translateY(0) scale(1); }
+            50% { transform: translateY(-20px) scale(1.05); }
+        }
+        .welcome-buttons {
+            display: flex;
+            gap: 1rem;
+            justify-content: center;
+            margin-top: 2rem;
+            flex-wrap: wrap;
+        }
+
+        /* --- Level Select Screen --- */
+        #level-select-screen .content {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            width: 100%;
+            flex-grow: 1;
+        }
+        .level-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
+            gap: 1.5rem;
+            margin-top: 2rem;
+            width: 100%;
+            max-width: 600px;
+        }
+        .level-tile {
+            aspect-ratio: 1;
+            background: linear-gradient(135deg, var(--space-blue), var(--space-purple));
+            border-radius: 20px;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            font-size: clamp(2rem, 4vw, 2.5rem);
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s;
+            position: relative;
+            color: var(--white);
+            box-shadow: 0 4px 15px rgba(30, 64, 175, 0.4);
+            overflow: hidden;
+        }
+        .level-tile::before {
+            content: '';
+            position: absolute;
+            top: -50%;
+            left: -50%;
+            width: 200%;
+            height: 200%;
+            background: radial-gradient(circle, rgba(255,255,255,0.1) 0%, transparent 70%);
+            transition: all 0.5s;
+        }
+        .level-tile:hover::before {
+            top: -30%;
+            left: -30%;
+        }
+        .level-tile:hover {
+            transform: scale(1.1) rotate(5deg);
+            box-shadow: 0 8px 25px rgba(99, 102, 241, 0.5);
+        }
+        .level-tile .level-icon {
+            font-size: clamp(2.5rem, 5vw, 3rem);
+            margin-bottom: 0.5rem;
+            z-index: 1;
+        }
+        .level-tile .level-number {
+            font-size: clamp(0.9rem, 2vw, 1.1rem);
+            z-index: 1;
+        }
+        .level-tile.locked {
+            background: linear-gradient(135deg, #475569, #334155);
+            cursor: not-allowed;
+            opacity: 0.6;
+        }
+        .level-tile.locked:hover {
+            transform: none;
+        }
+
+        /* --- Game Screen --- */
+        #game-screen {
+            padding: 0;
+        }
+        #game-header {
+            background: linear-gradient(135deg, var(--space-blue), var(--space-purple));
+            color: var(--white);
+            padding: 1rem 2rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-radius: 0 0 25px 25px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.3);
+        }
+        #game-prompt {
+            font-size: clamp(1.3rem, 3vw, 1.6rem);
+            font-weight: 600;
+            text-align: center;
+            flex-grow: 1;
+        }
+        #game-area {
+            flex-grow: 1;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            padding: 2rem;
+            background: radial-gradient(ellipse at center, rgba(99, 102, 241, 0.05) 0%, transparent 70%);
+        }
+
+        /* Progress Bar */
+        .progress-bar {
+            width: 100%;
+            max-width: 400px;
+            height: 20px;
+            background-color: rgba(255, 255, 255, 0.1);
+            border-radius: 10px;
+            margin-bottom: 1rem;
+            overflow: hidden;
+            border: 1px solid rgba(255, 255, 255, 0.2);
+        }
+        .progress-fill {
+            height: 100%;
+            background: linear-gradient(90deg, var(--accent), var(--primary));
+            border-radius: 10px;
+            transition: width 0.5s ease;
+            width: 0%;
+            box-shadow: 0 0 10px rgba(245, 158, 11, 0.5);
+        }
+
+        /* Sorting Areas */
+        .sorting-container {
+            display: flex;
+            gap: 2rem;
+            margin: 2rem 0;
+            flex-wrap: wrap;
+            justify-content: center;
+            width: 100%;
+            max-width: 900px;
+        }
+        .sorting-area {
+            flex: 1;
+            min-width: 200px;
+            min-height: 200px;
+            background: rgba(255, 255, 255, 0.05);
+            border: 3px dashed var(--primary);
+            border-radius: 20px;
+            padding: 1rem;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            transition: all 0.3s;
+        }
+        .sorting-area.highlight {
+            background: rgba(99, 102, 241, 0.1);
+            border-color: var(--accent);
+            transform: scale(1.02);
+        }
+        .sorting-area h3 {
+            font-size: clamp(1.2rem, 2.5vw, 1.4rem);
+            color: var(--primary);
+            margin-bottom: 1rem;
+            text-align: center;
+        }
+        .sorting-items {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 1rem;
+            justify-content: center;
+            align-content: flex-start;
+            min-height: 100px;
+            width: 100%;
+        }
+
+        /* Sortable Items */
+        .sortable-item {
+            width: clamp(60px, 10vw, 80px);
+            height: clamp(60px, 10vw, 80px);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: clamp(2rem, 4vw, 3rem);
+            background: linear-gradient(135deg, rgba(255, 255, 255, 0.1), rgba(255, 255, 255, 0.2));
+            border: 2px solid var(--secondary);
+            border-radius: 15px;
+            cursor: grab;
+            transition: all 0.3s;
+            position: relative;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.2);
+        }
+        .sortable-item:active {
+            cursor: grabbing;
+        }
+        .sortable-item:hover {
+            transform: translateY(-5px) scale(1.05);
+            box-shadow: 0 8px 20px rgba(139, 92, 246, 0.4);
+        }
+        .sortable-item.dragging {
+            opacity: 0.5;
+            transform: scale(1.1);
+        }
+        .sortable-item.small {
+            width: clamp(45px, 7vw, 60px);
+            height: clamp(45px, 7vw, 60px);
+            font-size: clamp(1.5rem, 3vw, 2rem);
+        }
+        .sortable-item.medium {
+            width: clamp(60px, 10vw, 80px);
+            height: clamp(60px, 10vw, 80px);
+            font-size: clamp(2rem, 4vw, 3rem);
+        }
+        .sortable-item.large {
+            width: clamp(75px, 12vw, 100px);
+            height: clamp(75px, 12vw, 100px);
+            font-size: clamp(2.5rem, 5vw, 3.5rem);
+        }
+        .sortable-item.correct {
+            background: linear-gradient(135deg, rgba(16, 185, 129, 0.2), rgba(52, 211, 153, 0.3));
+            border-color: var(--success);
+            animation: correct-pulse 0.5s;
+        }
+        @keyframes correct-pulse {
+            0% { transform: scale(1); }
+            50% { transform: scale(1.2); }
+            100% { transform: scale(1); }
+        }
+
+        /* Item Pool */
+        .item-pool {
+            background: rgba(255, 255, 255, 0.05);
+            border: 3px solid var(--accent);
+            border-radius: 20px;
+            padding: 1.5rem;
+            margin: 2rem 0;
+            min-height: 150px;
+            width: 100%;
+            max-width: 800px;
+        }
+        .item-pool h3 {
+            font-size: clamp(1.2rem, 2.5vw, 1.4rem);
+            color: var(--accent);
+            margin-bottom: 1rem;
+            text-align: center;
+        }
+        .pool-items {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 1rem;
+            justify-content: center;
+        }
+
+        /* Pattern Display */
+        .pattern-display {
+            display: flex;
+            gap: 0.8rem;
+            margin-bottom: 2rem;
+            padding: 1.5rem;
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 20px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.2);
+            flex-wrap: wrap;
+            justify-content: center;
+        }
+        .pattern-item {
+            width: clamp(50px, 8vw, 70px);
+            height: clamp(50px, 8vw, 70px);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: clamp(2rem, 4vw, 3rem);
+            background: rgba(255, 255, 255, 0.1);
+            border: 2px solid var(--secondary);
+            border-radius: 15px;
+            transition: all 0.3s;
+        }
+        .pattern-item.empty {
+            border: 2px dashed var(--accent);
+            background: rgba(245, 158, 11, 0.1);
+            animation: pulse 2s ease-in-out infinite;
+        }
+        @keyframes pulse {
+            0%, 100% { transform: scale(1); }
+            50% { transform: scale(1.05); }
+        }
+
+        /* Options */
+        .options-container {
+            display: flex;
+            gap: 1.5rem;
+            margin-top: 2rem;
+            flex-wrap: wrap;
+            justify-content: center;
+        }
+        .option-item {
+            width: clamp(60px, 10vw, 80px);
+            height: clamp(60px, 10vw, 80px);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: clamp(2rem, 4vw, 3rem);
+            background: rgba(255, 255, 255, 0.1);
+            border: 2px solid var(--purple);
+            border-radius: 15px;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+        .option-item:hover {
+            transform: translateY(-5px) scale(1.1);
+            box-shadow: 0 8px 20px rgba(139, 92, 246, 0.4);
+        }
+        .option-item.selected {
+            background: rgba(139, 92, 246, 0.3);
+            border-color: var(--accent);
+            transform: scale(1.15);
+            animation: wiggle 0.5s;
+        }
+        @keyframes wiggle {
+            0%, 100% { transform: rotate(0deg) scale(1.15); }
+            25% { transform: rotate(-10deg) scale(1.15); }
+            75% { transform: rotate(10deg) scale(1.15); }
+        }
+
+        /* --- Success Animation --- */
+        .success-animation {
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            font-size: clamp(5rem, 10vw, 8rem);
+            z-index: 1000;
+            animation: success-burst 1s ease-out forwards;
+            pointer-events: none;
+        }
+        @keyframes success-burst {
+            0% { transform: translate(-50%, -50%) scale(0) rotate(0deg); opacity: 1; }
+            50% { transform: translate(-50%, -50%) scale(1.5) rotate(180deg); opacity: 1; }
+            100% { transform: translate(-50%, -50%) scale(2) rotate(360deg); opacity: 0; }
+        }
+
+        /* --- Notification Toast --- */
+        .notification {
+            position: fixed;
+            top: 20px;
+            left: 50%;
+            transform: translateX(-50%) translateY(-100px);
+            background: linear-gradient(135deg, var(--success), #34D399);
+            color: var(--white);
+            padding: 1rem 2rem;
+            border-radius: 50px;
+            font-size: clamp(1.1rem, 2.5vw, 1.3rem);
+            font-weight: 600;
+            box-shadow: var(--shadow);
+            z-index: 2000;
+            opacity: 0;
+            transition: all 0.5s ease;
+        }
+        .notification.show {
+            transform: translateX(-50%) translateY(0);
+            opacity: 1;
+        }
+        .notification.error {
+            background: linear-gradient(135deg, var(--danger), #F87171);
+        }
+
+        /* --- Progress Stars --- */
+        .progress-stars {
+            display: flex;
+            gap: 0.5rem;
+            margin-top: 1rem;
+            justify-content: center;
+        }
+        .star {
+            font-size: clamp(2rem, 4vw, 2.5rem);
+            color: rgba(255, 255, 255, 0.2);
+            transition: all 0.3s;
+        }
+        .star.filled {
+            color: var(--star-yellow);
+            animation: star-pop 0.5s;
+        }
+        @keyframes star-pop {
+            0% { transform: scale(1); }
+            50% { transform: scale(1.3); }
+            100% { transform: scale(1); }
+        }
+
+        /* --- Helper Character --- */
+        .helper-character {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            font-size: clamp(3rem, 6vw, 4rem);
+            cursor: pointer;
+            transition: all 0.3s;
+            animation: helper-bounce 3s ease-in-out infinite;
+            filter: drop-shadow(0 0 10px rgba(99, 102, 241, 0.5));
+        }
+        @keyframes helper-bounce {
+            0%, 100% { transform: translateY(0); }
+            50% { transform: translateY(-10px); }
+        }
+        .helper-character:hover {
+            transform: scale(1.1);
+        }
+        .helper-speech {
+            position: absolute;
+            bottom: 100%;
+            right: 0;
+            background: linear-gradient(135deg, var(--space-blue), var(--space-purple));
+            color: var(--white);
+            padding: 0.5rem 1rem;
+            border-radius: 15px;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.3);
+            font-size: clamp(0.9rem, 2vw, 1.1rem);
+            white-space: nowrap;
+            opacity: 0;
+            transition: opacity 0.3s;
+            pointer-events: none;
+        }
+        .helper-character:hover .helper-speech {
+            opacity: 1;
+        }
+
+        /* --- Streak Counter --- */
+        .streak-counter {
+            position: absolute;
+            top: 20px;
+            right: 20px;
+            background: linear-gradient(135deg, var(--accent), var(--warning));
+            color: var(--white);
+            padding: 0.5rem 1rem;
+            border-radius: 20px;
+            font-size: clamp(1rem, 2vw, 1.2rem);
+            font-weight: bold;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.3);
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+        .streak-fire {
+            font-size: clamp(1.2rem, 2.5vw, 1.5rem);
+            animation: fire-flicker 0.5s ease-in-out infinite alternate;
+        }
+        @keyframes fire-flicker {
+            0% { transform: scale(1) rotate(-5deg); }
+            100% { transform: scale(1.1) rotate(5deg); }
+        }
+
+        /* --- Rocket Animation --- */
+        .rocket {
+            position: fixed;
+            font-size: clamp(3rem, 6vw, 4rem);
+            transition: all 0.5s ease;
+            z-index: 100;
+        }
+        .rocket.launch {
+            animation: rocket-launch 2s ease-out forwards;
+        }
+        @keyframes rocket-launch {
+            0% { transform: translateY(0) rotate(0deg); }
+            50% { transform: translateY(-50vh) rotate(10deg); }
+            100% { transform: translateY(-100vh) rotate(0deg); opacity: 0; }
+        }
+
+        /* --- Responsive --- */
+        @media (max-width: 768px) {
+            .sorting-container {
+                flex-direction: column;
+                gap: 1rem;
+            }
+            .sorting-area {
+                min-width: 100%;
+            }
+        }
+    </style>
+</head>
+<body>
+
+    <!-- Animated Stars Background -->
+    <div class="stars" id="stars"></div>
+
+    <div class="game-container">
+        <!-- Welcome Screen -->
+        <div id="welcome-screen" class="game-view">
+            <h1>Space Sorters</h1>
+            <div class="welcome-character">🚀</div>
+            <h2 style="font-size: clamp(1.5rem, 3vw, 1.8rem); color: var(--accent); margin: 1rem 0;">Cosmic Sorting Adventure!</h2>
+            <div class="welcome-buttons">
+                <button class="btn btn-primary" id="start-playing-btn">🎮 Start Playing</button>
+                <button class="btn btn-secondary" id="free-play-btn">🎨 Free Play</button>
+            </div>
+        </div>
+
+        <!-- Level Select Screen -->
+        <div id="level-select-screen" class="game-view hidden">
+            <div class="view-header">
+                <button class="icon-btn" id="level-select-back-btn">⬅️</button>
+                <h1 class="view-title">Choose a Mission</h1>
+                <div></div>
+            </div>
+            <div class="content">
+                <div class="level-grid" id="level-grid">
+                    <!-- Level tiles will be injected here -->
+                </div>
+            </div>
+        </div>
+
+        <!-- Game Screen -->
+        <div id="game-screen" class="game-view hidden">
+            <div id="game-header">
+                <div></div>
+                <div id="game-prompt">Sort the Items!</div>
+                <button class="icon-btn" id="game-back-btn">⬅️</button>
+            </div>
+            <div class="streak-counter" id="streak-counter" style="display: none;">
+                <span class="streak-fire">🔥</span>
+                <span id="streak-count">0</span>
+            </div>
+            <div id="game-area">
+                <!-- Game content will be dynamically added here -->
+            </div>
+        </div>
+    </div>
+
+    <!-- Helper Character -->
+    <div class="helper-character" id="helper-character">
+        👽
+        <div class="helper-speech">Need help? Click me!</div>
+    </div>
+
+    <!-- Notification Toast -->
+    <div id="notification" class="notification"></div>
+
+    <script>
+    document.addEventListener('DOMContentLoaded', () => {
+        // --- Create Stars Background ---
+        function createStars() {
+            const starsContainer = document.getElementById('stars');
+            const numberOfStars = 100;
+            
+            for (let i = 0; i < numberOfStars; i++) {
+                const star = document.createElement('div');
+                star.className = 'star';
+                
+                // Random position
+                star.style.left = `${Math.random() * 100}%`;
+                star.style.top = `${Math.random() * 100}%`;
+                
+                // Random size
+                const size = Math.random() * 3 + 1;
+                star.style.width = `${size}px`;
+                star.style.height = `${size}px`;
+                
+                // Random animation delay
+                star.style.animationDelay = `${Math.random() * 3}s`;
+                
+                starsContainer.appendChild(star);
+            }
+        }
+        
+        createStars();
+
+        // --- DOM Elements ---
+        const views = {
+            welcome: document.getElementById('welcome-screen'),
+            levelSelect: document.getElementById('level-select-screen'),
+            game: document.getElementById('game-screen')
+        };
+        const notificationEl = document.getElementById('notification');
+        const helperCharacter = document.getElementById('helper-character');
+        const streakCounter = document.getElementById('streak-counter');
+        const streakCount = document.getElementById('streak-count');
+
+        // --- Game State ---
+        const gameState = {
+            currentLevel: null,
+            currentGameType: null,
+            score: 0,
+            attempts: 0,
+            streak: 0,
+            unlockedLevels: [1, 2, 3],
+            currentRound: 0,
+            totalRounds: 3,
+            draggedItem: null,
+            sortedItems: new Set()
+        };
+
+        // --- Data Definitions ---
+        const numbers = {
+            1: { icon: '1️⃣', color: '#EF4444' },
+            2: { icon: '2️⃣', color: '#F97316' },
+            3: { icon: '3️⃣', color: '#F59E0B' },
+            4: { icon: '4️⃣', color: '#10B981' },
+            5: { icon: '5️⃣', color: '#06B6D4' },
+            6: { icon: '6️⃣', color: '#3B82F6' },
+            7: { icon: '7️⃣', color: '#6366F1' },
+            8: { icon: '8️⃣', color: '#8B5CF6' },
+            9: { icon: '9️⃣', color: '#A855F7' },
+            10: { icon: '🔟', color: '#EC4899' }
+        };
+
+        const shapes = {
+            circle: { icon: '⭕', color: '#EF4444' },
+            square: { icon: '⬜', color: '#F97316' },
+            triangle: { icon: '🔺', color: '#F59E0B' },
+            star: { icon: '⭐', color: '#10B981' },
+            heart: { icon: '❤️', color: '#EC4899' },
+            diamond: { icon: '💎', color: '#06B6D4' },
+            pentagon: { icon: '⬟', color: '#6366F1' },
+            hexagon: { icon: '⬢', color: '#8B5CF6' }
+        };
+
+        const spaceObjects = {
+            rocket: { icon: '🚀', color: '#EF4444' },
+            ufo: { icon: '🛸', color: '#8B5CF6' },
+            planet: { icon: '🪐', color: '#F59E0B' },
+            star: { icon: '⭐', color: '#FDE047' },
+            moon: { icon: '🌙', color: '#E2E8F0' },
+            sun: { icon: '☀️', color: '#F59E0B' },
+            comet: { icon: '☄️', color: '#06B6D4' },
+            satellite: { icon: '🛰️', color: '#94A3B8' },
+            astronaut: { icon: '👨‍🚀', color: '#E2E8F0' },
+            alien: { icon: '👽', color: '#10B981' }
+        };
+
+        // --- Level Data ---
+        const levels = [
+            {
+                id: 1,
+                name: "Number Sort",
+                icon: "🔢",
+                type: "number-sort",
+                difficulty: "easy",
+                description: "Sort numbers from smallest to largest"
+            },
+            {
+                id: 2,
+                name: "Shape Sort",
+                icon: "🔷",
+                type: "shape-sort",
+                difficulty: "easy",
+                description: "Group shapes by their type"
+            },
+            {
+                id: 3,
+                name: "Space Objects",
+                icon: "🚀",
+                type: "space-sort",
+                difficulty: "easy",
+                description: "Sort space objects by category"
+            },
+            {
+                id: 4,
+                name: "Size Sorting",
+                icon: "📏",
+                type: "size-sort",
+                difficulty: "medium",
+                description: "Sort items by their size"
+            },
+            {
+                id: 5,
+                name: "Color Sort",
+                icon: "🎨",
+                type: "color-sort",
+                difficulty: "medium",
+                description: "Group items by their color"
+            },
+            {
+                id: 6,
+                name: "Mixed Sorting",
+                icon: "🔀",
+                type: "mixed-sort",
+                difficulty: "medium",
+                description: "Sort mixed items by different attributes"
+            },
+            {
+                id: 7,
+                name: "Pattern Sort",
+                icon: "📈",
+                type: "pattern-sort",
+                difficulty: "hard",
+                description: "Complete and extend patterns"
+            },
+            {
+                id: 8,
+                name: "Master Sorter",
+                icon: "👑",
+                type: "master-sort",
+                difficulty: "expert",
+                description: "Complex sorting challenges"
+            }
+        ];
+
+        // --- Screen Management ---
+        function switchView(viewName) {
+            Object.values(views).forEach(view => view.classList.add('hidden'));
+            views[viewName].classList.remove('hidden');
+        }
+
+        function showNotification(message, duration = 2000, isError = false) {
+            notificationEl.textContent = message;
+            notificationEl.classList.toggle('error', isError);
+            notificationEl.classList.add('show');
+            setTimeout(() => notificationEl.classList.remove('show'), duration);
+        }
+
+        function showSuccessAnimation() {
+            const successEl = document.createElement('div');
+            successEl.className = 'success-animation';
+            successEl.textContent = '🎉';
+            document.body.appendChild(successEl);
+            setTimeout(() => successEl.remove(), 1000);
+        }
+
+        function updateStreak(correct) {
+            if (correct) {
+                gameState.streak++;
+                streakCount.textContent = gameState.streak;
+                streakCounter.style.display = 'flex';
+                
+                if (gameState.streak >= 3) {
+                    showNotification(`🔥 ${gameState.streak} in a row! Amazing!`, 2000);
+                }
+            } else {
+                gameState.streak = 0;
+                streakCounter.style.display = 'none';
+            }
+        }
+
+        function unlockNextLevel(levelId) {
+            const nextLevelId = levelId + 1;
+            if (nextLevelId <= levels.length && !gameState.unlockedLevels.includes(nextLevelId)) {
+                gameState.unlockedLevels.push(nextLevelId);
+                showNotification(`🎊 Mission ${nextLevelId} unlocked!`, 3000);
+            }
+        }
+
+        // --- Level Selection ---
+        function renderLevelSelect() {
+            const grid = document.getElementById('level-grid');
+            grid.innerHTML = '';
+            
+            levels.forEach(level => {
+                const tile = document.createElement('div');
+                tile.className = 'level-tile';
+                
+                if (gameState.unlockedLevels.includes(level.id)) {
+                    tile.innerHTML = `
+                        <div class="level-icon">${level.icon}</div>
+                        <div class="level-number">${level.name}</div>
+                    `;
+                    tile.onclick = () => startLevel(level);
+                } else {
+                    tile.className += ' locked';
+                    tile.innerHTML = `
+                        <div class="level-icon">🔒</div>
+                        <div class="level-number">Locked</div>
+                    `;
+                }
+                
+                grid.appendChild(tile);
+            });
+        }
+
+        // --- Game Logic ---
+        function startLevel(level) {
+            gameState.currentLevel = level;
+            gameState.currentGameType = level.type;
+            gameState.score = 0;
+            gameState.attempts = 0;
+            gameState.currentRound = 0;
+            gameState.sortedItems.clear();
+            
+            switchView('game');
+            
+            switch (level.type) {
+                case 'number-sort':
+                    startNumberSortGame(level);
+                    break;
+                case 'shape-sort':
+                    startShapeSortGame(level);
+                    break;
+                case 'space-sort':
+                    startSpaceSortGame(level);
+                    break;
+                case 'size-sort':
+                    startSizeSortGame(level);
+                    break;
+                case 'color-sort':
+                    startColorSortGame(level);
+                    break;
+                case 'mixed-sort':
+                    startMixedSortGame(level);
+                    break;
+                case 'pattern-sort':
+                    startPatternSortGame(level);
+                    break;
+                case 'master-sort':
+                    startMasterSortGame(level);
+                    break;
+            }
+        }
+
+        function startNumberSortGame(level) {
+            const gameArea = document.getElementById('game-area');
+            gameArea.innerHTML = '';
+            
+            // Update prompt
+            document.getElementById('game-prompt').textContent = "Sort numbers from smallest to largest!";
+            
+            // Create sorting areas
+            const sortingContainer = document.createElement('div');
+            sortingContainer.className = 'sorting-container';
+            
+            // Create a single sorted area
+            const sortedArea = document.createElement('div');
+            sortedArea.className = 'sorting-area';
+            sortedArea.innerHTML = '<h3>Sorted Numbers</h3>';
+            
+            const sortedItems = document.createElement('div');
+            sortedItems.className = 'sorting-items';
+            sortedItems.id = 'sorted-area';
+            sortedArea.appendChild(sortedItems);
+            
+            sortingContainer.appendChild(sortedArea);
+            gameArea.appendChild(sortingContainer);
+            
+            // Create item pool
+            const itemPool = document.createElement('div');
+            itemPool.className = 'item-pool';
+            itemPool.innerHTML = '<h3>Numbers to Sort</h3>';
+            
+            const poolItems = document.createElement('div');
+            poolItems.className = 'pool-items';
+            
+            // Generate random numbers
+            const numItems = level.difficulty === 'easy' ? 5 : 7;
+            const usedNumbers = new Set();
+            
+            while (usedNumbers.size < numItems) {
+                const num = Math.floor(Math.random() * 10) + 1;
+                usedNumbers.add(num);
+            }
+            
+            const numbersArray = Array.from(usedNumbers).sort(() => Math.random() - 0.5);
+            
+            numbersArray.forEach(num => {
+                const item = createSortableItem('number', num, numbers[num]);
+                poolItems.appendChild(item);
+            });
+            
+            itemPool.appendChild(poolItems);
+            gameArea.appendChild(itemPool);
+            
+            // Setup drop zone
+            setupDropZone(sortedItems);
+        }
+
+        function startShapeSortGame(level) {
+            const gameArea = document.getElementById('game-area');
+            gameArea.innerHTML = '';
+            
+            // Update prompt
+            document.getElementById('game-prompt').textContent = "Group shapes by their type!";
+            
+            // Create sorting areas for each shape type
+            const sortingContainer = document.createElement('div');
+            sortingContainer.className = 'sorting-container';
+            
+            const shapeTypes = ['circle', 'square', 'triangle', 'star'];
+            const numTypes = level.difficulty === 'easy' ? 3 : 4;
+            
+            for (let i = 0; i < numTypes; i++) {
+                const shapeType = shapeTypes[i];
+                const area = document.createElement('div');
+                area.className = 'sorting-area';
+                area.innerHTML = `<h3>${shapes[shapeType].icon} ${shapeType.charAt(0).toUpperCase() + shapeType.slice(1)}s</h3>`;
+                
+                const itemsContainer = document.createElement('div');
+                itemsContainer.className = 'sorting-items';
+                itemsContainer.dataset.shapeType = shapeType;
+                area.appendChild(itemsContainer);
+                
+                sortingContainer.appendChild(area);
+                
+                // Setup drop zone
+                setupDropZone(itemsContainer);
+            }
+            
+            gameArea.appendChild(sortingContainer);
+            
+            // Create item pool
+            const itemPool = document.createElement('div');
+            itemPool.className = 'item-pool';
+            itemPool.innerHTML = '<h3>Shapes to Sort</h3>';
+            
+            const poolItems = document.createElement('div');
+            poolItems.className = 'pool-items';
+            
+            // Generate random shapes
+            const numItems = level.difficulty === 'easy' ? 8 : 12;
+            
+            for (let i = 0; i < numItems; i++) {
+                const shapeType = shapeTypes[Math.floor(Math.random() * numTypes)];
+                const item = createSortableItem('shape', shapeType, shapes[shapeType]);
+                poolItems.appendChild(item);
+            }
+            
+            itemPool.appendChild(poolItems);
+            gameArea.appendChild(itemPool);
+        }
+
+        function startSpaceSortGame(level) {
+            const gameArea = document.getElementById('game-area');
+            gameArea.innerHTML = '';
+            
+            // Update prompt
+            document.getElementById('game-prompt').textContent = "Sort space objects by category!";
+            
+            // Create sorting areas for different categories
+            const sortingContainer = document.createElement('div');
+            sortingContainer.className = 'sorting-container';
+            
+            const categories = {
+                'vehicles': ['rocket', 'ufo', 'satellite'],
+                'celestial': ['planet', 'star', 'moon', 'sun', 'comet'],
+                'beings': ['astronaut', 'alien']
+            };
+            
+            Object.entries(categories).forEach(([category, objects]) => {
+                const area = document.createElement('div');
+                area.className = 'sorting-area';
+                area.innerHTML = `<h3>${category.charAt(0).toUpperCase() + category.slice(1)}</h3>`;
+                
+                const itemsContainer = document.createElement('div');
+                itemsContainer.className = 'sorting-items';
+                itemsContainer.dataset.category = category;
+                area.appendChild(itemsContainer);
+                
+                sortingContainer.appendChild(area);
+                
+                // Setup drop zone
+                setupDropZone(itemsContainer);
+            });
+            
+            gameArea.appendChild(sortingContainer);
+            
+            // Create item pool
+            const itemPool = document.createElement('div');
+            itemPool.className = 'item-pool';
+            itemPool.innerHTML = '<h3>Space Objects to Sort</h3>';
+            
+            const poolItems = document.createElement('div');
+            poolItems.className = 'pool-items';
+            
+            // Generate random space objects
+            const allObjects = Object.keys(spaceObjects);
+            const numItems = level.difficulty === 'easy' ? 8 : 12;
+            
+            for (let i = 0; i < numItems; i++) {
+                const objType = allObjects[Math.floor(Math.random() * allObjects.length)];
+                const item = createSortableItem('space', objType, spaceObjects[objType]);
+                poolItems.appendChild(item);
+            }
+            
+            itemPool.appendChild(poolItems);
+            gameArea.appendChild(itemPool);
+        }
+
+        function startSizeSortGame(level) {
+            const gameArea = document.getElementById('game-area');
+            gameArea.innerHTML = '';
+            
+            // Update prompt
+            document.getElementById('game-prompt').textContent = "Sort items by size: Small, Medium, Large!";
+            
+            // Create sorting areas for different sizes
+            const sortingContainer = document.createElement('div');
+            sortingContainer.className = 'sorting-container';
+            
+            const sizes = ['small', 'medium', 'large'];
+            const sizeLabels = ['Small', 'Medium', 'Large'];
+            
+            sizes.forEach((size, index) => {
+                const area = document.createElement('div');
+                area.className = 'sorting-area';
+                area.innerHTML = `<h3>${sizeLabels[index]}</h3>`;
+                
+                const itemsContainer = document.createElement('div');
+                itemsContainer.className = 'sorting-items';
+                itemsContainer.dataset.size = size;
+                area.appendChild(itemsContainer);
+                
+                sortingContainer.appendChild(area);
+                
+                // Setup drop zone
+                setupDropZone(itemsContainer);
+            });
+            
+            gameArea.appendChild(sortingContainer);
+            
+            // Create item pool
+            const itemPool = document.createElement('div');
+            itemPool.className = 'item-pool';
+            itemPool.innerHTML = '<h3>Items to Sort by Size</h3>';
+            
+            const poolItems = document.createElement('div');
+            poolItems.className = 'pool-items';
+            
+            // Generate random items with different sizes
+            const numItems = level.difficulty === 'easy' ? 9 : 12;
+            const allTypes = [...Object.keys(numbers), ...Object.keys(shapes)];
+            
+            for (let i = 0; i < numItems; i++) {
+                const type = allTypes[Math.floor(Math.random() * allTypes.length)];
+                const size = sizes[Math.floor(Math.random() * sizes.length)];
+                const data = type in numbers ? numbers[type] : shapes[type];
+                const item = createSortableItem('mixed', type, data, size);
+                poolItems.appendChild(item);
+            }
+            
+            itemPool.appendChild(poolItems);
+            gameArea.appendChild(itemPool);
+        }
+
+        function startColorSortGame(level) {
+            const gameArea = document.getElementById('game-area');
+            gameArea.innerHTML = '';
+            
+            // Update prompt
+            document.getElementById('game-prompt').textContent = "Group items by their color!";
+            
+            // Create sorting areas for different colors
+            const sortingContainer = document.createElement('div');
+            sortingContainer.className = 'sorting-container';
+            
+            const colors = [
+                { name: 'Red', value: '#EF4444' },
+                { name: 'Orange', value: '#F97316' },
+                { name: 'Yellow', value: '#F59E0B' },
+                { name: 'Green', value: '#10B981' },
+                { name: 'Blue', value: '#3B82F6' },
+                { name: 'Purple', value: '#8B5CF6' }
+            ];
+            
+            const numColors = level.difficulty === 'easy' ? 3 : 4;
+            const selectedColors = colors.slice(0, numColors);
+            
+            selectedColors.forEach(color => {
+                const area = document.createElement('div');
+                area.className = 'sorting-area';
+                area.innerHTML = `<h3>${color.name}</h3>`;
+                
+                const itemsContainer = document.createElement('div');
+                itemsContainer.className = 'sorting-items';
+                itemsContainer.dataset.color = color.value;
+                area.appendChild(itemsContainer);
+                
+                sortingContainer.appendChild(area);
+                
+                // Setup drop zone
+                setupDropZone(itemsContainer);
+            });
+            
+            gameArea.appendChild(sortingContainer);
+            
+            // Create item pool
+            const itemPool = document.createElement('div');
+            itemPool.className = 'item-pool';
+            itemPool.innerHTML = '<h3>Items to Sort by Color</h3>';
+            
+            const poolItems = document.createElement('div');
+            poolItems.className = 'pool-items';
+            
+            // Generate random items with different colors
+            const numItems = level.difficulty === 'easy' ? 9 : 15;
+            
+            for (let i = 0; i < numItems; i++) {
+                const color = selectedColors[Math.floor(Math.random() * selectedColors.length)];
+                const allTypes = [...Object.keys(numbers), ...Object.keys(shapes), ...Object.keys(spaceObjects)];
+                const type = allTypes[Math.floor(Math.random() * allTypes.length)];
+                const data = type in numbers ? numbers[type] : 
+                              type in shapes ? shapes[type] : spaceObjects[type];
+                
+                // Override color for the item
+                const itemData = { ...data, color: color.value };
+                const item = createSortableItem('mixed', type, itemData);
+                poolItems.appendChild(item);
+            }
+            
+            itemPool.appendChild(poolItems);
+            gameArea.appendChild(itemPool);
+        }
+
+        function startMixedSortGame(level) {
+            const gameArea = document.getElementById('game-area');
+            gameArea.innerHTML = '';
+            
+            // Update prompt
+            document.getElementById('game-prompt').textContent = "Sort items by different attributes!";
+            
+            // Create multiple sorting areas with different criteria
+            const sortingContainer = document.createElement('div');
+            sortingContainer.className = 'sorting-container';
+            
+            // Create areas for different sorting criteria
+            const criteria = [
+                { name: 'Numbers', type: 'number' },
+                { name: 'Shapes', type: 'shape' },
+                { name: 'Space', type: 'space' }
+            ];
+            
+            criteria.forEach(criterion => {
+                const area = document.createElement('div');
+                area.className = 'sorting-area';
+                area.innerHTML = `<h3>${criterion.name}</h3>`;
+                
+                const itemsContainer = document.createElement('div');
+                itemsContainer.className = 'sorting-items';
+                itemsContainer.dataset.type = criterion.type;
+                area.appendChild(itemsContainer);
+                
+                sortingContainer.appendChild(area);
+                
+                // Setup drop zone
+                setupDropZone(itemsContainer);
+            });
+            
+            gameArea.appendChild(sortingContainer);
+            
+            // Create item pool with mixed items
+            const itemPool = document.createElement('div');
+            itemPool.className = 'item-pool';
+            itemPool.innerHTML = '<h3>Mixed Items to Sort</h3>';
+            
+            const poolItems = document.createElement('div');
+            poolItems.className = 'pool-items';
+            
+            // Generate random mixed items
+            const numItems = level.difficulty === 'easy' ? 12 : 18;
+            const allTypes = [
+                ...Object.keys(numbers).map(t => ({ type: 'number', value: t })),
+                ...Object.keys(shapes).map(t => ({ type: 'shape', value: t })),
+                ...Object.keys(spaceObjects).map(t => ({ type: 'space', value: t }))
+            ];
+            
+            for (let i = 0; i < numItems; i++) {
+                const typeInfo = allTypes[Math.floor(Math.random() * allTypes.length)];
+                const data = typeInfo.type === 'number' ? numbers[typeInfo.value] :
+                              typeInfo.type === 'shape' ? shapes[typeInfo.value] :
+                              spaceObjects[typeInfo.value];
+                
+                const item = createSortableItem(typeInfo.type, typeInfo.value, data);
+                poolItems.appendChild(item);
+            }
+            
+            itemPool.appendChild(poolItems);
+            gameArea.appendChild(itemPool);
+        }
+
+        function startPatternSortGame(level) {
+            const gameArea = document.getElementById('game-area');
+            gameArea.innerHTML = '';
+            
+            // Update prompt
+            document.getElementById('game-prompt').textContent = "Complete the pattern and sort the items!";
+            
+            // Create pattern display
+            const patternDisplay = document.createElement('div');
+            patternDisplay.className = 'pattern-display';
+            
+            // Create a pattern with missing items
+            const patterns = [
+                { type: 'number', sequence: [1, 2, 3, 4, 5] },
+                { type: 'shape', sequence: ['circle', 'square', 'triangle', 'circle', 'square'] },
+                { type: 'space', sequence: ['rocket', 'planet', 'star', 'rocket', 'planet'] }
+            ];
+            
+            const pattern = patterns[Math.floor(Math.random() * patterns.length)];
+            const missingIndices = [2, 4]; // Missing positions
+            
+            pattern.sequence.forEach((item, index) => {
+                const patternItem = document.createElement('div');
+                patternItem.className = 'pattern-item';
+                
+                if (missingIndices.includes(index)) {
+                    patternItem.classList.add('empty');
+                    patternItem.dataset.correctItem = item;
+                    patternItem.dataset.index = index;
+                } else {
+                    const data = pattern.type === 'number' ? numbers[item] :
+                                  pattern.type === 'shape' ? shapes[item] :
+                                  spaceObjects[item];
+                    patternItem.textContent = data.icon;
+                    patternItem.style.borderColor = data.color;
+                }
+                
+                patternDisplay.appendChild(patternItem);
+            });
+            
+            gameArea.appendChild(patternDisplay);
+            
+            // Create options for missing items
+            const optionsContainer = document.createElement('div');
+            optionsContainer.className = 'options-container';
+            
+            missingIndices.forEach(index => {
+                const correctItem = pattern.sequence[index];
+                const data = pattern.type === 'number' ? numbers[correctItem] :
+                              pattern.type === 'shape' ? shapes[correctItem] :
+                              spaceObjects[correctItem];
+                
+                // Create options including correct answer and distractors
+                const options = [correctItem];
+                
+                // Add distractors
+                if (pattern.type === 'number') {
+                    const distractors = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10].filter(n => n !== correctItem);
+                    options.push(...distractors.slice(0, 2));
+                } else {
+                    const allItems = pattern.type === 'shape' ? Object.keys(shapes) : Object.keys(spaceObjects);
+                    const distractors = allItems.filter(item => item !== correctItem);
+                    options.push(...distractors.slice(0, 2));
+                }
+                
+                // Shuffle options
+                options.sort(() => Math.random() - 0.5);
+                
+                options.forEach(option => {
+                    const optionData = pattern.type === 'number' ? numbers[option] :
+                                      pattern.type === 'shape' ? shapes[option] :
+                                      spaceObjects[option];
+                    
+                    const optionEl = document.createElement('div');
+                    optionEl.className = 'option-item';
+                    optionEl.textContent = optionData.icon;
+                    optionEl.style.borderColor = optionData.color;
+                    optionEl.dataset.item = option;
+                    optionEl.dataset.patternIndex = index;
+                    optionEl.onclick = () => selectPatternOption(optionEl, option, index);
+                    
+                    optionsContainer.appendChild(optionEl);
+                });
+            });
+            
+            gameArea.appendChild(optionsContainer);
+            
+            // Create sorting area for completed pattern
+            const sortingContainer = document.createElement('div');
+            sortingContainer.className = 'sorting-container';
+            
+            const sortedArea = document.createElement('div');
+            sortedArea.className = 'sorting-area';
+            sortedArea.innerHTML = '<h3>Sorted Pattern</h3>';
+            
+            const sortedItems = document.createElement('div');
+            sortedItems.className = 'sorting-items';
+            sortedItems.id = 'pattern-sorted-area';
+            sortedArea.appendChild(sortedItems);
+            
+            sortingContainer.appendChild(sortedArea);
+            gameArea.appendChild(sortingContainer);
+            
+            // Setup drop zone
+            setupDropZone(sortedItems);
+        }
+
+        function selectPatternOption(optionEl, item, patternIndex) {
+            // Remove previous selection
+            document.querySelectorAll('.option-item').forEach(opt => {
+                opt.classList.remove('selected');
+            });
+            
+            // Add selection to clicked option
+            optionEl.classList.add('selected');
+            
+            // Fill the pattern
+            const patternItems = document.querySelectorAll('.pattern-item.empty');
+            patternItems.forEach(item => {
+                if (parseInt(item.dataset.index) === patternIndex) {
+                    const data = gameState.currentLevel.type === 'number' ? numbers[item] :
+                                  gameState.currentLevel.type === 'shape' ? shapes[item] :
+                                  spaceObjects[item];
+                    item.textContent = data.icon;
+                    item.style.borderColor = data.color;
+                    item.classList.remove('empty');
+                    
+                    // Create sortable item for sorting area
+                    const sortableItem = createSortableItem(
+                        gameState.currentLevel.type,
+                        item,
+                        data
+                    );
+                    
+                    // Add to pattern sorted area
+                    const sortedArea = document.getElementById('pattern-sorted-area');
+                    sortedArea.appendChild(sortableItem);
+                }
+            });
+            
+            // Check if pattern is complete
+            const remainingEmpty = document.querySelectorAll('.pattern-item.empty');
+            if (remainingEmpty.length === 0) {
+                setTimeout(() => {
+                    showNotification("Pattern complete! Now sort the items! 🌟", 2000);
+                }, 500);
+            }
+        }
+
+        function startMasterSortGame(level) {
+            // Complex sorting challenge with multiple criteria
+            const gameArea = document.getElementById('game-area');
+            gameArea.innerHTML = '';
+            
+            // Update prompt
+            document.getElementById('game-prompt').textContent = "Master Sort: Sort by multiple criteria!";
+            
+            // Create a complex sorting challenge
+            const sortingContainer = document.createElement('div');
+            sortingContainer.className = 'sorting-container';
+            
+            // Create areas for different combinations
+            const criteria = [
+                { name: 'Small Numbers', type: 'number', size: 'small' },
+                { name: 'Large Numbers', type: 'number', size: 'large' },
+                { name: 'Red Shapes', type: 'shape', color: '#EF4444' },
+                { name: 'Blue Space', type: 'space', color: '#3B82F6' }
+            ];
+            
+            criteria.forEach(criterion => {
+                const area = document.createElement('div');
+                area.className = 'sorting-area';
+                area.innerHTML = `<h3>${criterion.name}</h3>`;
+                
+                const itemsContainer = document.createElement('div');
+                itemsContainer.className = 'sorting-items';
+                itemsContainer.dataset.type = criterion.type;
+                if (criterion.size) itemsContainer.dataset.size = criterion.size;
+                if (criterion.color) itemsContainer.dataset.color = criterion.color;
+                area.appendChild(itemsContainer);
+                
+                sortingContainer.appendChild(area);
+                
+                // Setup drop zone
+                setupDropZone(itemsContainer);
+            });
+            
+            gameArea.appendChild(sortingContainer);
+            
+            // Create item pool with complex items
+            const itemPool = document.createElement('div');
+            itemPool.className = 'item-pool';
+            itemPool.innerHTML = '<h3>Master Items to Sort</h3>';
+            
+            const poolItems = document.createElement('div');
+            poolItems.className = 'pool-items';
+            
+            // Generate complex items
+            const numItems = 16;
+            const complexItems = [];
+            
+            // Small numbers
+            for (let i = 1; i <= 5; i++) {
+                complexItems.push({ type: 'number', value: i, size: 'small', data: numbers[i] });
+            }
+            
+            // Large numbers
+            for (let i = 6; i <= 10; i++) {
+                complexItems.push({ type: 'number', value: i, size: 'large', data: numbers[i] });
+            }
+            
+            // Red shapes
+            ['circle', 'square', 'triangle'].forEach(shape => {
+                const shapeData = { ...shapes[shape], color: '#EF4444' };
+                complexItems.push({ type: 'shape', value: shape, color: '#EF4444', data: shapeData });
+            });
+            
+            // Blue space objects
+            ['rocket', 'ufo', 'planet'].forEach(obj => {
+                const objData = { ...spaceObjects[obj], color: '#3B82F6' };
+                complexItems.push({ type: 'space', value: obj, color: '#3B82F6', data: objData });
+            });
+            
+            // Shuffle and select items
+            complexItems.sort(() => Math.random() - 0.5);
+            
+            for (let i = 0; i < numItems; i++) {
+                const itemInfo = complexItems[i];
+                const item = createSortableItem(itemInfo.type, itemInfo.value, itemInfo.data, itemInfo.size);
+                poolItems.appendChild(item);
+            }
+            
+            itemPool.appendChild(poolItems);
+            gameArea.appendChild(itemPool);
+        }
+
+        function createSortableItem(type, value, data, size = 'medium') {
+            const item = document.createElement('div');
+            item.className = `sortable-item ${size}`;
+            item.textContent = data.icon;
+            item.style.borderColor = data.color;
+            item.draggable = true;
+            item.dataset.type = type;
+            item.dataset.value = value;
+            item.dataset.size = size;
+            
+            // Add drag events
+            item.addEventListener('dragstart', handleDragStart);
+            item.addEventListener('dragend', handleDragEnd);
+            
+            return item;
+        }
+
+        function setupDropZone(dropZone) {
+            dropZone.addEventListener('dragover', handleDragOver);
+            dropZone.addEventListener('drop', handleDrop);
+            dropZone.addEventListener('dragleave', handleDragLeave);
+        }
+
+        // Drag and Drop Handlers
+        function handleDragStart(e) {
+            gameState.draggedItem = e.target;
+            e.target.classList.add('dragging');
+            e.dataTransfer.effectAllowed = 'move';
+        }
+
+        function handleDragEnd(e) {
+            e.target.classList.remove('dragging');
+        }
+
+        function handleDragOver(e) {
+            e.preventDefault();
+            e.dataTransfer.dropEffect = 'move';
+            e.currentTarget.classList.add('highlight');
+        }
+
+        function handleDragLeave(e) {
+            e.currentTarget.classList.remove('highlight');
+        }
+
+        function handleDrop(e) {
+            e.preventDefault();
+            e.currentTarget.classList.remove('highlight');
+            
+            if (gameState.draggedItem) {
+                // Move the item to the drop zone
+                e.currentTarget.appendChild(gameState.draggedItem);
+                
+                // Check if the item is in the correct place
+                checkSortCorrectness(gameState.draggedItem, e.currentTarget);
+                
+                // Check if all items are sorted
+                checkAllItemsSorted();
+            }
+        }
+
+        function checkSortCorrectness(item, dropZone) {
+            const itemType = item.dataset.type;
+            const itemValue = item.dataset.value;
+            const itemSize = item.dataset.size;
+            const itemColor = item.style.borderColor;
+            
+            let isCorrect = false;
+            
+            // Check based on the current game type and drop zone criteria
+            if (gameState.currentGameType === 'number-sort') {
+                // For number sort, check if numbers are in order
+                const sortedArea = document.querySelector('#sorted-area');
+                if (sortedArea && sortedArea.contains(dropZone)) {
+                    const items = Array.from(sortedArea.children);
+                    const values = items.map(child => parseInt(child.dataset.value));
+                    
+                    // Check if values are in ascending order
+                    for (let i = 1; i < values.length; i++) {
+                        if (values[i] < values[i - 1]) {
+                            isCorrect = false;
+                            break;
+                        }
+                    }
+                    isCorrect = true;
+                }
+            } else if (gameState.currentGameType === 'shape-sort') {
+                // Check if shape matches the area's shape type
+                const shapeType = dropZone.dataset.shapeType;
+                isCorrect = itemType === 'shape' && itemValue === shapeType;
+            } else if (gameState.currentGameType === 'space-sort') {
+                // Check if space object matches the area's category
+                const category = dropZone.dataset.category;
+                const spaceCategories = {
+                    'vehicles': ['rocket', 'ufo', 'satellite'],
+                    'celestial': ['planet', 'star', 'moon', 'sun', 'comet'],
+                    'beings': ['astronaut', 'alien']
+                };
+                isCorrect = itemType === 'space' && spaceCategories[category].includes(itemValue);
+            } else if (gameState.currentGameType === 'size-sort') {
+                // Check if size matches
+                const size = dropZone.dataset.size;
+                isCorrect = itemSize === size;
+            } else if (gameState.currentGameType === 'color-sort') {
+                // Check if color matches
+                const color = dropZone.dataset.color;
+                isCorrect = itemColor === color;
+            } else if (gameState.currentGameType === 'mixed-sort') {
+                // Check if type matches
+                const type = dropZone.dataset.type;
+                isCorrect = itemType === type;
+            } else if (gameState.currentGameType === 'master-sort') {
+                // Check multiple criteria
+                const type = dropZone.dataset.type;
+                const size = dropZone.dataset.size;
+                const color = dropZone.dataset.color;
+                
+                isCorrect = itemType === type;
+                if (size && itemSize !== size) isCorrect = false;
+                if (color && itemColor !== color) isCorrect = false;
+            }
+            
+            if (isCorrect) {
+                item.classList.add('correct');
+                gameState.sortedItems.add(item);
+                showNotification("Correct! 🎯", 1000);
+                updateStreak(true);
+                
+                // Create rocket animation for correct sort
+                if (Math.random() > 0.7) {
+                    createRocketAnimation();
+                }
+            } else {
+                showNotification("Try again! 🤔", 1000, true);
+                updateStreak(false);
+                
+                // Shake animation for incorrect sort
+                item.style.animation = 'shake 0.5s';
+                setTimeout(() => item.style.animation = '', 500);
+            }
+        }
+
+        function checkAllItemsSorted() {
+            // Check if all items from the pool have been sorted correctly
+            const poolItems = document.querySelectorAll('.pool-items .sortable-item');
+            
+            if (poolItems.length === 0) {
+                // All items have been sorted
+                const totalItems = document.querySelectorAll('.sortable-item').length;
+                const correctItems = document.querySelectorAll('.sortable-item.correct').length;
+                
+                if (totalItems === correctItems) {
+                    // All items sorted correctly
+                    showNotification("Mission Complete! Amazing sorting! 🌟", 3000);
+                    showSuccessAnimation();
+                    unlockNextLevel(gameState.currentLevel.id);
+                    
+                    // Create multiple rocket animations
+                    for (let i = 0; i < 3; i++) {
+                        setTimeout(() => createRocketAnimation(), i * 300);
+                    }
+                    
+                    setTimeout(() => {
+                        startLevel(gameState.currentLevel);
+                    }, 3000);
+                }
+            }
+        }
+
+        function createRocketAnimation() {
+            const rocket = document.createElement('div');
+            rocket.className = 'rocket';
+            rocket.textContent = '🚀';
+            
+            // Random starting position
+            rocket.style.left = Math.random() * window.innerWidth + 'px';
+            rocket.style.bottom = '20px';
+            
+            document.body.appendChild(rocket);
+            
+            // Launch the rocket
+            setTimeout(() => {
+                rocket.classList.add('launch');
+            }, 100);
+            
+            // Remove after animation
+            setTimeout(() => {
+                rocket.remove();
+            }, 2000);
+        }
+
+        function startFreePlay() {
+            switchView('game');
+            document.getElementById('game-prompt').textContent = "Create your own sorting patterns!";
+            
+            const gameArea = document.getElementById('game-area');
+            gameArea.innerHTML = '';
+            
+            // Create free play area
+            const freePlayArea = document.createElement('div');
+            freePlayArea.className = 'sorting-container';
+            
+            // Create multiple sorting areas
+            const areaNames = ['Area 1', 'Area 2', 'Area 3'];
+            
+            areaNames.forEach(name => {
+                const area = document.createElement('div');
+                area.className = 'sorting-area';
+                area.innerHTML = `<h3>${name}</h3>`;
+                
+                const itemsContainer = document.createElement('div');
+                itemsContainer.className = 'sorting-items';
+                area.appendChild(itemsContainer);
+                
+                freePlayArea.appendChild(area);
+                
+                // Setup drop zone
+                setupDropZone(itemsContainer);
+            });
+            
+            gameArea.appendChild(freePlayArea);
+            
+            // Create item pool
+            const itemPool = document.createElement('div');
+            itemPool.className = 'item-pool';
+            itemPool.innerHTML = '<h3>Items to Sort</h3>';
+            
+            const poolItems = document.createElement('div');
+            poolItems.className = 'pool-items';
+            
+            // Add various items
+            const allItems = [
+                ...Object.keys(numbers).map(n => ({ type: 'number', value: n, data: numbers[n] })),
+                ...Object.keys(shapes).map(s => ({ type: 'shape', value: s, data: shapes[s] })),
+                ...Object.keys(spaceObjects).map(s => ({ type: 'space', value: s, data: spaceObjects[s] }))
+            ];
+            
+            // Shuffle and select items
+            allItems.sort(() => Math.random() - 0.5);
+            
+            for (let i = 0; i < 15; i++) {
+                const itemInfo = allItems[i];
+                const item = createSortableItem(itemInfo.type, itemInfo.value, itemInfo.data);
+                poolItems.appendChild(item);
+            }
+            
+            itemPool.appendChild(poolItems);
+            gameArea.appendChild(itemPool);
+        }
+
+        // Helper Character Functions
+        function helperTalk(message) {
+            const speech = helperCharacter.querySelector('.helper-speech');
+            speech.textContent = message;
+            speech.style.opacity = '1';
+            setTimeout(() => speech.style.opacity = '0', 3000);
+        }
+
+        // --- Event Listeners ---
+        document.getElementById('start-playing-btn').addEventListener('click', () => {
+            renderLevelSelect();
+            switchView('levelSelect');
+        });
+
+        document.getElementById('free-play-btn').addEventListener('click', () => {
+            startFreePlay();
+        });
+
+        document.getElementById('level-select-back-btn').addEventListener('click', () => {
+            switchView('welcome');
+        });
+
+        document.getElementById('game-back-btn').addEventListener('click', () => {
+            switchView('levelSelect');
+        });
+
+        helperCharacter.addEventListener('click', () => {
+            const encouragements = [
+                "You're doing great! 🌟",
+                "Keep sorting! 💪",
+                "Space is amazing! 🚀",
+                "You can do it! 🎯",
+                "Nice work! 👏",
+                "Think carefully! 🤔",
+                "Almost there! 🎊"
+            ];
+            helperTalk(encouragements[Math.floor(Math.random() * encouragements.length)]);
+        });
+
+        // Add shake animation
+        const style = document.createElement('style');
+        style.textContent = `
+            @keyframes shake {
+                0%, 100% { transform: translateX(0); }
+                25% { transform: translateX(-10px); }
+                75% { transform: translateX(10px); }
+            }
+        `;
+        document.head.appendChild(style);
+
+        // --- Initialize ---
+        // Show welcome message
+        setTimeout(() => {
+            helperTalk("Hi! I'm your space alien friend! Let's sort!");
+        }, 1000);
+    });
+    </script>
+</body>
+</html>
