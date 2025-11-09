@@ -1,0 +1,638 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Shape Safari: A Rainbow Matching Adventure!</title>
+    <style>
+        /* --- General Setup & Theming --- */
+        @import url('https://fonts.googleapis.com/css2?family=Fredoka:wght@400;600;700&display=swap');
+
+        :root {
+            --bg-gradient-start: #7DD3FC;
+            --bg-gradient-end: #C084FC;
+            --card-bg: #FEF3C7;
+            --card-shadow: #0EA5E9;
+            --text-color: #1E293B;
+            --button-bg: #FBBF24;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            font-family: 'Fredoka', sans-serif;
+            background: linear-gradient(135deg, var(--bg-gradient-start), var(--bg-gradient-end));
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            color: var(--text-color);
+            position: relative;
+        }
+
+        /* Prevent scrolling only when the victory screen is up */
+        body.victory-active {
+            overflow: hidden;
+        }
+
+        /* --- Header & Mascot --- */
+        header {
+            text-align: center;
+            margin-bottom: 20px;
+            z-index: 10;
+        }
+
+        h1 {
+            font-size: 2.5rem;
+            font-weight: 700;
+            color: var(--button-bg);
+            text-shadow: 3px 3px 0px var(--text-color);
+            animation: float 3s ease-in-out infinite;
+        }
+
+        .miko {
+            font-size: 4rem;
+            animation: swing 2s ease-in-out infinite;
+            transform-origin: top center;
+            display: inline-block;
+        }
+
+        /* --- Main Game Area --- */
+        main {
+            width: 90%;
+            max-width: 800px;
+            padding: 20px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            flex-grow: 1; /* Allows main area to grow and push footer down */
+        }
+
+        /* --- Level Selection Menu --- */
+        #level-menu {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 20px;
+        }
+
+        .level-btn {
+            padding: 20px 40px;
+            font-size: 1.8rem;
+            font-family: 'Fredoka', sans-serif;
+            font-weight: 600;
+            background: var(--button-bg);
+            color: var(--text-color);
+            border: 3px solid var(--text-color);
+            border-radius: 50px;
+            cursor: pointer;
+            box-shadow: 0 6px 0 var(--text-color);
+            transition: transform 0.1s, box-shadow 0.1s;
+            width: 250px;
+        }
+
+        .level-btn:hover {
+            transform: translateY(2px);
+            box-shadow: 0 4px 0 var(--text-color);
+        }
+
+        .level-btn:active {
+            transform: translateY(6px);
+            box-shadow: none;
+        }
+
+        /* --- Game Boards --- */
+        .game-screen {
+            display: none; /* Hidden by default */
+            width: 100%;
+            flex-direction: column;
+            align-items: center;
+        }
+
+        #game-board-easy {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 20px;
+            width: 100%;
+            max-width: 500px;
+        }
+
+        #game-board-medium {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 15px;
+            width: 100%;
+            perspective: 1000px;
+        }
+
+        /* --- Card & Item Styling --- */
+        .card, .item {
+            aspect-ratio: 1 / 1;
+            cursor: pointer;
+            position: relative;
+            border-radius: 20px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            box-shadow: 0 6px 0 var(--card-shadow), 0 8px 15px rgba(0,0,0,0.2);
+            border: 3px solid var(--text-color);
+            background: var(--card-bg);
+            font-size: 3rem;
+            transition: transform 0.2s, background-color 0.3s;
+        }
+
+        .item.word {
+            font-size: 1.5rem;
+            font-weight: 600;
+            padding: 10px;
+        }
+
+        .card.flipped {
+            transform: rotateY(180deg);
+        }
+
+        .card.matched, .item.matched {
+            animation: matchPulse 0.6s ease-out;
+            pointer-events: none;
+            background-color: #86EFAC; /* Light green for matched */
+        }
+        
+        .card-face {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            backface-visibility: hidden;
+            border-radius: 20px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 4rem;
+        }
+
+        .card-front {
+            background: var(--card-bg);
+        }
+
+        .card-back {
+            background: #86EFAC;
+            transform: rotateY(180deg);
+        }
+
+        /* --- Shared UI Elements --- */
+        .back-btn {
+            margin-top: 20px;
+            padding: 10px 20px;
+            font-size: 1.2rem;
+            font-family: 'Fredoka', sans-serif;
+            font-weight: 600;
+            background: #EF4444;
+            color: white;
+            border: 3px solid var(--text-color);
+            border-radius: 50px;
+            cursor: pointer;
+            box-shadow: 0 4px 0 var(--text-color);
+            transition: transform 0.1s, box-shadow 0.1s;
+        }
+        .back-btn:hover {
+            transform: translateY(2px);
+            box-shadow: 0 2px 0 var(--text-color);
+        }
+
+        /* --- Confetti Effect --- */
+        .confetti-container {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+            overflow: hidden;
+            z-index: 100;
+        }
+
+        .confetti {
+            position: absolute;
+            width: 10px;
+            height: 10px;
+            background: var(--button-bg);
+            animation: confetti-fall 3s linear forwards;
+        }
+
+        /* --- Victory Screen --- */
+        #victory-screen {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.7);
+            z-index: 200;
+            justify-content: center;
+            align-items: center;
+            flex-direction: column;
+            text-align: center;
+        }
+
+        #victory-screen h2 {
+            font-size: 3rem;
+            color: var(--button-bg);
+            margin-bottom: 20px;
+            animation: float 2s ease-in-out infinite;
+        }
+
+        #victory-screen .dancing-shapes {
+            font-size: 4rem;
+            animation: dance 1s ease-in-out infinite;
+        }
+
+        .play-again-btn {
+            margin-top: 30px;
+            padding: 15px 40px;
+            font-size: 1.5rem;
+            font-family: 'Fredoka', sans-serif;
+            font-weight: 600;
+            background: var(--button-bg);
+            color: var(--text-color);
+            border: 3px solid var(--text-color);
+            border-radius: 50px;
+            cursor: pointer;
+            box-shadow: 0 4px 0 var(--text-color);
+            transition: transform 0.1s, box-shadow 0.1s;
+        }
+
+        .play-again-btn:hover {
+            transform: translateY(2px);
+            box-shadow: 0 2px 0 var(--text-color);
+        }
+
+        .play-again-btn:active {
+            transform: translateY(4px);
+            box-shadow: none;
+        }
+
+        /* --- Animations --- */
+        @keyframes float {
+            0%, 100% { transform: translateY(0); }
+            50% { transform: translateY(-10px); }
+        }
+
+        @keyframes swing {
+            0%, 100% { transform: rotate(-5deg); }
+            50% { transform: rotate(5deg); }
+        }
+
+        @keyframes matchPulse {
+            0% { transform: scale(1); }
+            50% { transform: scale(1.2); }
+            100% { transform: scale(1); }
+        }
+
+        @keyframes confetti-fall {
+            to {
+                transform: translateY(110vh) rotate(360deg);
+                opacity: 0;
+            }
+        }
+
+        @keyframes dance {
+            0%, 100% { transform: rotate(-10deg) scale(1); }
+            25% { transform: rotate(10deg) scale(1.1); }
+            50% { transform: rotate(-10deg) scale(1); }
+            75% { transform: rotate(10deg) scale(1.1); }
+        }
+    </style>
+</head>
+<body>
+
+    <header>
+        <h1>Shape Safari!</h1>
+        <div class="miko">🐵</div>
+    </header>
+
+    <main>
+        <!-- Level Selection Menu -->
+        <section id="level-menu">
+            <h2>Choose Your Level!</h2>
+            <button class="level-btn" onclick="startGame('easy')">Easy</button>
+            <button class="level-btn" onclick="startGame('medium')">Medium</button>
+        </section>
+
+        <!-- Easy Level Screen -->
+        <section id="game-screen-easy" class="game-screen">
+            <h2>Match the Shape to its Name!</h2>
+            <div id="game-board-easy"></div>
+            <button class="back-btn" onclick="showMenu()">Back to Menu</button>
+        </section>
+
+        <!-- Medium Level Screen -->
+        <section id="game-screen-medium" class="game-screen">
+            <h2>Find the Matching Shapes!</h2>
+            <div id="game-board-medium"></div>
+            <button class="back-btn" onclick="showMenu()">Back to Menu</button>
+        </section>
+    </main>
+
+    <div id="victory-screen">
+        <h2>You're a Super Shape Finder!</h2>
+        <div class="dancing-shapes">🎉🌟🎈</div>
+        <button class="play-again-btn" onclick="showMenu()">Play Again!</button>
+    </div>
+
+    <div class="confetti-container" id="confetti-container"></div>
+
+    <script>
+        // --- Game Configuration ---
+        const gameData = {
+            circle: { emoji: '🟡', word: 'Circle' },
+            square: { emoji: '🟦', word: 'Square' },
+            triangle: { emoji: '🔺', word: 'Triangle' },
+            star: { emoji: '⭐', word: 'Star' },
+            heart: { emoji: '❤️', word: 'Heart' },
+            diamond: { emoji: '💎', word: 'Diamond' },
+            hexagon: { emoji: '⬡', word: 'Hexagon' }
+        };
+
+        const levelConfig = {
+            easy: { pairs: 4 },
+            medium: { pairs: 6 }
+        };
+
+        // --- Game State ---
+        let currentLevel = '';
+        let flippedCards = [];
+        let matchedPairs = 0;
+        let isProcessing = false;
+
+        // --- DOM Elements ---
+        const levelMenu = document.getElementById('level-menu');
+        const gameScreens = {
+            easy: document.getElementById('game-screen-easy'),
+            medium: document.getElementById('game-screen-medium')
+        };
+        const gameBoards = {
+            easy: document.getElementById('game-board-easy'),
+            medium: document.getElementById('game-board-medium')
+        };
+        const victoryScreen = document.getElementById('victory-screen');
+        const confettiContainer = document.getElementById('confetti-container');
+
+        // --- Audio Helper (using Web Audio API for simple beeps) ---
+        const audioContext = new (window.AudioContext || window.webkitAudioContext());
+
+        function playSound(type) {
+            const oscillator = audioContext.createOscillator();
+            const gainNode = audioContext.createGain();
+            
+            oscillator.connect(gainNode);
+            gainNode.connect(audioContext.destination);
+            const currentTime = audioContext.currentTime;
+
+            switch(type) {
+                case 'match':
+                    for(let i = 0; i < 3; i++) {
+                        const osc = audioContext.createOscillator();
+                        const gain = audioContext.createGain();
+                        osc.connect(gain);
+                        gain.connect(audioContext.destination);
+                        osc.frequency.setValueAtTime(400 + (i * 200), currentTime + (i * 0.1));
+                        gain.gain.setValueAtTime(0.2, currentTime + (i * 0.1));
+                        gain.gain.exponentialRampToValueAtTime(0.01, currentTime + (i * 0.1) + 0.2);
+                        osc.start(currentTime + (i * 0.1));
+                        osc.stop(currentTime + (i * 0.1) + 0.2);
+                    }
+                    break;
+                case 'nomatch':
+                    oscillator.frequency.setValueAtTime(300, currentTime);
+                    oscillator.frequency.exponentialRampToValueAtTime(100, currentTime + 0.2);
+                    gainNode.gain.setValueAtTime(0.2, currentTime);
+                    gainNode.gain.exponentialRampToValueAtTime(0.01, currentTime + 0.2);
+                    oscillator.start(currentTime);
+                    oscillator.stop(currentTime + 0.2);
+                    break;
+            }
+        }
+
+        // --- Navigation ---
+        function showMenu() {
+            levelMenu.style.display = 'flex';
+            Object.values(gameScreens).forEach(screen => screen.style.display = 'none');
+            victoryScreen.style.display = 'none';
+            document.body.classList.remove('victory-active'); // Re-enable scrolling
+        }
+
+        function startGame(level) {
+            currentLevel = level;
+            levelMenu.style.display = 'none';
+            victoryScreen.style.display = 'none';
+            document.body.classList.remove('victory-active'); // Re-enable scrolling
+            Object.values(gameScreens).forEach(screen => screen.style.display = 'none');
+            gameScreens[level].style.display = 'flex';
+            
+            resetState();
+            initLevel(level);
+        }
+
+        function resetState() {
+            flippedCards = [];
+            matchedPairs = 0;
+            isProcessing = false;
+        }
+
+        // --- Level Initialization ---
+        function initLevel(level) {
+            Object.values(gameBoards).forEach(board => board.innerHTML = '');
+            
+            switch(level) {
+                case 'easy':
+                    initEasyLevel();
+                    break;
+                case 'medium':
+                    initMediumLevel();
+                    break;
+            }
+        }
+
+        // --- EASY LEVEL LOGIC ---
+        function initEasyLevel() {
+            const shapeKeys = Object.keys(gameData);
+            const selectedShapes = shuffle(shapeKeys).slice(0, levelConfig.easy.pairs);
+            
+            selectedShapes.forEach(shapeKey => {
+                const shapeCard = createEasyItem(shapeKey, 'shape');
+                const wordCard = createEasyItem(shapeKey, 'word');
+                gameBoards.easy.appendChild(shapeCard);
+                gameBoards.easy.appendChild(wordCard);
+            });
+            // Shuffle the items in the grid
+            const allItems = [...gameBoards.easy.children];
+            shuffle(allItems);
+            gameBoards.easy.innerHTML = '';
+            allItems.forEach(item => gameBoards.easy.appendChild(item));
+        }
+
+        function createEasyItem(shapeKey, type) {
+            const item = document.createElement('div');
+            item.classList.add('item', type);
+            item.dataset.shapeKey = shapeKey;
+            item.textContent = type === 'shape' ? gameData[shapeKey].emoji : gameData[shapeKey].word;
+            item.addEventListener('click', handleEasyClick);
+            return item;
+        }
+
+        let firstEasySelection = null;
+        function handleEasyClick(event) {
+            if (isProcessing) return;
+            const clickedItem = event.currentTarget;
+            if (clickedItem.classList.contains('matched')) return;
+
+            if (!firstEasySelection) {
+                firstEasySelection = clickedItem;
+                clickedItem.style.backgroundColor = '#FDE047'; // Highlight
+            } else if (firstEasySelection === clickedItem) {
+                firstEasySelection.style.backgroundColor = '';
+                firstEasySelection = null;
+            } else {
+                // Check for match
+                isProcessing = true;
+                if (firstEasySelection.dataset.shapeKey === clickedItem.dataset.shapeKey) {
+                    // Match!
+                    setTimeout(() => {
+                        firstEasySelection.classList.add('matched');
+                        clickedItem.classList.add('matched');
+                        playSound('match');
+                        createConfetti();
+                        matchedPairs++;
+                        isProcessing = false;
+                        firstEasySelection = null;
+                        if (matchedPairs === levelConfig.easy.pairs) {
+                            setTimeout(showVictoryScreen, 500);
+                        }
+                    }, 300);
+                } else {
+                    // No match
+                    setTimeout(() => {
+                        firstEasySelection.style.backgroundColor = '';
+                        playSound('nomatch');
+                        isProcessing = false;
+                        firstEasySelection = null;
+                    }, 500);
+                }
+            }
+        }
+
+        // --- MEDIUM LEVEL LOGIC ---
+        function initMediumLevel() {
+            const shapeKeys = Object.keys(gameData);
+            const selectedShapes = shuffle(shapeKeys).slice(0, levelConfig.medium.pairs);
+            const cardPairs = [...selectedShapes, ...selectedShapes];
+            shuffle(cardPairs);
+
+            cardPairs.forEach((shapeKey, index) => {
+                const card = createMediumCard(shapeKey, index);
+                gameBoards.medium.appendChild(card);
+            });
+        }
+
+        function createMediumCard(shapeKey, id) {
+            const card = document.createElement('div');
+            card.classList.add('card');
+            card.dataset.shapeKey = shapeKey;
+            card.dataset.id = id;
+
+            const cardFront = document.createElement('div');
+            cardFront.classList.add('card-face', 'card-front');
+            cardFront.textContent = '🍃';
+
+            const cardBack = document.createElement('div');
+            cardBack.classList.add('card-face', 'card-back');
+            cardBack.textContent = gameData[shapeKey].emoji;
+
+            card.appendChild(cardFront);
+            card.appendChild(cardBack);
+            card.addEventListener('click', handleMediumClick);
+            return card;
+        }
+
+        function handleMediumClick(event) {
+            if (isProcessing) return;
+            const clickedCard = event.currentTarget;
+            if (clickedCard.classList.contains('flipped') || clickedCard.classList.contains('matched')) return;
+
+            clickedCard.classList.add('flipped');
+            flippedCards.push(clickedCard);
+
+            if (flippedCards.length === 2) {
+                isProcessing = true;
+                checkMediumMatch();
+            }
+        }
+
+        function checkMediumMatch() {
+            const [card1, card2] = flippedCards;
+            const shape1 = card1.dataset.shapeKey;
+            const shape2 = card2.dataset.shapeKey;
+
+            if (shape1 === shape2) {
+                setTimeout(() => {
+                    card1.classList.add('matched');
+                    card2.classList.add('matched');
+                    playSound('match');
+                    createConfetti();
+                    matchedPairs++;
+                    flippedCards = [];
+                    isProcessing = false;
+                    if (matchedPairs === levelConfig.medium.pairs) {
+                        setTimeout(showVictoryScreen, 500);
+                    }
+                }, 600);
+            } else {
+                setTimeout(() => {
+                    card1.classList.remove('flipped');
+                    card2.classList.remove('flipped');
+                    playSound('nomatch');
+                    flippedCards = [];
+                    isProcessing = false;
+                }, 1200);
+            }
+        }
+
+        // --- Shared Game Functions ---
+        function shuffle(array) {
+            for (let i = array.length - 1; i > 0; i--) {
+                const j = Math.floor(Math.random() * (i + 1));
+                [array[i], array[j]] = [array[j], array[i]];
+            }
+            return array;
+        }
+
+        function createConfetti() {
+            confettiContainer.innerHTML = '';
+            const colors = ['#FBBF24', '#F87171', '#A78BFA', '#60A5FA', '#34D399', '#FDE047'];
+            for (let i = 0; i < 50; i++) {
+                const confettiPiece = document.createElement('div');
+                confettiPiece.classList.add('confetti');
+                confettiPiece.style.left = Math.random() * 100 + '%';
+                confettiPiece.style.backgroundColor = colors[Math.floor(Math.random() * colors.length)];
+                confettiPiece.style.animationDelay = Math.random() * 0.5 + 's';
+                confettiPiece.style.animationDuration = (Math.random() * 1 + 2) + 's';
+                confettiContainer.appendChild(confettiPiece);
+            }
+            setTimeout(() => { confettiContainer.innerHTML = ''; }, 3000);
+        }
+
+        function showVictoryScreen() {
+            victoryScreen.style.display = 'flex';
+            document.body.classList.add('victory-active'); // Disable scrolling
+        }
+
+        // --- Initial Load ---
+        showMenu();
+
+    </script>
+</body>
+</html>
