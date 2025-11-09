@@ -1,0 +1,664 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Shape Explorer Adventure!</title>
+    <style>
+        /* --- Global Styles & Animations --- */
+        @import url('https://fonts.googleapis.com/css2?family=Fredoka:wght@400;600;700&display=swap');
+
+        * {
+            box-sizing: border-box;
+            user-select: none; /* Prevents text selection on mobile */
+        }
+
+        body {
+            font-family: 'Fredoka', sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            margin: 0;
+            padding: 0;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            overflow: hidden;
+        }
+
+        #game-container {
+            width: 100%;
+            max-width: 800px;
+            height: 100vh;
+            max-height: 600px;
+            background: #fff;
+            border-radius: 20px;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
+            position: relative;
+        }
+
+        /* --- Header & Navigation --- */
+        header {
+            background: linear-gradient(90deg, #f093fb 0%, #f5576c 100%);
+            padding: 10px 20px;
+            color: white;
+            text-align: center;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+            z-index: 10;
+        }
+
+        h1 {
+            margin: 0;
+            font-size: 2em;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.2);
+        }
+
+        #score-display {
+            font-size: 1.2em;
+            font-weight: 600;
+        }
+
+        nav {
+            display: flex;
+            justify-content: space-around;
+            background: #f8f9fa;
+            padding: 10px;
+            border-top: 3px solid #e9ecef;
+        }
+
+        .nav-button {
+            background: #ffffff;
+            border: 3px solid #dee2e6;
+            border-radius: 15px;
+            padding: 10px 20px;
+            font-family: 'Fredoka', sans-serif;
+            font-size: 1em;
+            font-weight: 600;
+            color: #495057;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+        }
+
+        .nav-button:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 6px 12px rgba(0,0,0,0.15);
+        }
+
+        .nav-button.active {
+            background: linear-gradient(45deg, #fa709a 0%, #fee140 100%);
+            color: white;
+            border-color: #fa709a;
+        }
+
+        /* --- Game Area --- */
+        #game-area {
+            flex-grow: 1;
+            position: relative;
+            background: #eef2ff;
+            overflow: hidden;
+        }
+
+        .game-screen {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            display: none;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+        }
+
+        .game-screen.active {
+            display: flex;
+        }
+
+        /* --- Shape Styles --- */
+        .shape {
+            position: absolute;
+            cursor: pointer;
+            transition: transform 0.2s ease;
+        }
+
+        .shape:hover {
+            transform: scale(1.1);
+        }
+
+        .shape-circle {
+            width: 80px;
+            height: 80px;
+            background: #FF6B6B;
+            border-radius: 50%;
+            box-shadow: 0 5px 15px rgba(255, 107, 107, 0.4);
+        }
+
+        .shape-square {
+            width: 80px;
+            height: 80px;
+            background: #4ECDC4;
+            box-shadow: 0 5px 15px rgba(78, 205, 196, 0.4);
+        }
+
+        .shape-triangle {
+            width: 0;
+            height: 0;
+            border-left: 40px solid transparent;
+            border-right: 40px solid transparent;
+            border-bottom: 70px solid #FFE66D;
+            filter: drop-shadow(0 5px 10px rgba(255, 230, 109, 0.5));
+        }
+
+        .shape-star {
+            position: relative;
+            display: inline-block;
+            width: 0;
+            height: 0;
+            border-left: 40px solid transparent;
+            border-right: 40px solid transparent;
+            border-bottom: 30px solid #A8E6CF;
+            transform: rotate(35deg);
+            filter: drop-shadow(0 5px 10px rgba(168, 230, 207, 0.5));
+        }
+        .shape-star:before {
+            content: '';
+            position: absolute;
+            left: -40px;
+            top: -20px;
+            width: 0;
+            height: 0;
+            border-left: 40px solid transparent;
+            border-right: 40px solid transparent;
+            border-bottom: 30px solid #A8E6CF;
+            transform: rotate(-70deg);
+        }
+        .shape-star:after {
+            content: '';
+            position: absolute;
+            left: -40px;
+            top: 3px;
+            width: 0;
+            height: 0;
+            border-left: 40px solid transparent;
+            border-right: 40px solid transparent;
+            border-bottom: 30px solid #A8E6CF;
+            transform: rotate(70deg);
+        }
+
+        /* --- Home Screen --- */
+        #home-screen h2 {
+            font-size: 2.5em;
+            color: #764ba2;
+            margin-bottom: 20px;
+        }
+        #home-screen p {
+            font-size: 1.2em;
+            color: #555;
+        }
+        .character {
+            font-size: 5em;
+            animation: bounce 2s infinite;
+        }
+        @keyframes bounce {
+            0%, 100% { transform: translateY(0); }
+            50% { transform: translateY(-20px); }
+        }
+
+        /* --- Shape Catcher Game --- */
+        #catcher-instruction {
+            font-size: 1.5em;
+            color: #495057;
+            margin-bottom: 20px;
+            text-align: center;
+            z-index: 5;
+        }
+        .falling-shape {
+            animation: fall 5s linear;
+        }
+        @keyframes fall {
+            from { top: -100px; }
+            to { top: 100%; }
+        }
+
+        /* --- Shape Builder Game --- */
+        #builder-area {
+            position: relative;
+            width: 300px;
+            height: 300px;
+            border: 5px dashed #ced4da;
+            border-radius: 15px;
+            background: #fff;
+            margin-bottom: 20px;
+        }
+        #builder-shapes-palette {
+            display: flex;
+            gap: 20px;
+        }
+        .draggable-shape {
+            cursor: grab;
+        }
+        .draggable-shape:active {
+            cursor: grabbing;
+        }
+        .drop-zone {
+            position: absolute;
+            border: 3px dashed #adb5bd;
+            border-radius: 10px;
+        }
+        .drop-zone.filled {
+            border: none;
+        }
+
+        /* --- Shape Safari Game --- */
+        #safari-scene {
+            position: relative;
+            width: 90%;
+            height: 80%;
+            background: url('https://i.imgur.com/k3W2a9e.png') no-repeat center center; /* Placeholder jungle scene */
+            background-size: cover;
+            border-radius: 20px;
+            box-shadow: inset 0 0 20px rgba(0,0,0,0.2);
+        }
+        .hidden-shape {
+            opacity: 0.3;
+            cursor: pointer;
+            transition: opacity 0.3s ease;
+        }
+        .hidden-shape:hover {
+            opacity: 0.7;
+        }
+        .hidden-shape.found {
+            opacity: 1;
+            animation: pulse 0.5s;
+        }
+        @keyframes pulse {
+            0% { transform: scale(1); }
+            50% { transform: scale(1.2); }
+            100% { transform: scale(1); }
+        }
+        #safari-instruction {
+            position: absolute;
+            top: 10px;
+            left: 50%;
+            transform: translateX(-50%);
+            background: rgba(255, 255, 255, 0.9);
+            padding: 10px 20px;
+            border-radius: 20px;
+            font-size: 1.2em;
+            font-weight: 600;
+            color: #495057;
+            z-index: 5;
+        }
+
+
+        /* --- Feedback & Effects --- */
+        .feedback {
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            font-size: 4em;
+            font-weight: 700;
+            color: #FFD93D;
+            text-shadow: 3px 3px 0 #FCB045;
+            z-index: 100;
+            pointer-events: none;
+            animation: feedback-pop 1s ease-out forwards;
+        }
+        @keyframes feedback-pop {
+            0% { transform: translate(-50%, -50%) scale(0) rotate(0deg); opacity: 1; }
+            50% { transform: translate(-50%, -50%) scale(1.2) rotate(10deg); }
+            100% { transform: translate(-50%, -50%) scale(1) rotate(0deg); opacity: 0; }
+        }
+
+        .confetti {
+            position: fixed;
+            width: 10px;
+            height: 10px;
+            background: #f0f;
+            position: absolute;
+            animation: confetti-fall 3s linear forwards;
+        }
+        @keyframes confetti-fall {
+            to {
+                transform: translateY(100vh) rotate(360deg);
+                opacity: 0;
+            }
+        }
+
+    </style>
+</head>
+<body>
+
+<div id="game-container">
+    <header>
+        <h1>🌈 Shape Explorer Adventure! 🎮</h1>
+        <div id="score-display">Score: <span id="score">0</span> ⭐</div>
+    </header>
+
+    <nav>
+        <button class="nav-button active" data-screen="home-screen">🏠 Home</button>
+        <button class="nav-button" data-screen="catcher-screen">🎯 Catcher</button>
+        <button class="nav-button" data-screen="builder-screen">🧩 Builder</button>
+        <button class="nav-button" data-screen="safari-screen">🌳 Safari</button>
+    </nav>
+
+    <main id="game-area">
+        <!-- Home Screen -->
+        <section id="home-screen" class="game-screen active">
+            <div class="character">⭐</div>
+            <h2>Welcome, Explorer!</h2>
+            <p>Choose a game to start your shape adventure!</p>
+        </section>
+
+        <!-- Shape Catcher Screen -->
+        <section id="catcher-screen" class="game-screen">
+            <div id="catcher-instruction">Tap the <strong>Circles</strong>!</div>
+        </section>
+
+        <!-- Shape Builder Screen -->
+        <section id="builder-screen" class="game-screen">
+            <div id="builder-area">
+                <!-- Drop zones will be generated by JS -->
+            </div>
+            <div id="builder-shapes-palette">
+                <!-- Draggable shapes will be generated by JS -->
+            </div>
+        </section>
+
+        <!-- Shape Safari Screen -->
+        <section id="safari-screen" class="game-screen">
+            <div id="safari-instruction">Find the <strong>Triangles</strong>!</div>
+            <div id="safari-scene">
+                <!-- Hidden shapes will be generated by JS -->
+            </div>
+        </section>
+    </main>
+</div>
+
+<!-- Audio Elements (using data URIs for simplicity) -->
+<audio id="bgMusic" loop></audio>
+<audio id="clickSound"></audio>
+<audio id="successSound"></audio>
+
+<script>
+document.addEventListener('DOMContentLoaded', () => {
+    // --- DOM Elements ---
+    const gameContainer = document.getElementById('game-container');
+    const navButtons = document.querySelectorAll('.nav-button');
+    const gameScreens = document.querySelectorAll('.game-screen');
+    const scoreDisplay = document.getElementById('score');
+    const gameArea = document.getElementById('game-area');
+
+    // --- Game State ---
+    let score = 0;
+    let currentScreen = 'home-screen';
+    let catcherInterval;
+    let currentTargetShape = 'circle';
+
+    // --- Audio Setup (Simple Beeps) ---
+    // In a real game, you'd use proper audio files.
+    const AudioContext = window.AudioContext || window.webkitAudioContext;
+    const audioCtx = new AudioContext();
+
+    function playSound(frequency, duration) {
+        const oscillator = audioCtx.createOscillator();
+        const gainNode = audioCtx.createGain();
+        oscillator.connect(gainNode);
+        gainNode.connect(audioCtx.destination);
+        oscillator.frequency.value = frequency;
+        oscillator.type = 'sine';
+        gainNode.gain.setValueAtTime(0.3, audioCtx.currentTime);
+        gainNode.gain.exponentialRampToValueAtTime(0.01, audioCtx.currentTime + duration);
+        oscillator.start(audioCtx.currentTime);
+        oscillator.stop(audioCtx.currentTime + duration);
+    }
+    const sounds = {
+        click: () => playSound(600, 0.1),
+        success: () => { playSound(523, 0.1); setTimeout(() => playSound(659, 0.1), 100); },
+        wrong: () => playSound(200, 0.2)
+    };
+
+    // --- Core Functions ---
+    function updateScore(points) {
+        score += points;
+        scoreDisplay.textContent = score;
+        showFeedback(points > 0 ? '✨' : '😅');
+        if (points > 0) {
+            sounds.success();
+            createConfetti();
+        } else {
+            sounds.wrong();
+        }
+    }
+
+    function showFeedback(emoji) {
+        const feedbackEl = document.createElement('div');
+        feedbackEl.className = 'feedback';
+        feedbackEl.textContent = emoji;
+        gameContainer.appendChild(feedbackEl);
+        setTimeout(() => feedbackEl.remove(), 1000);
+    }
+
+    function createConfetti() {
+        for(let i = 0; i < 20; i++) {
+            setTimeout(() => {
+                const confetti = document.createElement('div');
+                confetti.className = 'confetti';
+                confetti.style.left = Math.random() * 100 + '%';
+                confetti.style.backgroundColor = `hsl(${Math.random() * 360}, 100%, 50%)`;
+                confetti.style.animationDuration = (Math.random() * 2 + 2) + 's';
+                gameContainer.appendChild(confetti);
+                setTimeout(() => confetti.remove(), 3000);
+            }, i * 50);
+        }
+    }
+
+    function switchScreen(screenId) {
+        gameScreens.forEach(screen => screen.classList.remove('active'));
+        navButtons.forEach(btn => btn.classList.remove('active'));
+        
+        document.getElementById(screenId).classList.add('active');
+        document.querySelector(`[data-screen="${screenId}"]`).classList.add('active');
+        
+        currentScreen = screenId;
+        sounds.click();
+        stopAllGames(); // Stop any running game logic
+        initGame(screenId); // Start the new game logic
+    }
+
+    function stopAllGames() {
+        clearInterval(catcherInterval);
+        // Clear dynamic content
+        document.querySelectorAll('.falling-shape, .drop-zone, .draggable-shape, .hidden-shape').forEach(el => el.remove());
+    }
+
+    // --- Navigation ---
+    navButtons.forEach(button => {
+        button.addEventListener('click', () => {
+            const screenId = button.dataset.screen;
+            switchScreen(screenId);
+        });
+    });
+
+    // --- Game Initialization Logic ---
+    function initGame(screenId) {
+        switch(screenId) {
+            case 'catcher-screen':
+                initCatcherGame();
+                break;
+            case 'builder-screen':
+                initBuilderGame();
+                break;
+            case 'safari-screen':
+                initSafariGame();
+                break;
+        }
+    }
+
+    // --- MINI-GAME 1: Shape Catcher ---
+    function initCatcherGame() {
+        const shapes = ['circle', 'square', 'triangle', 'star'];
+        const instructionEl = document.getElementById('catcher-instruction');
+        currentTargetShape = shapes[Math.floor(Math.random() * shapes.length)];
+        instructionEl.innerHTML = `Tap the <strong>${currentTargetShape}s</strong>!`;
+
+        function spawnShape() {
+            const shapeEl = document.createElement('div');
+            const shapeType = shapes[Math.floor(Math.random() * shapes.length)];
+            shapeEl.className = `shape shape-${shapeType} falling-shape`;
+            shapeEl.dataset.shape = shapeType;
+            shapeEl.style.left = Math.random() * (gameArea.offsetWidth - 80) + 'px';
+            
+            shapeEl.addEventListener('click', () => {
+                if (shapeType === currentTargetShape) {
+                    updateScore(10);
+                } else {
+                    updateScore(-5);
+                }
+                shapeEl.remove();
+            });
+            
+            gameArea.appendChild(shapeEl);
+            // Remove shape after animation finishes
+            setTimeout(() => shapeEl.remove(), 5000);
+        }
+
+        // Spawn shapes periodically
+        catcherInterval = setInterval(spawnShape, 1500);
+        // Change target shape periodically
+        setInterval(() => {
+            currentTargetShape = shapes[Math.floor(Math.random() * shapes.length)];
+            instructionEl.innerHTML = `Tap the <strong>${currentTargetShape}s</strong>!`;
+        }, 10000);
+    }
+
+    // --- MINI-GAME 2: Shape Builder ---
+    function initBuilderGame() {
+        const builderArea = document.getElementById('builder-area');
+        const palette = document.getElementById('builder-shapes-palette');
+        const puzzle = [
+            { type: 'square', top: '110px', left: '110px' }, // Body
+            { type: 'triangle', top: '20px', left: '110px' }, // Roof
+            { type: 'circle', top: '140px', left: '130px' }, // Door
+        ];
+
+        // Create drop zones
+        puzzle.forEach(p => {
+            const zone = document.createElement('div');
+            zone.className = 'drop-zone';
+            zone.dataset.shapeType = p.type;
+            zone.style.top = p.top;
+            zone.style.left = p.left;
+            zone.style.width = p.type === 'triangle' ? '0' : '80px';
+            zone.style.height = p.type === 'triangle' ? '0' : '80px';
+            if (p.type === 'triangle') {
+                zone.style.borderLeft = '40px solid transparent';
+                zone.style.borderRight = '40px solid transparent';
+                zone.style.borderBottom = '70px dashed #adb5bd';
+            }
+            builderArea.appendChild(zone);
+        });
+
+        // Create draggable shapes
+        const shuffledPuzzle = [...puzzle].sort(() => Math.random() - 0.5);
+        shuffledPuzzle.forEach(p => {
+            const shape = document.createElement('div');
+            shape.className = `shape shape-${p.type} draggable-shape`;
+            shape.draggable = true;
+            shape.dataset.shapeType = p.type;
+            palette.appendChild(shape);
+
+            // Drag and Drop Events
+            shape.addEventListener('dragstart', (e) => {
+                e.dataTransfer.setData('text/plain', p.type);
+                e.dataTransfer.effectAllowed = 'move';
+                sounds.click();
+            });
+        });
+
+        // Drop Zone Events
+        document.querySelectorAll('.drop-zone').forEach(zone => {
+            zone.addEventListener('dragover', (e) => {
+                e.preventDefault();
+                e.dataTransfer.dropEffect = 'move';
+            });
+            zone.addEventListener('drop', (e) => {
+                e.preventDefault();
+                const droppedShapeType = e.dataTransfer.getData('text/plain');
+                if (droppedShapeType === zone.dataset.shapeType) {
+                    zone.classList.add('filled');
+                    const shape = document.querySelector(`.draggable-shape[data-shape-type="${droppedShapeType}"]`);
+                    if(shape) shape.remove();
+                    updateScore(15);
+                    // Check if puzzle is complete
+                    if (document.querySelectorAll('.drop-zone:not(.filled)').length === 0) {
+                        setTimeout(() => showFeedback('🎉'), 300);
+                        setTimeout(() => initBuilderGame(), 2000); // Restart puzzle
+                    }
+                } else {
+                    updateScore(-5);
+                }
+            });
+        });
+    }
+
+    // --- MINI-GAME 3: Shape Safari ---
+    function initSafariGame() {
+        const scene = document.getElementById('safari-scene');
+        const instructionEl = document.getElementById('safari-instruction');
+        const shapes = ['circle', 'square', 'triangle', 'star'];
+        const itemsToFind = 3;
+        let foundCount = 0;
+
+        currentTargetShape = shapes[Math.floor(Math.random() * shapes.length)];
+        instructionEl.innerHTML = `Find the <strong>${currentTargetShape}s</strong>!`;
+
+        for (let i = 0; i < itemsToFind; i++) {
+            const shapeEl = document.createElement('div');
+            shapeEl.className = `shape shape-${currentTargetShape} hidden-shape`;
+            shapeEl.dataset.shape = currentTargetShape;
+            
+            // Randomly position shapes
+            shapeEl.style.top = Math.random() * (scene.offsetHeight - 100) + 'px';
+            shapeEl.style.left = Math.random() * (scene.offsetWidth - 100) + 'px';
+            
+            // Add some decoy shapes
+            const decoyType = shapes.filter(s => s !== currentTargetShape)[Math.floor(Math.random() * (shapes.length - 1))];
+            const decoyEl = document.createElement('div');
+            decoyEl.className = `shape shape-${decoyType} hidden-shape`;
+            decoyEl.dataset.shape = decoyType;
+            decoyEl.style.top = Math.random() * (scene.offsetHeight - 100) + 'px';
+            decoyEl.style.left = Math.random() * (scene.offsetWidth - 100) + 'px';
+
+            scene.appendChild(shapeEl);
+            scene.appendChild(decoyEl);
+        }
+        
+        scene.addEventListener('click', (e) => {
+            if (e.target.classList.contains('hidden-shape')) {
+                if (e.target.dataset.shape === currentTargetShape && !e.target.classList.contains('found')) {
+                    e.target.classList.add('found');
+                    updateScore(20);
+                    foundCount++;
+                    if (foundCount === itemsToFind) {
+                        setTimeout(() => {
+                            showFeedback('🏆');
+                            initSafariGame(); // Start a new round
+                        }, 500);
+                    }
+                } else if (!e.target.classList.contains('found')) {
+                    updateScore(-5);
+                }
+            }
+        });
+    }
+});
+</script>
+
+</body>
+</html>
