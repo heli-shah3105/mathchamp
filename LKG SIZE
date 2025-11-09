@@ -1,0 +1,1511 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Big & Small Adventure</title>
+    <style>
+        body {
+            font-family: 'Comic Sans MS', cursive, sans-serif;
+            margin: 0;
+            padding: 0;
+            background: linear-gradient(135deg, #a2d2ff, #ffafcc);
+            color: #333;
+            overflow: hidden;
+            height: 100vh;
+            display: flex;
+            flex-direction: column;
+        }
+
+        header {
+            background-color: rgba(255, 255, 255, 0.8);
+            padding: 10px;
+            text-align: center;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+            z-index: 10;
+        }
+
+        h1 {
+            margin: 0;
+            color: #ff6b6b;
+            font-size: 2.5rem;
+            text-shadow: 2px 2px 0px #ffd166;
+        }
+
+        .score-container {
+            display: flex;
+            justify-content: space-around;
+            margin-top: 10px;
+            font-size: 1.2rem;
+            font-weight: bold;
+        }
+
+        .score {
+            background-color: #8ecae6;
+            padding: 5px 15px;
+            border-radius: 20px;
+            color: white;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+        }
+
+        .level-indicator {
+            background-color: #f4a261;
+            padding: 5px 15px;
+            border-radius: 20px;
+            color: white;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+        }
+
+        .voice-button {
+            background-color: #9b5de5;
+            color: white;
+            border: none;
+            border-radius: 50%;
+            width: 50px;
+            height: 50px;
+            font-size: 1.5rem;
+            cursor: pointer;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            position: relative;
+        }
+
+        .voice-button:hover {
+            background-color: #7c3aed;
+            transform: scale(1.1);
+        }
+
+        .voice-button.speaking {
+            animation: pulse 1.5s infinite;
+        }
+
+        @keyframes pulse {
+            0% { box-shadow: 0 0 0 0 rgba(155, 93, 229, 0.7); }
+            70% { box-shadow: 0 0 0 10px rgba(155, 93, 229, 0); }
+            100% { box-shadow: 0 0 0 0 rgba(155, 93, 229, 0); }
+        }
+
+        main {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+            position: relative;
+        }
+
+        .game-container {
+            background-color: rgba(255, 255, 255, 0.9);
+            border-radius: 20px;
+            padding: 20px;
+            width: 90%;
+            max-width: 800px;
+            height: 70%;
+            display: flex;
+            flex-direction: column;
+            box-shadow: 0 8px 16px rgba(0, 0, 0, 0.2);
+            position: relative;
+        }
+
+        .question {
+            text-align: center;
+            font-size: 1.8rem;
+            margin-bottom: 20px;
+            color: #2a9d8f;
+            font-weight: bold;
+        }
+
+        .options-container {
+            display: flex;
+            justify-content: space-around;
+            flex: 1;
+            align-items: center;
+        }
+
+        .option {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            cursor: pointer;
+            transition: transform 0.3s ease;
+            width: 40%;
+        }
+
+        .option:hover {
+            transform: scale(1.05);
+        }
+
+        .option-image {
+            width: 150px;
+            height: 150px;
+            background-color: #f8f9fa;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-bottom: 15px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .option-image img {
+            max-width: 80%;
+            max-height: 80%;
+            object-fit: contain;
+        }
+
+        .option-label {
+            font-size: 1.4rem;
+            font-weight: bold;
+            color: #e76f51;
+            text-align: center;
+        }
+
+        .feedback {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            font-size: 3rem;
+            font-weight: bold;
+            color: #2a9d8f;
+            text-shadow: 2px 2px 0px #fff;
+            opacity: 0;
+            pointer-events: none;
+            z-index: 100;
+        }
+
+        .correct-animation {
+            animation: correctAnswer 1.5s ease-out;
+        }
+
+        .incorrect-animation {
+            animation: incorrectAnswer 1.5s ease-out;
+        }
+
+        @keyframes correctAnswer {
+            0% { opacity: 0; transform: translate(-50%, -50%) scale(0.5); }
+            50% { opacity: 1; transform: translate(-50%, -50%) scale(1.2); }
+            100% { opacity: 0; transform: translate(-50%, -50%) scale(1); }
+        }
+
+        @keyframes incorrectAnswer {
+            0% { opacity: 0; transform: translate(-50%, -50%) rotate(0deg); }
+            50% { opacity: 1; transform: translate(-50%, -50%) rotate(10deg); }
+            100% { opacity: 0; transform: translate(-50%, -50%) rotate(0deg); }
+        }
+
+        .next-button {
+            background-color: #e9c46a;
+            color: #264653;
+            border: none;
+            border-radius: 30px;
+            padding: 15px 30px;
+            font-size: 1.2rem;
+            font-weight: bold;
+            cursor: pointer;
+            margin-top: 20px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+            transition: all 0.3s ease;
+            align-self: center;
+            display: none;
+        }
+
+        .next-button:hover {
+            background-color: #f4a261;
+            transform: translateY(-3px);
+            box-shadow: 0 6px 12px rgba(0, 0, 0, 0.15);
+        }
+
+        .next-button.show {
+            display: block;
+        }
+
+        .confetti {
+            position: absolute;
+            width: 10px;
+            height: 10px;
+            background-color: #f4a261;
+            opacity: 0.8;
+            border-radius: 50%;
+            z-index: 1000;
+        }
+
+        .clouds {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            top: 0;
+            left: 0;
+            pointer-events: none;
+            z-index: -1;
+        }
+
+        .cloud {
+            position: absolute;
+            background-color: rgba(255, 255, 255, 0.8);
+            border-radius: 50%;
+        }
+
+        .cloud::before,
+        .cloud::after {
+            content: '';
+            position: absolute;
+            background-color: rgba(255, 255, 255, 0.8);
+            border-radius: 50%;
+        }
+
+        .cloud1 {
+            width: 100px;
+            height: 40px;
+            top: 20%;
+            left: 10%;
+            animation: float 20s infinite linear;
+        }
+
+        .cloud1::before {
+            width: 50px;
+            height: 50px;
+            top: -25px;
+            left: 10px;
+        }
+
+        .cloud1::after {
+            width: 60px;
+            height: 40px;
+            top: -15px;
+            right: 10px;
+        }
+
+        .cloud2 {
+            width: 80px;
+            height: 35px;
+            top: 40%;
+            right: 15%;
+            animation: float 25s infinite linear reverse;
+        }
+
+        .cloud2::before {
+            width: 40px;
+            height: 40px;
+            top: -20px;
+            left: 15px;
+        }
+
+        .cloud2::after {
+            width: 50px;
+            height: 35px;
+            top: -10px;
+            right: 15px;
+        }
+
+        @keyframes float {
+            0% { transform: translateX(0); }
+            100% { transform: translateX(100vw); }
+        }
+
+        .game-over {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(255, 255, 255, 0.95);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            border-radius: 20px;
+            z-index: 200;
+            display: none;
+        }
+
+        .game-over.show {
+            display: flex;
+        }
+
+        .game-over h2 {
+            font-size: 2.5rem;
+            color: #e76f51;
+            margin-bottom: 20px;
+        }
+
+        .final-score {
+            font-size: 1.8rem;
+            color: #2a9d8f;
+            margin-bottom: 30px;
+        }
+
+        .play-again-button {
+            background-color: #e9c46a;
+            color: #264653;
+            border: none;
+            border-radius: 30px;
+            padding: 15px 30px;
+            font-size: 1.2rem;
+            font-weight: bold;
+            cursor: pointer;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+            transition: all 0.3s ease;
+        }
+
+        .play-again-button:hover {
+            background-color: #f4a261;
+            transform: translateY(-3px);
+            box-shadow: 0 6px 12px rgba(0, 0, 0, 0.15);
+        }
+
+        .star {
+            position: absolute;
+            font-size: 2rem;
+            color: #ffd166;
+            animation: twinkle 1.5s infinite alternate;
+            z-index: -1;
+        }
+
+        @keyframes twinkle {
+            0% { opacity: 0.3; }
+            100% { opacity: 1; }
+        }
+
+        .level-complete {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(255, 255, 255, 0.95);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            border-radius: 20px;
+            z-index: 200;
+            display: none;
+        }
+
+        .level-complete.show {
+            display: flex;
+        }
+
+        .level-complete h2 {
+            font-size: 2.5rem;
+            color: #e76f51;
+            margin-bottom: 20px;
+        }
+
+        .level-score {
+            font-size: 1.8rem;
+            color: #2a9d8f;
+            margin-bottom: 30px;
+        }
+
+        .next-level-button {
+            background-color: #e9c46a;
+            color: #264653;
+            border: none;
+            border-radius: 30px;
+            padding: 15px 30px;
+            font-size: 1.2rem;
+            font-weight: bold;
+            cursor: pointer;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+            transition: all 0.3s ease;
+        }
+
+        .next-level-button:hover {
+            background-color: #f4a261;
+            transform: translateY(-3px);
+            box-shadow: 0 6px 12px rgba(0, 0, 0, 0.15);
+        }
+
+        .spatial-container {
+            position: relative;
+            width: 100%;
+            height: 300px;
+            margin-bottom: 20px;
+            background-color: #e0f7fa;
+            border-radius: 15px;
+            overflow: hidden;
+            box-shadow: inset 0 0 10px rgba(0, 0, 0, 0.1);
+        }
+
+        .ground {
+            position: absolute;
+            bottom: 0;
+            width: 100%;
+            height: 50px;
+            background-color: #8bc34a;
+        }
+
+        .sky {
+            position: absolute;
+            top: 0;
+            width: 100%;
+            height: calc(100% - 50px);
+            background: linear-gradient(to bottom, #87ceeb, #e0f7fa);
+        }
+
+        .spatial-object {
+            position: absolute;
+            transition: all 0.5s ease;
+        }
+
+        .spatial-object.near {
+            transform: scale(1.2);
+            z-index: 10;
+        }
+
+        .spatial-object.far {
+            transform: scale(0.7);
+            opacity: 0.8;
+        }
+
+        .spatial-label {
+            position: absolute;
+            background-color: rgba(255, 255, 255, 0.8);
+            padding: 5px 10px;
+            border-radius: 10px;
+            font-weight: bold;
+            font-size: 1rem;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+        }
+
+        .spatial-options {
+            display: flex;
+            justify-content: space-around;
+            margin-top: 20px;
+        }
+
+        .spatial-option {
+            background-color: #e9c46a;
+            color: #264653;
+            border: none;
+            border-radius: 30px;
+            padding: 15px 30px;
+            font-size: 1.2rem;
+            font-weight: bold;
+            cursor: pointer;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+            transition: all 0.3s ease;
+        }
+
+        .spatial-option:hover {
+            background-color: #f4a261;
+            transform: translateY(-3px);
+            box-shadow: 0 6px 12px rgba(0, 0, 0, 0.15);
+        }
+
+        .level-indicator-container {
+            display: flex;
+            justify-content: center;
+            margin-top: 10px;
+        }
+
+        .level-dot {
+            width: 15px;
+            height: 15px;
+            border-radius: 50%;
+            background-color: #ccc;
+            margin: 0 5px;
+            transition: all 0.3s ease;
+        }
+
+        .level-dot.active {
+            background-color: #f4a261;
+            transform: scale(1.2);
+        }
+
+        .level-dot.completed {
+            background-color: #2a9d8f;
+        }
+
+        .length-container {
+            position: relative;
+            width: 100%;
+            height: 200px;
+            margin-bottom: 20px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .length-object {
+            position: relative;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 0 20px;
+        }
+
+        .length-bar {
+            height: 20px;
+            background-color: #f4a261;
+            border-radius: 10px;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+        }
+
+        .length-label {
+            position: absolute;
+            bottom: -30px;
+            left: 50%;
+            transform: translateX(-50%);
+            background-color: rgba(255, 255, 255, 0.8);
+            padding: 5px 10px;
+            border-radius: 10px;
+            font-weight: bold;
+            font-size: 1rem;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+            white-space: nowrap;
+        }
+
+        .length-options {
+            display: flex;
+            justify-content: space-around;
+            margin-top: 20px;
+        }
+
+        .length-option {
+            background-color: #e9c46a;
+            color: #264653;
+            border: none;
+            border-radius: 30px;
+            padding: 15px 30px;
+            font-size: 1.2rem;
+            font-weight: bold;
+            cursor: pointer;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+            transition: all 0.3s ease;
+        }
+
+        .length-option:hover {
+            background-color: #f4a261;
+            transform: translateY(-3px);
+            box-shadow: 0 6px 12px rgba(0, 0, 0, 0.15);
+        }
+
+        .ruler {
+            position: absolute;
+            bottom: 0;
+            width: 100%;
+            height: 30px;
+            background-color: #f8f9fa;
+            display: flex;
+            justify-content: space-between;
+            padding: 0 10px;
+            box-sizing: border-box;
+        }
+
+        .ruler-mark {
+            width: 2px;
+            height: 100%;
+            background-color: #333;
+        }
+
+        .ruler-label {
+            position: absolute;
+            bottom: 35px;
+            font-size: 0.8rem;
+            color: #333;
+        }
+
+        .voice-settings {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            background-color: rgba(255, 255, 255, 0.9);
+            padding: 15px;
+            border-radius: 15px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+            z-index: 1000;
+        }
+
+        .voice-speed {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            margin-top: 10px;
+        }
+
+        .voice-speed label {
+            font-weight: bold;
+            color: #333;
+        }
+
+        .voice-speed input {
+            width: 100px;
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <h1>Big & Small Adventure</h1>
+        <div class="score-container">
+            <div class="score">Score: <span id="score">0</span></div>
+            <div class="level-indicator">Level: <span id="level">1</span>/4</div>
+            <div class="score">Round: <span id="round">1</span>/5</div>
+            <button class="voice-button" id="voice-button" title="Voice Instructions">🔊</button>
+        </div>
+        <div class="level-indicator-container">
+            <div class="level-dot active" id="level1-dot"></div>
+            <div class="level-dot" id="level2-dot"></div>
+            <div class="level-dot" id="level3-dot"></div>
+            <div class="level-dot" id="level4-dot"></div>
+        </div>
+    </header>
+
+    <main>
+        <div class="clouds">
+            <div class="cloud cloud1"></div>
+            <div class="cloud cloud2"></div>
+        </div>
+
+        <div class="game-container">
+            <div class="question" id="question">Which is bigger?</div>
+            
+            <!-- Regular options container for size questions -->
+            <div class="options-container" id="options-container">
+                <div class="option" id="option1">
+                    <div class="option-image" id="option1-image">
+                        <!-- Image will be inserted here -->
+                    </div>
+                    <div class="option-label" id="option1-label">Option 1</div>
+                </div>
+                <div class="option" id="option2">
+                    <div class="option-image" id="option2-image">
+                        <!-- Image will be inserted here -->
+                    </div>
+                    <div class="option-label" id="option2-label">Option 2</div>
+                </div>
+            </div>
+            
+            <!-- Spatial container for near/far questions -->
+            <div class="spatial-container" id="spatial-container" style="display: none;">
+                <div class="sky"></div>
+                <div class="ground"></div>
+                <!-- Spatial objects will be inserted here -->
+            </div>
+            
+            <!-- Spatial options for near/far questions -->
+            <div class="spatial-options" id="spatial-options" style="display: none;">
+                <button class="spatial-option" id="spatial-option1">Object 1</button>
+                <button class="spatial-option" id="spatial-option2">Object 2</button>
+            </div>
+            
+            <!-- Length container for long/short questions -->
+            <div class="length-container" id="length-container" style="display: none;">
+                <!-- Length objects will be inserted here -->
+                <div class="ruler" id="ruler">
+                    <!-- Ruler marks will be inserted here -->
+                </div>
+            </div>
+            
+            <!-- Length options for long/short questions -->
+            <div class="length-options" id="length-options" style="display: none;">
+                <button class="length-option" id="length-option1">Object 1</button>
+                <button class="length-option" id="length-option2">Object 2</button>
+            </div>
+            
+            <div class="feedback" id="feedback"></div>
+            <button class="next-button" id="next-button">Next Question</button>
+            
+            <!-- Level complete screen -->
+            <div class="level-complete" id="level-complete">
+                <h2>Level Complete!</h2>
+                <div class="level-score">Your Score: <span id="level-score">0</span>/5</div>
+                <button class="next-level-button" id="next-level-button">Next Level</button>
+            </div>
+            
+            <!-- Game over screen -->
+            <div class="game-over" id="game-over">
+                <h2>Great Job!</h2>
+                <div class="final-score">Your Final Score: <span id="final-score">0</span>/20</div>
+                <button class="play-again-button" id="play-again-button">Play Again</button>
+            </div>
+        </div>
+    </main>
+
+    <div class="voice-settings">
+        <div class="voice-speed">
+            <label for="voice-speed-slider">Voice Speed:</label>
+            <input type="range" id="voice-speed-slider" min="0.5" max="1.5" step="0.1" value="1">
+            <span id="voice-speed-value">1.0</span>
+        </div>
+    </div>
+
+    <script>
+        // Game data organized by levels
+        const gameData = {
+            level1: [
+                {
+                    question: "Which is bigger?",
+                    options: [
+                        { name: "Elephant", image: "🐘", isCorrect: true },
+                        { name: "Rabbit", image: "🐰", isCorrect: false }
+                    ],
+                    type: "size"
+                },
+                {
+                    question: "Which is smaller?",
+                    options: [
+                        { name: "Sun", image: "☀️", isCorrect: false },
+                        { name: "Moon", image: "🌙", isCorrect: true }
+                    ],
+                    type: "size"
+                },
+                {
+                    question: "Which is bigger?",
+                    options: [
+                        { name: "House", image: "🏠", isCorrect: true },
+                        { name: "Car", image: "🚗", isCorrect: false }
+                    ],
+                    type: "size"
+                },
+                {
+                    question: "Which is smaller?",
+                    options: [
+                        { name: "Whale", image: "🐋", isCorrect: false },
+                        { name: "Fish", image: "🐠", isCorrect: true }
+                    ],
+                    type: "size"
+                },
+                {
+                    question: "Which is bigger?",
+                    options: [
+                        { name: "Cat", image: "🐱", isCorrect: false },
+                        { name: "Dog", image: "🐕", isCorrect: true }
+                    ],
+                    type: "size"
+                }
+            ],
+            level2: [
+                {
+                    question: "Which is longer?",
+                    options: [
+                        { name: "Pencil", length: 120, isCorrect: false },
+                        { name: "Ruler", length: 200, isCorrect: true }
+                    ],
+                    type: "length"
+                },
+                {
+                    question: "Which is shorter?",
+                    options: [
+                        { name: "Snake", length: 180, isCorrect: false },
+                        { name: "Worm", length: 80, isCorrect: true }
+                    ],
+                    type: "length"
+                },
+                {
+                    question: "Which is longer?",
+                    options: [
+                        { name: "Train", length: 250, isCorrect: true },
+                        { name: "Bicycle", length: 100, isCorrect: false }
+                    ],
+                    type: "length"
+                },
+                {
+                    question: "Which is shorter?",
+                    options: [
+                        { name: "Bus", length: 200, isCorrect: false },
+                        { name: "Car", length: 120, isCorrect: true }
+                    ],
+                    type: "length"
+                },
+                {
+                    question: "Which is longer?",
+                    options: [
+                        { name: "Bridge", length: 250, isCorrect: true },
+                        { name: "Road", length: 150, isCorrect: false }
+                    ],
+                    type: "length"
+                }
+            ],
+            level3: [
+                {
+                    question: "Which is nearer?",
+                    options: [
+                        { name: "Tree", image: "🌳", isCorrect: true, nearPosition: { bottom: "50px", left: "100px" } },
+                        { name: "Mountain", image: "⛰️", isCorrect: false, farPosition: { bottom: "50px", right: "100px" } }
+                    ],
+                    type: "spatial"
+                },
+                {
+                    question: "Which is farther?",
+                    options: [
+                        { name: "Flower", image: "🌸", isCorrect: false, nearPosition: { bottom: "50px", left: "150px" } },
+                        { name: "Cloud", image: "☁️", isCorrect: true, farPosition: { top: "50px", right: "150px" } }
+                    ],
+                    type: "spatial"
+                },
+                {
+                    question: "Which is nearer?",
+                    options: [
+                        { name: "Chair", image: "🪑", isCorrect: true, nearPosition: { bottom: "50px", left: "200px" } },
+                        { name: "Building", image: "🏢", isCorrect: false, farPosition: { bottom: "50px", right: "200px" } }
+                    ],
+                    type: "spatial"
+                },
+                {
+                    question: "Which is farther?",
+                    options: [
+                        { name: "Ball", image: "⚽", isCorrect: false, nearPosition: { bottom: "50px", left: "250px" } },
+                        { name: "Airplane", image: "✈️", isCorrect: true, farPosition: { top: "50px", right: "250px" } }
+                    ],
+                    type: "spatial"
+                },
+                {
+                    question: "Which is nearer?",
+                    options: [
+                        { name: "Bicycle", image: "🚲", isCorrect: true, nearPosition: { bottom: "50px", left: "300px" } },
+                        { name: "Rainbow", image: "🌈", isCorrect: false, farPosition: { top: "50px", right: "300px" } }
+                    ],
+                    type: "spatial"
+                }
+            ],
+            level4: [
+                {
+                    question: "Which is bigger?",
+                    options: [
+                        { name: "Apple", image: "🍎", isCorrect: true },
+                        { name: "Grape", image: "🍇", isCorrect: false }
+                    ],
+                    type: "size"
+                },
+                {
+                    question: "Which is shorter?",
+                    options: [
+                        { name: "Pencil", length: 120, isCorrect: true },
+                        { name: "Paintbrush", length: 180, isCorrect: false }
+                    ],
+                    type: "length"
+                },
+                {
+                    question: "Which is nearer?",
+                    options: [
+                        { name: "Bird", image: "🐦", isCorrect: false, farPosition: { top: "50px", left: "100px" } },
+                        { name: "Butterfly", image: "🦋", isCorrect: true, nearPosition: { bottom: "100px", left: "200px" } }
+                    ],
+                    type: "spatial"
+                },
+                {
+                    question: "Which is longer?",
+                    options: [
+                        { name: "Fork", length: 100, isCorrect: false },
+                        { name: "Spoon", length: 130, isCorrect: true }
+                    ],
+                    type: "length"
+                },
+                {
+                    question: "Which is bigger?",
+                    options: [
+                        { name: "Strawberry", image: "🍓", isCorrect: false },
+                        { name: "Watermelon", image: "🍉", isCorrect: true }
+                    ],
+                    type: "size"
+                }
+            ]
+        };
+
+        // Game state
+        let currentLevel = 1;
+        let currentRound = 0;
+        let score = 0;
+        let levelScore = 0;
+        let isAnswered = false;
+        let currentQuestions = [];
+        let voiceEnabled = true;
+        let voiceSpeed = 1.0;
+
+        // DOM elements
+        const questionElement = document.getElementById('question');
+        const optionsContainer = document.getElementById('options-container');
+        const spatialContainer = document.getElementById('spatial-container');
+        const spatialOptions = document.getElementById('spatial-options');
+        const lengthContainer = document.getElementById('length-container');
+        const lengthOptions = document.getElementById('length-options');
+        const option1Element = document.getElementById('option1');
+        const option2Element = document.getElementById('option2');
+        const option1ImageElement = document.getElementById('option1-image');
+        const option2ImageElement = document.getElementById('option2-image');
+        const option1LabelElement = document.getElementById('option1-label');
+        const option2LabelElement = document.getElementById('option2-label');
+        const spatialOption1Element = document.getElementById('spatial-option1');
+        const spatialOption2Element = document.getElementById('spatial-option2');
+        const lengthOption1Element = document.getElementById('length-option1');
+        const lengthOption2Element = document.getElementById('length-option2');
+        const feedbackElement = document.getElementById('feedback');
+        const nextButton = document.getElementById('next-button');
+        const scoreElement = document.getElementById('score');
+        const levelElement = document.getElementById('level');
+        const roundElement = document.getElementById('round');
+        const levelCompleteElement = document.getElementById('level-complete');
+        const levelScoreElement = document.getElementById('level-score');
+        const nextLevelButton = document.getElementById('next-level-button');
+        const gameOverElement = document.getElementById('game-over');
+        const finalScoreElement = document.getElementById('final-score');
+        const playAgainButton = document.getElementById('play-again-button');
+        const level1Dot = document.getElementById('level1-dot');
+        const level2Dot = document.getElementById('level2-dot');
+        const level3Dot = document.getElementById('level3-dot');
+        const level4Dot = document.getElementById('level4-dot');
+        const rulerElement = document.getElementById('ruler');
+        const voiceButton = document.getElementById('voice-button');
+        const voiceSpeedSlider = document.getElementById('voice-speed-slider');
+        const voiceSpeedValue = document.getElementById('voice-speed-value');
+
+        // Voice synthesis setup
+        const synth = window.speechSynthesis;
+        let voices = [];
+
+        function populateVoices() {
+            voices = synth.getVoices();
+        }
+
+        // Wait for voices to be loaded
+        if (speechSynthesis.onvoiceschanged !== undefined) {
+            speechSynthesis.onvoiceschanged = populateVoices;
+        }
+
+        // Voice functions
+        function speak(text, callback) {
+            if (!voiceEnabled || !synth) {
+                if (callback) callback();
+                return;
+            }
+
+            // Cancel any ongoing speech
+            synth.cancel();
+
+            const utterance = new SpeechSynthesisUtterance(text);
+            
+            // Select a child-friendly voice
+            const preferredVoices = voices.filter(voice => 
+                voice.name.includes('Samantha') || 
+                voice.name.includes('Karen') || 
+                voice.name.includes('Moira') ||
+                voice.name.includes('Google') ||
+                voice.name.includes('Female')
+            );
+            
+            if (preferredVoices.length > 0) {
+                utterance.voice = preferredVoices[0];
+            }
+            
+            utterance.rate = voiceSpeed;
+            utterance.pitch = 1.1;
+            utterance.volume = 0.9;
+            
+            if (callback) {
+                utterance.onend = callback;
+            }
+            
+            synth.speak(utterance);
+        }
+
+        function speakQuestion() {
+            const currentQuestion = currentQuestions[currentRound];
+            let questionText = currentQuestion.question;
+            
+            // Add the options to the speech
+            if (currentQuestion.type === 'size' || currentQuestion.type === 'length') {
+                questionText += ` Is it ${currentQuestion.options[0].name} or ${currentQuestion.options[1].name}?`;
+            } else if (currentQuestion.type === 'spatial') {
+                questionText += ` Look at the screen. Is it ${currentQuestion.options[0].name} or ${currentQuestion.options[1].name}?`;
+            }
+            
+            speak(questionText);
+        }
+
+        function speakFeedback(isCorrect) {
+            if (isCorrect) {
+                const encouragements = [
+                    "Great job! You got it right!",
+                    "Excellent! That's correct!",
+                    "Wow! You're so smart!",
+                    "Amazing! You did it!",
+                    "Super! That's the right answer!"
+                ];
+                const randomEncouragement = encouragements[Math.floor(Math.random() * encouragements.length)];
+                speak(randomEncouragement);
+            } else {
+                const encouragements = [
+                    "Nice try! Let's try again!",
+                    "Almost there! Keep going!",
+                    "Good effort! You'll get it next time!",
+                    "Don't worry! Learning is fun!",
+                    "Keep trying! You're doing great!"
+                ];
+                const randomEncouragement = encouragements[Math.floor(Math.random() * encouragements.length)];
+                speak(randomEncouragement);
+            }
+        }
+
+        function speakLevelComplete() {
+            speak(`Great job! You completed level ${currentLevel} with a score of ${levelScore} out of 5!`);
+        }
+
+        function speakGameOver() {
+            speak(`Amazing! You finished all levels with a final score of ${score} out of 20! You're a champion!`);
+        }
+
+        // Voice controls
+        voiceButton.addEventListener('click', () => {
+            voiceEnabled = !voiceEnabled;
+            voiceButton.textContent = voiceEnabled ? '🔊' : '🔇';
+            
+            if (voiceEnabled) {
+                speakQuestion();
+            } else {
+                synth.cancel();
+            }
+        });
+
+        voiceSpeedSlider.addEventListener('input', (e) => {
+            voiceSpeed = parseFloat(e.target.value);
+            voiceSpeedValue.textContent = voiceSpeed.toFixed(1);
+        });
+
+        // Initialize the game
+        function initGame() {
+            currentLevel = 1;
+            currentRound = 0;
+            score = 0;
+            levelScore = 0;
+            isAnswered = false;
+            scoreElement.textContent = score;
+            levelElement.textContent = currentLevel;
+            roundElement.textContent = currentRound + 1;
+            gameOverElement.classList.remove('show');
+            levelCompleteElement.classList.remove('show');
+            nextButton.classList.remove('show');
+            
+            // Reset level indicators
+            level1Dot.classList.add('active');
+            level1Dot.classList.remove('completed');
+            level2Dot.classList.remove('active', 'completed');
+            level3Dot.classList.remove('active', 'completed');
+            level4Dot.classList.remove('active', 'completed');
+            
+            // Load first level
+            loadLevel();
+        }
+
+        // Load a level
+        function loadLevel() {
+            currentRound = 0;
+            levelScore = 0;
+            isAnswered = false;
+            nextButton.classList.remove('show');
+            
+            // Update level indicator
+            levelElement.textContent = currentLevel;
+            roundElement.textContent = currentRound + 1;
+            
+            // Update level dots
+            if (currentLevel === 1) {
+                level1Dot.classList.add('active');
+                level1Dot.classList.remove('completed');
+                level2Dot.classList.remove('active', 'completed');
+                level3Dot.classList.remove('active', 'completed');
+                level4Dot.classList.remove('active', 'completed');
+            } else if (currentLevel === 2) {
+                level1Dot.classList.remove('active');
+                level1Dot.classList.add('completed');
+                level2Dot.classList.add('active');
+                level2Dot.classList.remove('completed');
+                level3Dot.classList.remove('active', 'completed');
+                level4Dot.classList.remove('active', 'completed');
+            } else if (currentLevel === 3) {
+                level1Dot.classList.remove('active');
+                level1Dot.classList.add('completed');
+                level2Dot.classList.remove('active');
+                level2Dot.classList.add('completed');
+                level3Dot.classList.add('active');
+                level3Dot.classList.remove('completed');
+                level4Dot.classList.remove('active', 'completed');
+            } else if (currentLevel === 4) {
+                level1Dot.classList.remove('active');
+                level1Dot.classList.add('completed');
+                level2Dot.classList.remove('active');
+                level2Dot.classList.add('completed');
+                level3Dot.classList.remove('active');
+                level3Dot.classList.add('completed');
+                level4Dot.classList.add('active');
+                level4Dot.classList.remove('completed');
+            }
+            
+            // Get questions for current level
+            currentQuestions = gameData[`level${currentLevel}`];
+            
+            // Load first question
+            loadQuestion();
+        }
+
+        // Load a question
+        function loadQuestion() {
+            if (currentRound >= currentQuestions.length) {
+                endLevel();
+                return;
+            }
+
+            isAnswered = false;
+            nextButton.classList.remove('show');
+            
+            const currentQuestion = currentQuestions[currentRound];
+            questionElement.textContent = currentQuestion.question;
+            
+            // Reset containers
+            optionsContainer.style.display = 'none';
+            spatialContainer.style.display = 'none';
+            spatialOptions.style.display = 'none';
+            lengthContainer.style.display = 'none';
+            lengthOptions.style.display = 'none';
+            
+            // Randomize options
+            const randomOrder = Math.random() < 0.5 ? 0 : 1;
+            
+            if (currentQuestion.type === 'size') {
+                // Show size comparison options
+                optionsContainer.style.display = 'flex';
+                
+                // Set option 1
+                option1ImageElement.innerHTML = `<span style="font-size: 5rem;">${currentQuestion.options[randomOrder].image}</span>`;
+                option1LabelElement.textContent = currentQuestion.options[randomOrder].name;
+                option1Element.dataset.correct = currentQuestion.options[randomOrder].isCorrect;
+                
+                // Set option 2
+                option2ImageElement.innerHTML = `<span style="font-size: 5rem;">${currentQuestion.options[1 - randomOrder].image}</span>`;
+                option2LabelElement.textContent = currentQuestion.options[1 - randomOrder].name;
+                option2Element.dataset.correct = currentQuestion.options[1 - randomOrder].isCorrect;
+            } else if (currentQuestion.type === 'spatial') {
+                // Show spatial comparison options
+                spatialContainer.style.display = 'block';
+                spatialOptions.style.display = 'flex';
+                
+                // Clear previous objects
+                const previousObjects = spatialContainer.querySelectorAll('.spatial-object');
+                previousObjects.forEach(obj => obj.remove());
+                
+                // Create spatial objects
+                const nearObject = currentQuestion.options.find(opt => opt.nearPosition);
+                const farObject = currentQuestion.options.find(opt => opt.farPosition);
+                
+                if (nearObject) {
+                    const nearObjElement = document.createElement('div');
+                    nearObjElement.classList.add('spatial-object', 'near');
+                    nearObjElement.innerHTML = `<span style="font-size: 3rem;">${nearObject.image}</span>`;
+                    
+                    // Set position
+                    Object.keys(nearObject.nearPosition).forEach(prop => {
+                        nearObjElement.style[prop] = nearObject.nearPosition[prop];
+                    });
+                    
+                    // Add label
+                    const nearLabel = document.createElement('div');
+                    nearLabel.classList.add('spatial-label');
+                    nearLabel.textContent = nearObject.name;
+                    nearLabel.style.bottom = '40px';
+                    nearLabel.style.left = '50%';
+                    nearLabel.style.transform = 'translateX(-50%)';
+                    nearObjElement.appendChild(nearLabel);
+                    
+                    spatialContainer.appendChild(nearObjElement);
+                }
+                
+                if (farObject) {
+                    const farObjElement = document.createElement('div');
+                    farObjElement.classList.add('spatial-object', 'far');
+                    farObjElement.innerHTML = `<span style="font-size: 3rem;">${farObject.image}</span>`;
+                    
+                    // Set position
+                    Object.keys(farObject.farPosition).forEach(prop => {
+                        farObjElement.style[prop] = farObject.farPosition[prop];
+                    });
+                    
+                    // Add label
+                    const farLabel = document.createElement('div');
+                    farLabel.classList.add('spatial-label');
+                    farLabel.textContent = farObject.name;
+                    farLabel.style.bottom = '40px';
+                    farLabel.style.left = '50%';
+                    farLabel.style.transform = 'translateX(-50%)';
+                    farObjElement.appendChild(farLabel);
+                    
+                    spatialContainer.appendChild(farObjElement);
+                }
+                
+                // Set spatial option buttons
+                spatialOption1Element.textContent = currentQuestion.options[randomOrder].name;
+                spatialOption1Element.dataset.correct = currentQuestion.options[randomOrder].isCorrect;
+                
+                spatialOption2Element.textContent = currentQuestion.options[1 - randomOrder].name;
+                spatialOption2Element.dataset.correct = currentQuestion.options[1 - randomOrder].isCorrect;
+            } else if (currentQuestion.type === 'length') {
+                // Show length comparison options
+                lengthContainer.style.display = 'flex';
+                lengthOptions.style.display = 'flex';
+                
+                // Clear previous objects
+                const previousObjects = lengthContainer.querySelectorAll('.length-object');
+                previousObjects.forEach(obj => obj.remove());
+                
+                // Clear ruler
+                rulerElement.innerHTML = '';
+                
+                // Create ruler marks
+                for (let i = 0; i <= 10; i++) {
+                    const mark = document.createElement('div');
+                    mark.classList.add('ruler-mark');
+                    mark.style.left = `${i * 10}%`;
+                    rulerElement.appendChild(mark);
+                    
+                    // Add ruler labels
+                    if (i % 2 === 0) {
+                        const label = document.createElement('div');
+                        label.classList.add('ruler-label');
+                        label.textContent = i * 10;
+                        label.style.left = `${i * 10}%`;
+                        rulerElement.appendChild(label);
+                    }
+                }
+                
+                // Create length objects
+                const option1 = currentQuestion.options[randomOrder];
+                const option2 = currentQuestion.options[1 - randomOrder];
+                
+                // Create object 1
+                const obj1Element = document.createElement('div');
+                obj1Element.classList.add('length-object');
+                
+                const bar1Element = document.createElement('div');
+                bar1Element.classList.add('length-bar');
+                bar1Element.style.width = `${option1.length}px`;
+                
+                const label1Element = document.createElement('div');
+                label1Element.classList.add('length-label');
+                label1Element.textContent = option1.name;
+                
+                obj1Element.appendChild(bar1Element);
+                obj1Element.appendChild(label1Element);
+                lengthContainer.appendChild(obj1Element);
+                
+                // Create object 2
+                const obj2Element = document.createElement('div');
+                obj2Element.classList.add('length-object');
+                
+                const bar2Element = document.createElement('div');
+                bar2Element.classList.add('length-bar');
+                bar2Element.style.width = `${option2.length}px`;
+                
+                const label2Element = document.createElement('div');
+                label2Element.classList.add('length-label');
+                label2Element.textContent = option2.name;
+                
+                obj2Element.appendChild(bar2Element);
+                obj2Element.appendChild(label2Element);
+                lengthContainer.appendChild(obj2Element);
+                
+                // Set length option buttons
+                lengthOption1Element.textContent = currentQuestion.options[randomOrder].name;
+                lengthOption1Element.dataset.correct = currentQuestion.options[randomOrder].isCorrect;
+                
+                lengthOption2Element.textContent = currentQuestion.options[1 - randomOrder].name;
+                lengthOption2Element.dataset.correct = currentQuestion.options[1 - randomOrder].isCorrect;
+            }
+            
+            // Update round counter
+            roundElement.textContent = currentRound + 1;
+            
+            // Add stars for decoration
+            addStars();
+            
+            // Speak the question
+            setTimeout(() => {
+                speakQuestion();
+            }, 500);
+        }
+
+        // Add decorative stars
+        function addStars() {
+            // Remove existing stars
+            document.querySelectorAll('.star').forEach(star => star.remove());
+            
+            // Add new stars
+            for (let i = 0; i < 5; i++) {
+                const star = document.createElement('div');
+                star.classList.add('star');
+                star.textContent = '⭐';
+                star.style.left = `${Math.random() * 90 + 5}%`;
+                star.style.top = `${Math.random() * 90 + 5}%`;
+                document.querySelector('.game-container').appendChild(star);
+            }
+        }
+
+        // Handle option click
+        function handleOptionClick(event) {
+            if (isAnswered) return;
+            
+            isAnswered = true;
+            const option = event.currentTarget;
+            const isCorrect = option.dataset.correct === 'true';
+            
+            if (isCorrect) {
+                score++;
+                levelScore++;
+                scoreElement.textContent = score;
+                showFeedback(true);
+                createConfetti();
+            } else {
+                showFeedback(false);
+            }
+            
+            // Speak feedback
+            speakFeedback(isCorrect);
+            
+            nextButton.classList.add('show');
+        }
+
+        // Show feedback
+        function showFeedback(isCorrect) {
+            feedbackElement.textContent = isCorrect ? '✓ Correct!' : '✗ Try Again!';
+            feedbackElement.classList.remove('correct-animation', 'incorrect-animation');
+            
+            if (isCorrect) {
+                feedbackElement.classList.add('correct-animation');
+            } else {
+                feedbackElement.classList.add('incorrect-animation');
+            }
+            
+            // Force reflow to restart animation
+            void feedbackElement.offsetWidth;
+        }
+
+        // Create confetti effect
+        function createConfetti() {
+            const colors = ['#ff6b6b', '#4ecdc4', '#45b7d1', '#f9ca24', '#f0932b', '#eb4d4b', '#6ab04c', '#c44569'];
+            
+            for (let i = 0; i < 30; i++) {
+                const confetti = document.createElement('div');
+                confetti.classList.add('confetti');
+                confetti.style.backgroundColor = colors[Math.floor(Math.random() * colors.length)];
+                confetti.style.left = `${Math.random() * 100}%`;
+                confetti.style.top = `${Math.random() * 100}%`;
+                
+                // Random size
+                const size = Math.random() * 10 + 5;
+                confetti.style.width = `${size}px`;
+                confetti.style.height = `${size}px`;
+                
+                // Random shape
+                if (Math.random() < 0.5) {
+                    confetti.style.borderRadius = '50%';
+                } else {
+                    confetti.style.borderRadius = '0';
+                }
+                
+                // Random animation
+                const duration = Math.random() * 2 + 1;
+                const delay = Math.random() * 0.5;
+                
+                confetti.style.animation = `fall ${duration}s ease-out ${delay}s forwards`;
+                
+                document.querySelector('.game-container').appendChild(confetti);
+                
+                // Remove confetti after animation
+                setTimeout(() => {
+                    confetti.remove();
+                }, (duration + delay) * 1000);
+            }
+        }
+
+        // End the level
+        function endLevel() {
+            levelScoreElement.textContent = levelScore;
+            levelCompleteElement.classList.add('show');
+            
+            // Mark current level as completed
+            if (currentLevel === 1) {
+                level1Dot.classList.remove('active');
+                level1Dot.classList.add('completed');
+            } else if (currentLevel === 2) {
+                level2Dot.classList.remove('active');
+                level2Dot.classList.add('completed');
+            } else if (currentLevel === 3) {
+                level3Dot.classList.remove('active');
+                level3Dot.classList.add('completed');
+            } else if (currentLevel === 4) {
+                level4Dot.classList.remove('active');
+                level4Dot.classList.add('completed');
+            }
+            
+            // Speak level complete message
+            speakLevelComplete();
+        }
+
+        // End the game
+        function endGame() {
+            finalScoreElement.textContent = score;
+            gameOverElement.classList.add('show');
+            
+            // Speak game over message
+            speakGameOver();
+        }
+
+        // Event listeners
+        option1Element.addEventListener('click', handleOptionClick);
+        option2Element.addEventListener('click', handleOptionClick);
+        spatialOption1Element.addEventListener('click', handleOptionClick);
+        spatialOption2Element.addEventListener('click', handleOptionClick);
+        lengthOption1Element.addEventListener('click', handleOptionClick);
+        lengthOption2Element.addEventListener('click', handleOptionClick);
+        
+        nextButton.addEventListener('click', () => {
+            currentRound++;
+            loadQuestion();
+        });
+        
+        nextLevelButton.addEventListener('click', () => {
+            levelCompleteElement.classList.remove('show');
+            currentLevel++;
+            
+            if (currentLevel > 4) {
+                endGame();
+            } else {
+                loadLevel();
+            }
+        });
+        
+        playAgainButton.addEventListener('click', () => {
+            gameOverElement.classList.remove('show');
+            initGame();
+        });
+
+        // Add falling animation for confetti
+        const style = document.createElement('style');
+        style.textContent = `
+            @keyframes fall {
+                0% {
+                    transform: translateY(0) rotate(0deg);
+                    opacity: 1;
+                }
+                100% {
+                    transform: translateY(300px) rotate(360deg);
+                    opacity: 0;
+                }
+            }
+        `;
+        document.head.appendChild(style);
+
+        // Initialize the game on load
+        window.addEventListener('load', () => {
+            initGame();
+            populateVoices();
+        });
+    </script>
+</body>
+</html>
