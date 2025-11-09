@@ -1,0 +1,1494 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Number Adventure - Fun Math for Kids</title>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Comic+Neue:wght@700&display=swap');
+        
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Comic Neue', cursive;
+            background: linear-gradient(135deg, #a1c4fd 0%, #c2e9fb 100%);
+            min-height: 100vh;
+            overflow-x: hidden;
+        }
+        
+        .game-wrapper {
+            width: 100%;
+            min-height: 100vh;
+            padding: 20px;
+        }
+        
+        .game-container {
+            max-width: 1000px;
+            margin: 0 auto;
+            background-color: rgba(255, 255, 255, 0.95);
+            border-radius: 30px;
+            padding: 30px;
+            box-shadow: 0 15px 30px rgba(0, 0, 0, 0.2);
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .header {
+            text-align: center;
+            margin-bottom: 30px;
+        }
+        
+        h1 {
+            font-size: 3rem;
+            color: #ff6b6b;
+            text-shadow: 2px 2px 0px #ff9e9e;
+            margin-bottom: 10px;
+            animation: bounce 2s infinite;
+        }
+        
+        .score-container {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 20px;
+            flex-wrap: wrap;
+            gap: 10px;
+        }
+        
+        .score, .level, .streak {
+            background-color: #ffeb3b;
+            color: #333;
+            padding: 10px 20px;
+            border-radius: 50px;
+            font-size: 1.2rem;
+            font-weight: bold;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+            display: flex;
+            align-items: center;
+            gap: 5px;
+        }
+        
+        .voice-controls {
+            display: flex;
+            gap: 10px;
+            justify-content: center;
+            margin-bottom: 20px;
+            flex-wrap: wrap;
+        }
+        
+        .voice-button {
+            background-color: #f5f5f5;
+            color: #666;
+            border: 2px solid #e0e0e0;
+            padding: 8px 16px;
+            border-radius: 25px;
+            cursor: pointer;
+            font-size: 0.95rem;
+            font-weight: 600;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+        
+        .voice-button:hover {
+            background-color: #eeeeee;
+            border-color: #bdbdbd;
+            transform: translateY(-1px);
+            box-shadow: 0 3px 6px rgba(0, 0, 0, 0.15);
+        }
+        
+        .voice-button.active {
+            background-color: #e8f5e9;
+            color: #2e7d32;
+            border-color: #81c784;
+            box-shadow: 0 2px 4px rgba(46, 125, 50, 0.2);
+        }
+        
+        .voice-button.active:hover {
+            background-color: #c8e6c9;
+            transform: translateY(-1px);
+        }
+        
+        .voice-button:disabled {
+            background-color: #fafafa;
+            color: #bdbdbd;
+            border-color: #e0e0e0;
+            cursor: not-allowed;
+            transform: none;
+        }
+        
+        .voice-button span:first-child {
+            font-size: 1.1rem;
+        }
+        
+        .question-container {
+            background-color: #f8f9fa;
+            border-radius: 20px;
+            padding: 30px;
+            margin-bottom: 30px;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+            text-align: center;
+            min-height: 200px;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+        }
+        
+        .question {
+            font-size: 2.5rem;
+            color: #333;
+            margin-bottom: 30px;
+        }
+        
+        .number-sequence {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            margin-bottom: 30px;
+            flex-wrap: wrap;
+            gap: 8px;
+        }
+        
+        .number {
+            font-size: 2.2rem;
+            margin: 0 8px;
+            color: #333;
+            font-weight: bold;
+        }
+        
+        .missing-number {
+            width: 65px;
+            height: 65px;
+            border: 4px dashed #ff6b6b;
+            border-radius: 15px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            margin: 0 8px;
+            background-color: rgba(255, 107, 107, 0.1);
+        }
+        
+        .options-container {
+            display: flex;
+            justify-content: center;
+            flex-wrap: wrap;
+            gap: 20px;
+            margin-bottom: 30px;
+        }
+        
+        .option {
+            width: 65px;
+            height: 65px;
+            border-radius: 50%;
+            background-color: #4ecdc4;
+            color: white;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            font-size: 1.6rem;
+            font-weight: bold;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+            position: relative;
+        }
+        
+        .option:hover {
+            transform: scale(1.1);
+            background-color: #3dadb4;
+        }
+        
+        .option.correct {
+            background-color: #4caf50;
+            animation: pulse 0.5s;
+        }
+        
+        .option.incorrect {
+            background-color: #f44336;
+            animation: shake 0.5s;
+        }
+        
+        .feedback {
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            font-size: 3rem;
+            font-weight: bold;
+            color: white;
+            background-color: rgba(0, 0, 0, 0.7);
+            padding: 20px 40px;
+            border-radius: 20px;
+            display: none;
+            z-index: 1000;
+        }
+        
+        .feedback.show {
+            display: block;
+            animation: fadeInOut 1.5s;
+        }
+        
+        .next-button {
+            background-color: #ff9800;
+            color: white;
+            border: none;
+            padding: 15px 30px;
+            font-size: 1.5rem;
+            border-radius: 50px;
+            cursor: pointer;
+            margin: 20px auto;
+            font-family: 'Comic Neue', cursive;
+            font-weight: bold;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+            transition: all 0.3s ease;
+            display: none;
+        }
+        
+        .next-button.show {
+            display: block;
+            animation: bounce 1s infinite;
+        }
+        
+        .next-button:hover {
+            background-color: #e68900;
+            transform: scale(1.05);
+        }
+        
+        .stars {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            top: 0;
+            left: 0;
+            pointer-events: none;
+            z-index: -1;
+        }
+        
+        .star {
+            position: absolute;
+            background-color: #ffeb3b;
+            clip-path: polygon(50% 0%, 61% 35%, 98% 35%, 68% 57%, 79% 91%, 50% 70%, 21% 91%, 32% 57%, 2% 35%, 39% 35%);
+            animation: twinkle 3s infinite;
+        }
+        
+        .confetti {
+            position: fixed;
+            width: 10px;
+            height: 10px;
+            background-color: #f44336;
+            opacity: 0;
+            pointer-events: none;
+        }
+        
+        .speaking-indicator {
+            position: absolute;
+            top: -8px;
+            right: -8px;
+            width: 16px;
+            height: 16px;
+            background-color: #4caf50;
+            border-radius: 50%;
+            display: none;
+            animation: gentlePulse 1.5s infinite;
+        }
+        
+        .speaking-indicator.active {
+            display: block;
+        }
+        
+        .progress-section {
+            margin-top: 30px;
+            padding: 20px;
+            background-color: #fff3e0;
+            border-radius: 20px;
+        }
+        
+        .progress-section h3 {
+            text-align: center;
+            color: #f57c00;
+            margin-bottom: 15px;
+            font-size: 1.5rem;
+        }
+        
+        .progress-bar {
+            width: 100%;
+            height: 30px;
+            background-color: #e0e0e0;
+            border-radius: 15px;
+            overflow: hidden;
+            margin-bottom: 10px;
+        }
+        
+        .progress-fill {
+            height: 100%;
+            background: linear-gradient(90deg, #4caf50, #8bc34a);
+            border-radius: 15px;
+            transition: width 0.5s ease;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-weight: bold;
+        }
+        
+        .pattern-examples {
+            margin-top: 30px;
+            padding: 20px;
+            background-color: #e8f5e9;
+            border-radius: 20px;
+        }
+        
+        .pattern-examples h3 {
+            text-align: center;
+            color: #2e7d32;
+            margin-bottom: 15px;
+            font-size: 1.5rem;
+        }
+        
+        .example-pattern {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            margin-bottom: 15px;
+            flex-wrap: wrap;
+            gap: 5px;
+        }
+        
+        .example-number {
+            font-size: 1.5rem;
+            margin: 0 5px;
+            color: #333;
+            font-weight: bold;
+        }
+        
+        .example-missing {
+            width: 40px;
+            height: 40px;
+            border: 2px dashed #ff6b6b;
+            border-radius: 10px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            margin: 0 5px;
+            background-color: rgba(255, 107, 107, 0.1);
+        }
+        
+        .character {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            width: 100px;
+            height: 100px;
+            background-color: #ff6b6b;
+            border-radius: 50%;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            font-size: 3rem;
+            animation: bounce 2s infinite;
+            z-index: 100;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+        
+        .character:hover {
+            transform: scale(1.1);
+        }
+        
+        .character-message {
+            position: fixed;
+            bottom: 130px;
+            right: 30px;
+            background-color: white;
+            padding: 15px;
+            border-radius: 15px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+            display: none;
+            max-width: 200px;
+            font-size: 1rem;
+            color: #333;
+        }
+        
+        .character-message.show {
+            display: block;
+            animation: fadeInOut 2s;
+        }
+        
+        .instructions {
+            text-align: center;
+            margin-bottom: 20px;
+            font-size: 1.2rem;
+            color: #555;
+        }
+        
+        @keyframes bounce {
+            0%, 100% {
+                transform: translateY(0);
+            }
+            50% {
+                transform: translateY(-10px);
+            }
+        }
+        
+        @keyframes pulse {
+            0% {
+                transform: scale(1);
+                opacity: 1;
+            }
+            50% {
+                transform: scale(1.2);
+                opacity: 0.7;
+            }
+            100% {
+                transform: scale(1);
+                opacity: 1;
+            }
+        }
+        
+        @keyframes gentlePulse {
+            0% {
+                transform: scale(1);
+                opacity: 0.8;
+            }
+            50% {
+                transform: scale(1.1);
+                opacity: 1;
+            }
+            100% {
+                transform: scale(1);
+                opacity: 0.8;
+            }
+        }
+        
+        @keyframes shake {
+            0%, 100% {
+                transform: translateX(0);
+            }
+            10%, 30%, 50%, 70%, 90% {
+                transform: translateX(-5px);
+            }
+            20%, 40%, 60%, 80% {
+                transform: translateX(5px);
+            }
+        }
+        
+        @keyframes fadeInOut {
+            0% {
+                opacity: 0;
+                transform: translate(-50%, -50%) scale(0.5);
+            }
+            50% {
+                opacity: 1;
+                transform: translate(-50%, -50%) scale(1);
+            }
+            100% {
+                opacity: 0;
+                transform: translate(-50%, -50%) scale(0.5);
+            }
+        }
+        
+        @keyframes twinkle {
+            0%, 100% {
+                opacity: 0.2;
+            }
+            50% {
+                opacity: 0.8;
+            }
+        }
+        
+        @keyframes fall {
+            0% {
+                transform: translateY(-100vh) rotate(0deg);
+                opacity: 1;
+            }
+            100% {
+                transform: translateY(100vh) rotate(360deg);
+                opacity: 0;
+            }
+        }
+        
+        @media (max-width: 600px) {
+            h1 {
+                font-size: 2rem;
+            }
+            
+            .question {
+                font-size: 1.8rem;
+            }
+            
+            .number {
+                font-size: 1.6rem;
+                margin: 0 5px;
+            }
+            
+            .option {
+                width: 55px;
+                height: 55px;
+                font-size: 1.3rem;
+            }
+            
+            .missing-number {
+                width: 55px;
+                height: 55px;
+                margin: 0 5px;
+            }
+            
+            .voice-button {
+                padding: 6px 12px;
+                font-size: 0.85rem;
+            }
+            
+            .character {
+                width: 80px;
+                height: 80px;
+                font-size: 2rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="game-wrapper">
+        <div class="game-container">
+            <div class="stars" id="stars"></div>
+            
+            <div class="header">
+                <h1>Number Adventure!</h1>
+                <div class="instructions">Find the missing numbers in these sequences!</div>
+            </div>
+            
+            <div class="score-container">
+                <div class="score">
+                    <span>⭐</span>
+                    <span>Score: <span id="score">0</span></span>
+                </div>
+                <div class="level">
+                    <span>🏆</span>
+                    <span>Level: <span id="level">1</span></span>
+                </div>
+                <div class="streak">
+                    <span>🔥</span>
+                    <span>Streak: <span id="streak">0</span></span>
+                </div>
+            </div>
+            
+            <div class="voice-controls">
+                <button class="voice-button" id="voice-toggle">
+                    <span>🔊</span>
+                    <span>Voice ON</span>
+                </button>
+                <button class="voice-button" id="repeat-button">
+                    <span>🔁</span>
+                    <span>Repeat</span>
+                </button>
+            </div>
+            
+            <div class="question-container">
+                <div class="question" id="question-text">What comes after 3?</div>
+                <div class="number-sequence" id="number-sequence">
+                    <div class="number">3</div>
+                    <div class="missing-number">?</div>
+                </div>
+            </div>
+            
+            <div class="options-container" id="options-container">
+                <div class="option" data-value="1">1</div>
+                <div class="option" data-value="2">2</div>
+                <div class="option" data-value="3">3</div>
+                <div class="option" data-value="4">4</div>
+            </div>
+            
+            <button class="next-button" id="next-button">Next Question!</button>
+            
+            <div class="progress-section">
+                <h3>🎯 Progress to Next Level</h3>
+                <div class="progress-bar">
+                    <div class="progress-fill" id="progress-fill" style="width: 0%">
+                        <span id="progress-text">0%</span>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="pattern-examples">
+                <h3>🧩 Pattern Examples</h3>
+                <div class="example-pattern">
+                    <div class="example-number">1</div>
+                    <div class="example-number">2</div>
+                    <div class="example-missing">?</div>
+                    <div class="example-number">4</div>
+                    <div class="example-number">5</div>
+                </div>
+                <div class="example-pattern">
+                    <div class="example-number">2</div>
+                    <div class="example-number">4</div>
+                    <div class="example-number">6</div>
+                    <div class="example-missing">?</div>
+                    <div class="example-number">10</div>
+                </div>
+                <div class="example-pattern">
+                    <div class="example-number">10</div>
+                    <div class="example-missing">?</div>
+                    <div class="example-number">30</div>
+                    <div class="example-number">40</div>
+                    <div class="example-number">50</div>
+                </div>
+                <div class="example-pattern">
+                    <div class="example-number">5</div>
+                    <div class="example-number">10</div>
+                    <div class="example-number">15</div>
+                    <div class="example-missing">?</div>
+                    <div class="example-number">25</div>
+                </div>
+            </div>
+            
+            <div class="speaking-indicator" id="speaking-indicator"></div>
+        </div>
+    </div>
+    
+    <div class="character" id="character">🐸</div>
+    <div class="character-message" id="character-message"></div>
+    
+    <div class="feedback" id="feedback"></div>
+
+    <script>
+        // Game state
+        let score = 0;
+        let level = 1;
+        let maxNumber = 10;
+        let currentQuestion = null;
+        let correctAnswer = null;
+        let questionTypes = [
+            'missing', 'before', 'after', 'sequence', 'pattern',
+            'reverse', 'alternating', 'fibonacci', 'squares', 'multiples'
+        ];
+        let currentQuestionType = null;
+        let voiceEnabled = true;
+        let currentSpeechText = '';
+        let streak = 0;
+        let totalQuestions = 0;
+        let correctAnswers = 0;
+        
+        // Character messages
+        const characterMessages = [
+            "You're doing great! 🌟",
+            "Keep going! 💪",
+            "Amazing job! 🎉",
+            "You're a math star! ⭐",
+            "Wow! So smart! 🧠",
+            "Fantastic! 🎊",
+            "You got this! 🚀",
+            "Super work! 🏆"
+        ];
+        
+        // DOM elements
+        const scoreElement = document.getElementById('score');
+        const levelElement = document.getElementById('level');
+        const streakElement = document.getElementById('streak');
+        const questionText = document.getElementById('question-text');
+        const numberSequence = document.getElementById('number-sequence');
+        const optionsContainer = document.getElementById('options-container');
+        const feedback = document.getElementById('feedback');
+        const nextButton = document.getElementById('next-button');
+        const starsContainer = document.getElementById('stars');
+        const voiceToggle = document.getElementById('voice-toggle');
+        const repeatButton = document.getElementById('repeat-button');
+        const speakingIndicator = document.getElementById('speaking-indicator');
+        const progressFill = document.getElementById('progress-fill');
+        const progressText = document.getElementById('progress-text');
+        const character = document.getElementById('character');
+        const characterMessage = document.getElementById('character-message');
+        
+        // Voice synthesis setup
+        const synth = window.speechSynthesis;
+        let voices = [];
+        let selectedFemaleVoice = null;
+        
+        // Enhanced voice loading with AI voice prioritization
+        function loadVoices() {
+            voices = synth.getVoices();
+            
+            // Priority list for high-quality female AI voices
+            const femaleVoicePriority = [
+                // Google Cloud Text-to-Speech voices (highest quality)
+                'Google US English Female',
+                'Google UK English Female',
+                'Google Australian English Female',
+                'Google Canadian English Female',
+                
+                // Microsoft Azure Cognitive Services voices
+                'Microsoft Zira Desktop',
+                'Microsoft Hazel Desktop',
+                'Microsoft Susan Desktop',
+                
+                // Apple Neural voices (most natural)
+                'Samantha',
+                'Karen',
+                'Moira',
+                'Tessa',
+                'Veena',
+                
+                // Amazon Polly voices
+                'Joanna',
+                'Kendra',
+                'Kimberly',
+                'Salli',
+                'Joey',
+                
+                // Other high-quality voices
+                'Google US English',
+                'Microsoft David Desktop'
+            ];
+            
+            // Try to find best female AI voice
+            for (let voiceName of femaleVoicePriority) {
+                const voice = voices.find(v => v.name.includes(voiceName));
+                if (voice) {
+                    selectedFemaleVoice = voice;
+                    console.log('Selected high-quality female voice:', voice.name);
+                    break;
+                }
+            }
+            
+            // Fallback to any female voice
+            if (!selectedFemaleVoice) {
+                const anyFemaleVoice = voices.find(v => 
+                    v.name.toLowerCase().includes('female') ||
+                    v.name.toLowerCase().includes('woman') ||
+                    v.name.toLowerCase().includes('girl') ||
+                    v.lang.includes('en-US') ||
+                    v.lang.includes('en-GB')
+                );
+                if (anyFemaleVoice) {
+                    selectedFemaleVoice = anyFemaleVoice;
+                    console.log('Selected fallback female voice:', anyFemaleVoice.name);
+                }
+            }
+            
+            // Last resort: use any English voice
+            if (!selectedFemaleVoice && voices.length > 0) {
+                const englishVoice = voices.find(v => v.lang.startsWith('en'));
+                if (englishVoice) {
+                    selectedFemaleVoice = englishVoice;
+                    console.log('Using English voice:', englishVoice.name);
+                } else {
+                    selectedFemaleVoice = voices[0];
+                    console.log('Using default voice:', voices[0].name);
+                }
+            }
+        }
+        
+        // Load voices immediately and when they change
+        loadVoices();
+        if (speechSynthesis.onvoiceschanged !== undefined) {
+            speechSynthesis.onvoiceschanged = loadVoices;
+        }
+        
+        // Enhanced speech function with AI voice optimization
+        function speak(text, callback) {
+            if (!voiceEnabled) {
+                if (callback) callback();
+                return;
+            }
+            
+            // Cancel any ongoing speech
+            synth.cancel();
+            
+            const utterance = new SpeechSynthesisUtterance(text);
+            
+            // Use the selected female AI voice
+            if (selectedFemaleVoice) {
+                utterance.voice = selectedFemaleVoice;
+            }
+            
+            // Optimized parameters for female AI voice
+            utterance.rate = 0.9; // Slightly slower for children's comprehension
+            utterance.pitch = 1.1; // Natural female pitch range
+            utterance.volume = 0.85; // Clear but comfortable volume
+            
+            // Enhanced prosody for natural speech
+            utterance.pitch = 1.05; // Subtle variation
+            utterance.rate = 0.92; // Natural speaking pace
+            
+            // Add natural pauses and emphasis
+            if (text.includes('?')) {
+                utterance.pitch = 1.15; // Slightly higher for questions
+            }
+            
+            if (text.includes('!') || text.includes('Great') || text.includes('Amazing')) {
+                utterance.pitch = 1.2; // More enthusiastic for praise
+                utterance.rate = 0.95; // Slightly faster for excitement
+            }
+            
+            // Show subtle speaking indicator
+            speakingIndicator.classList.add('active');
+            
+            utterance.onend = () => {
+                speakingIndicator.classList.remove('active');
+                if (callback) callback();
+            };
+            
+            utterance.onerror = () => {
+                speakingIndicator.classList.remove('active');
+                console.error('Speech synthesis error');
+                if (callback) callback();
+            };
+            
+            synth.speak(utterance);
+        }
+        
+        // Toggle voice on/off with subtle feedback
+        voiceToggle.addEventListener('click', () => {
+            voiceEnabled = !voiceEnabled;
+            voiceToggle.classList.toggle('active');
+            
+            if (voiceEnabled) {
+                voiceToggle.innerHTML = '<span>🔊</span><span>Voice ON</span>';
+                // Subtle voice announcement
+                speak("Voice enabled", () => {
+                    setTimeout(() => speakCurrentQuestion(), 500);
+                });
+            } else {
+                voiceToggle.innerHTML = '<span>🔇</span><span>Voice OFF</span>';
+                synth.cancel();
+                speakingIndicator.classList.remove('active');
+            }
+        });
+        
+        // Repeat current question
+        repeatButton.addEventListener('click', () => {
+            if (voiceEnabled) {
+                speakCurrentQuestion();
+            }
+        });
+        
+        // Character click handler
+        character.addEventListener('click', () => {
+            const message = characterMessages[Math.floor(Math.random() * characterMessages.length)];
+            characterMessage.textContent = message;
+            characterMessage.classList.add('show');
+            
+            if (voiceEnabled) {
+                speak(message);
+            }
+            
+            setTimeout(() => {
+                characterMessage.classList.remove('show');
+            }, 2000);
+        });
+        
+        // Initialize stars
+        function createStars() {
+            for (let i = 0; i < 20; i++) {
+                const star = document.createElement('div');
+                star.classList.add('star');
+                star.style.width = Math.random() * 15 + 5 + 'px';
+                star.style.height = star.style.width;
+                star.style.left = Math.random() * 100 + '%';
+                star.style.top = Math.random() * 100 + '%';
+                star.style.animationDelay = Math.random() * 3 + 's';
+                starsContainer.appendChild(star);
+            }
+        }
+        
+        // Create confetti for correct answers
+        function createConfetti() {
+            for (let i = 0; i < 50; i++) {
+                const confetti = document.createElement('div');
+                confetti.classList.add('confetti');
+                confetti.style.left = Math.random() * 100 + '%';
+                confetti.style.backgroundColor = `hsl(${Math.random() * 360}, 100%, 50%)`;
+                confetti.style.width = Math.random() * 10 + 5 + 'px';
+                confetti.style.height = confetti.style.width;
+                confetti.style.animation = `fall ${Math.random() * 2 + 1}s linear forwards`;
+                confetti.style.animationDelay = Math.random() * 0.5 + 's';
+                document.body.appendChild(confetti);
+                
+                setTimeout(() => confetti.remove(), 3000);
+            }
+        }
+        
+        // Update progress bar
+        function updateProgress() {
+            const progressToNextLevel = score % 50;
+            const percentage = (progressToNextLevel / 50) * 100;
+            progressFill.style.width = percentage + '%';
+            progressText.textContent = Math.round(percentage) + '%';
+        }
+        
+        // Generate a new question
+        function generateQuestion() {
+            // Determine question type based on level
+            if (level <= 2) {
+                // Early levels: simple questions
+                currentQuestionType = questionTypes[Math.floor(Math.random() * 3)]; // Only missing, before, after
+            } else if (level <= 4) {
+                // Mid levels: add sequence questions
+                currentQuestionType = questionTypes[Math.floor(Math.random() * 5)]; // Add sequence, pattern
+            } else if (level <= 6) {
+                // Advanced levels: add more complex patterns
+                currentQuestionType = questionTypes[Math.floor(Math.random() * 7)]; // Add reverse, alternating
+            } else {
+                // Expert levels: all question types
+                currentQuestionType = questionTypes[Math.floor(Math.random() * questionTypes.length)];
+            }
+            
+            // Generate numbers based on level
+            if (level <= 2) {
+                maxNumber = 10;
+            } else if (level <= 4) {
+                maxNumber = 15;
+            } else if (level <= 6) {
+                maxNumber = 20;
+            } else {
+                maxNumber = 30;
+            }
+            
+            // Generate question based on type
+            if (currentQuestionType === 'missing') {
+                generateMissingNumberQuestion();
+            } else if (currentQuestionType === 'before') {
+                generateBeforeQuestion();
+            } else if (currentQuestionType === 'after') {
+                generateAfterQuestion();
+            } else if (currentQuestionType === 'sequence') {
+                generateSequenceQuestion();
+            } else if (currentQuestionType === 'pattern') {
+                generatePatternQuestion();
+            } else if (currentQuestionType === 'reverse') {
+                generateReverseSequenceQuestion();
+            } else if (currentQuestionType === 'alternating') {
+                generateAlternatingPatternQuestion();
+            } else if (currentQuestionType === 'fibonacci') {
+                generateFibonacciQuestion();
+            } else if (currentQuestionType === 'squares') {
+                generateSquaresQuestion();
+            } else if (currentQuestionType === 'multiples') {
+                generateMultiplesQuestion();
+            }
+            
+            // Create options
+            createOptions();
+            
+            // Speak the question
+            setTimeout(() => speakCurrentQuestion(), 500);
+        }
+        
+        // Generate missing number question (2-3 numbers)
+        function generateMissingNumberQuestion() {
+            const position = Math.floor(Math.random() * 3); // 0: first, 1: middle, 2: last
+            let num1, num2, num3;
+            
+            if (position === 0) { // Missing first number
+                num2 = Math.floor(Math.random() * (maxNumber - 2)) + 2;
+                num3 = num2 + 1;
+                correctAnswer = num2 - 1;
+                
+                numberSequence.innerHTML = `
+                    <div class="missing-number">?</div>
+                    <div class="number">${num2}</div>
+                    <div class="number">${num3}</div>
+                `;
+                
+                questionText.textContent = "What's the missing number?";
+                currentSpeechText = `What's the missing number? The sequence is question mark, ${num2}, ${num3}.`;
+            } else if (position === 1) { // Missing middle number
+                num1 = Math.floor(Math.random() * (maxNumber - 2)) + 1;
+                num3 = num1 + 2;
+                correctAnswer = num1 + 1;
+                
+                numberSequence.innerHTML = `
+                    <div class="number">${num1}</div>
+                    <div class="missing-number">?</div>
+                    <div class="number">${num3}</div>
+                `;
+                
+                questionText.textContent = "What's the missing number?";
+                currentSpeechText = `What's the missing number? The sequence is ${num1}, question mark, ${num3}.`;
+            } else { // Missing last number
+                num1 = Math.floor(Math.random() * (maxNumber - 2)) + 1;
+                num2 = num1 + 1;
+                correctAnswer = num1 + 2;
+                
+                numberSequence.innerHTML = `
+                    <div class="number">${num1}</div>
+                    <div class="number">${num2}</div>
+                    <div class="missing-number">?</div>
+                `;
+                
+                questionText.textContent = "What's the missing number?";
+                currentSpeechText = `What's the missing number? The sequence is ${num1}, ${num2}, question mark.`;
+            }
+        }
+        
+        // Generate "what comes before" question
+        function generateBeforeQuestion() {
+            const num = Math.floor(Math.random() * (maxNumber - 1)) + 2;
+            correctAnswer = num - 1;
+            
+            numberSequence.innerHTML = `
+                <div class="missing-number">?</div>
+                <div class="number">${num}</div>
+            `;
+            
+            questionText.textContent = `What comes before ${num}?`;
+            currentSpeechText = `What comes before ${num}?`;
+        }
+        
+        // Generate "what comes after" question
+        function generateAfterQuestion() {
+            const num = Math.floor(Math.random() * (maxNumber - 1)) + 1;
+            correctAnswer = num + 1;
+            
+            numberSequence.innerHTML = `
+                <div class="number">${num}</div>
+                <div class="missing-number">?</div>
+            `;
+            
+            questionText.textContent = `What comes after ${num}?`;
+            currentSpeechText = `What comes after ${num}?`;
+        }
+        
+        // Generate sequence question (4-6 numbers)
+        function generateSequenceQuestion() {
+            const sequenceLength = 4 + Math.floor(Math.random() * 3); // 4-6 numbers
+            const missingPosition = Math.floor(Math.random() * sequenceLength);
+            const start = Math.floor(Math.random() * (maxNumber - sequenceLength)) + 1;
+            const sequence = [];
+            
+            // Create a simple sequence (counting by 1)
+            for (let i = 0; i < sequenceLength; i++) {
+                sequence.push(start + i);
+            }
+            
+            correctAnswer = sequence[missingPosition];
+            
+            // Build HTML for sequence
+            let sequenceHTML = '';
+            for (let i = 0; i < sequenceLength; i++) {
+                if (i === missingPosition) {
+                    sequenceHTML += '<div class="missing-number">?</div>';
+                } else {
+                    sequenceHTML += `<div class="number">${sequence[i]}</div>`;
+                }
+            }
+            
+            numberSequence.innerHTML = sequenceHTML;
+            questionText.textContent = "What's the missing number in this sequence?";
+            currentSpeechText = `What's the missing number in this sequence? ${sequence.join(', ').replace(sequence[missingPosition].toString(), 'question mark')}`;
+        }
+        
+        // Generate pattern question (5-7 numbers with patterns)
+        function generatePatternQuestion() {
+            const sequenceLength = 5 + Math.floor(Math.random() * 3); // 5-7 numbers
+            const missingPosition = Math.floor(Math.random() * sequenceLength);
+            const patternType = Math.floor(Math.random() * 4); // 0: +2, 1: +5, 2: +10, 3: +3
+            let start, step;
+            
+            // Set pattern
+            if (patternType === 0) { // Counting by 2
+                start = Math.floor(Math.random() * 5) * 2 + 2; // Start with an even number
+                step = 2;
+            } else if (patternType === 1) { // Counting by 5
+                start = Math.floor(Math.random() * 4) * 5 + 5; // Start with a multiple of 5
+                step = 5;
+            } else if (patternType === 2) { // Counting by 10
+                start = Math.floor(Math.random() * 3) * 10 + 10; // Start with a multiple of 10
+                step = 10;
+            } else { // Counting by 3
+                start = Math.floor(Math.random() * 3) * 3 + 3; // Start with a multiple of 3
+                step = 3;
+            }
+            
+            // Create pattern sequence
+            const sequence = [];
+            for (let i = 0; i < sequenceLength; i++) {
+                sequence.push(start + i * step);
+            }
+            
+            correctAnswer = sequence[missingPosition];
+            
+            // Build HTML for sequence
+            let sequenceHTML = '';
+            for (let i = 0; i < sequenceLength; i++) {
+                if (i === missingPosition) {
+                    sequenceHTML += '<div class="missing-number">?</div>';
+                } else {
+                    sequenceHTML += `<div class="number">${sequence[i]}</div>`;
+                }
+            }
+            
+            numberSequence.innerHTML = sequenceHTML;
+            questionText.textContent = "What's the missing number in this pattern?";
+            currentSpeechText = `What's the missing number in this pattern? ${sequence.join(', ').replace(sequence[missingPosition].toString(), 'question mark')}`;
+        }
+        
+        // Generate reverse sequence question (counting down)
+        function generateReverseSequenceQuestion() {
+            const sequenceLength = 4 + Math.floor(Math.random() * 3); // 4-6 numbers
+            const missingPosition = Math.floor(Math.random() * sequenceLength);
+            const start = Math.floor(Math.random() * (maxNumber - sequenceLength - 5)) + sequenceLength + 5;
+            const sequence = [];
+            
+            // Create a reverse sequence (counting down by 1)
+            for (let i = 0; i < sequenceLength; i++) {
+                sequence.push(start - i);
+            }
+            
+            correctAnswer = sequence[missingPosition];
+            
+            // Build HTML for sequence
+            let sequenceHTML = '';
+            for (let i = 0; i < sequenceLength; i++) {
+                if (i === missingPosition) {
+                    sequenceHTML += '<div class="missing-number">?</div>';
+                } else {
+                    sequenceHTML += `<div class="number">${sequence[i]}</div>`;
+                }
+            }
+            
+            numberSequence.innerHTML = sequenceHTML;
+            questionText.textContent = "What's the missing number in this countdown?";
+            currentSpeechText = `What's the missing number in this countdown? ${sequence.join(', ').replace(sequence[missingPosition].toString(), 'question mark')}`;
+        }
+        
+        // Generate alternating pattern question
+        function generateAlternatingPatternQuestion() {
+            const sequenceLength = 6 + Math.floor(Math.random() * 2); // 6-7 numbers
+            const missingPosition = Math.floor(Math.random() * sequenceLength);
+            const patternType = Math.floor(Math.random() * 3); // 0: odd/even, 1: +1/-1, 2: two sequences
+            let sequence = [];
+            
+            if (patternType === 0) { // Odd and even numbers
+                const startOdd = Math.floor(Math.random() * 5) * 2 + 1; // Start with odd
+                const startEven = Math.floor(Math.random() * 5) * 2 + 2; // Start with even
+                for (let i = 0; i < sequenceLength; i++) {
+                    if (i % 2 === 0) {
+                        sequence.push(startOdd + i);
+                    } else {
+                        sequence.push(startEven + i - 1);
+                    }
+                }
+            } else if (patternType === 1) { // +1, -1 pattern
+                const start = Math.floor(Math.random() * 10) + 5;
+                for (let i = 0; i < sequenceLength; i++) {
+                    if (i % 2 === 0) {
+                        sequence.push(start + Math.floor(i / 2));
+                    } else {
+                        sequence.push(start + Math.floor(i / 2) + 1);
+                    }
+                }
+            } else { // Two interleaved sequences
+                const start1 = Math.floor(Math.random() * 5) + 1;
+                const start2 = Math.floor(Math.random() * 5) + 10;
+                for (let i = 0; i < sequenceLength; i++) {
+                    if (i % 2 === 0) {
+                        sequence.push(start1 + Math.floor(i / 2));
+                    } else {
+                        sequence.push(start2 + Math.floor(i / 2));
+                    }
+                }
+            }
+            
+            correctAnswer = sequence[missingPosition];
+            
+            // Build HTML for sequence
+            let sequenceHTML = '';
+            for (let i = 0; i < sequenceLength; i++) {
+                if (i === missingPosition) {
+                    sequenceHTML += '<div class="missing-number">?</div>';
+                } else {
+                    sequenceHTML += `<div class="number">${sequence[i]}</div>`;
+                }
+            }
+            
+            numberSequence.innerHTML = sequenceHTML;
+            questionText.textContent = "What's the missing number in this alternating pattern?";
+            currentSpeechText = `What's the missing number in this alternating pattern? ${sequence.join(', ').replace(sequence[missingPosition].toString(), 'question mark')}`;
+        }
+        
+        // Generate Fibonacci-like sequence
+        function generateFibonacciQuestion() {
+            const sequenceLength = 5 + Math.floor(Math.random() * 2); // 5-6 numbers
+            const missingPosition = Math.floor(Math.random() * sequenceLength);
+            const start1 = Math.floor(Math.random() * 3) + 1;
+            const start2 = Math.floor(Math.random() * 3) + 1;
+            const sequence = [start1, start2];
+            
+            // Create Fibonacci-like sequence
+            for (let i = 2; i < sequenceLength; i++) {
+                const next = sequence[i - 1] + sequence[i - 2];
+                if (next > maxNumber) break;
+                sequence.push(next);
+            }
+            
+            // Ensure we have enough numbers
+            while (sequence.length < sequenceLength) {
+                sequence.push(sequence[sequence.length - 1] + Math.floor(Math.random() * 3) + 1);
+            }
+            
+            correctAnswer = sequence[missingPosition];
+            
+            // Build HTML for sequence
+            let sequenceHTML = '';
+            for (let i = 0; i < sequenceLength; i++) {
+                if (i === missingPosition) {
+                    sequenceHTML += '<div class="missing-number">?</div>';
+                } else {
+                    sequenceHTML += `<div class="number">${sequence[i]}</div>`;
+                }
+            }
+            
+            numberSequence.innerHTML = sequenceHTML;
+            questionText.textContent = "What's the missing number in this pattern?";
+            currentSpeechText = `What's the missing number in this pattern? ${sequence.join(', ').replace(sequence[missingPosition].toString(), 'question mark')}`;
+        }
+        
+        // Generate squares sequence
+        function generateSquaresQuestion() {
+            const sequenceLength = 4 + Math.floor(Math.random() * 2); // 4-5 numbers
+            const missingPosition = Math.floor(Math.random() * sequenceLength);
+            const start = Math.floor(Math.random() * 3) + 2; // Start with 2, 3, or 4
+            const sequence = [];
+            
+            // Create squares sequence
+            for (let i = 0; i < sequenceLength; i++) {
+                const next = Math.pow(start + i, 2);
+                if (next > maxNumber * 10) break;
+                sequence.push(next);
+            }
+            
+            // Ensure we have enough numbers
+            while (sequence.length < sequenceLength) {
+                sequence.push(sequence[sequence.length - 1] + Math.floor(Math.random() * 10) + 5);
+            }
+            
+            correctAnswer = sequence[missingPosition];
+            
+            // Build HTML for sequence
+            let sequenceHTML = '';
+            for (let i = 0; i < sequenceLength; i++) {
+                if (i === missingPosition) {
+                    sequenceHTML += '<div class="missing-number">?</div>';
+                } else {
+                    sequenceHTML += `<div class="number">${sequence[i]}</div>`;
+                }
+            }
+            
+            numberSequence.innerHTML = sequenceHTML;
+            questionText.textContent = "What's the missing number in this pattern?";
+            currentSpeechText = `What's the missing number in this pattern? ${sequence.join(', ').replace(sequence[missingPosition].toString(), 'question mark')}`;
+        }
+        
+        // Generate multiples sequence
+        function generateMultiplesQuestion() {
+            const sequenceLength = 5 + Math.floor(Math.random() * 2); // 5-6 numbers
+            const missingPosition = Math.floor(Math.random() * sequenceLength);
+            const multiple = Math.floor(Math.random() * 5) + 2; // 2-6
+            const start = multiple * (Math.floor(Math.random() * 3) + 1); // Start with a multiple
+            const sequence = [];
+            
+            // Create multiples sequence
+            for (let i = 0; i < sequenceLength; i++) {
+                sequence.push(start + i * multiple);
+            }
+            
+            correctAnswer = sequence[missingPosition];
+            
+            // Build HTML for sequence
+            let sequenceHTML = '';
+            for (let i = 0; i < sequenceLength; i++) {
+                if (i === missingPosition) {
+                    sequenceHTML += '<div class="missing-number">?</div>';
+                } else {
+                    sequenceHTML += `<div class="number">${sequence[i]}</div>`;
+                }
+            }
+            
+            numberSequence.innerHTML = sequenceHTML;
+            questionText.textContent = "What's the missing number in this multiples pattern?";
+            currentSpeechText = `What's the missing number in this multiples pattern? ${sequence.join(', ').replace(sequence[missingPosition].toString(), 'question mark')}`;
+        }
+        
+        // Speak the current question
+        function speakCurrentQuestion() {
+            if (voiceEnabled && currentSpeechText) {
+                speak(currentSpeechText);
+            }
+        }
+        
+        // Create answer options
+        function createOptions() {
+            optionsContainer.innerHTML = '';
+            
+            // Generate wrong answers
+            const wrongAnswers = [];
+            while (wrongAnswers.length < 3) {
+                const wrongAnswer = Math.floor(Math.random() * (maxNumber + 20)) + 1;
+                if (wrongAnswer !== correctAnswer && !wrongAnswers.includes(wrongAnswer)) {
+                    wrongAnswers.push(wrongAnswer);
+                }
+            }
+            
+            // Combine correct and wrong answers
+            const allAnswers = [correctAnswer, ...wrongAnswers];
+            
+            // Shuffle answers
+            allAnswers.sort(() => Math.random() - 0.5);
+            
+            // Create option elements
+            allAnswers.forEach(answer => {
+                const option = document.createElement('div');
+                option.classList.add('option');
+                option.textContent = answer;
+                option.dataset.value = answer;
+                
+                option.addEventListener('click', checkAnswer);
+                
+                optionsContainer.appendChild(option);
+            });
+        }
+        
+        // Check if answer is correct
+        function checkAnswer(e) {
+            const selectedValue = parseInt(e.target.dataset.value);
+            const selectedOption = e.target;
+            
+            // Disable all options
+            const options = document.querySelectorAll('.option');
+            options.forEach(option => {
+                option.removeEventListener('click', checkAnswer);
+                option.style.cursor = 'default';
+            });
+            
+            totalQuestions++;
+            
+            if (selectedValue === correctAnswer) {
+                // Correct answer
+                selectedOption.classList.add('correct');
+                feedback.textContent = 'Correct! 🎉';
+                feedback.classList.add('show');
+                
+                // Speak success message
+                if (voiceEnabled) {
+                    speak(`Great job! The answer is ${correctAnswer}! You got it right!`);
+                }
+                
+                // Increase score and streak
+                score += 10;
+                correctAnswers++;
+                streak++;
+                scoreElement.textContent = score;
+                streakElement.textContent = streak;
+                
+                // Update progress
+                updateProgress();
+                
+                // Create confetti
+                createConfetti();
+                
+                // Show next button
+                nextButton.classList.add('show');
+            } else {
+                // Incorrect answer
+                selectedOption.classList.add('incorrect');
+                feedback.textContent = 'Try again! 🤔';
+                feedback.classList.add('show');
+                
+                // Reset streak
+                streak = 0;
+                streakElement.textContent = streak;
+                
+                // Speak try again message
+                if (voiceEnabled) {
+                    speak(`Oops! That's not quite right. Let's try again!`);
+                }
+                
+                // Show correct answer after a delay
+                setTimeout(() => {
+                    options.forEach(option => {
+                        if (parseInt(option.dataset.value) === correctAnswer) {
+                            option.classList.add('correct');
+                        }
+                    });
+                    
+                    feedback.textContent = `The answer is ${correctAnswer}!`;
+                    
+                    // Speak the correct answer
+                    if (voiceEnabled) {
+                        speak(`The correct answer is ${correctAnswer}. Let's try the next one!`);
+                    }
+                    
+                    // Show next button
+                    nextButton.classList.add('show');
+                }, 1500);
+            }
+            
+            // Hide feedback after animation
+            setTimeout(() => {
+                feedback.classList.remove('show');
+            }, 3000);
+        }
+        
+        // Move to next question
+        function nextQuestion() {
+            // Hide next button
+            nextButton.classList.remove('show');
+            
+            // Check if level should increase
+            if (score > 0 && score % 50 === 0) {
+                level++;
+                levelElement.textContent = level;
+                
+                // Reset for new level
+                totalQuestions = 0;
+                correctAnswers = 0;
+                
+                // Show level up message
+                feedback.textContent = `Level ${level}! 🚀`;
+                feedback.classList.add('show');
+                
+                // Speak level up message
+                if (voiceEnabled) {
+                    speak(`Wow! You've reached level ${level}! Amazing work!`);
+                }
+                
+                setTimeout(() => {
+                    feedback.classList.remove('show');
+                }, 2000);
+            }
+            
+            // Generate new question
+            generateQuestion();
+        }
+        
+        // Initialize game
+        function initGame() {
+            createStars();
+            
+            // Set initial voice button state
+            voiceToggle.classList.add('active');
+            
+            // Generate first question
+            generateQuestion();
+            
+            // Add event listener to next button
+            nextButton.addEventListener('click', nextQuestion);
+            
+            // Welcome message
+            setTimeout(() => {
+                if (voiceEnabled) {
+                    speak("Welcome to Number Adventure! Let's have fun with numbers!");
+                }
+            }, 1000);
+        }
+        
+        // Start the game
+        initGame();
+    </script>
+</body>
+</html>
