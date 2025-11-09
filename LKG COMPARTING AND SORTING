@@ -1,0 +1,1912 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Compare & Sort Adventure</title>
+    <style>
+        body {
+            font-family: 'Comic Sans MS', cursive, sans-serif;
+            margin: 0;
+            padding: 0;
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            color: #333;
+            overflow-x: hidden;
+            height: 100vh;
+            display: flex;
+            flex-direction: column;
+        }
+
+        /* Smooth scrolling */
+        html {
+            scroll-behavior: smooth;
+        }
+
+        /* Custom scrollbar */
+        ::-webkit-scrollbar {
+            width: 12px;
+        }
+
+        ::-webkit-scrollbar-track {
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 10px;
+        }
+
+        ::-webkit-scrollbar-thumb {
+            background: linear-gradient(135deg, #f093fb, #4facfe);
+            border-radius: 10px;
+            border: 2px solid rgba(255, 255, 255, 0.3);
+        }
+
+        ::-webkit-scrollbar-thumb:hover {
+            background: linear-gradient(135deg, #ff6b9d, #74b9ff);
+        }
+
+        /* Scroll indicator */
+        .scroll-indicator {
+            position: fixed;
+            bottom: 20px;
+            left: 50%;
+            transform: translateX(-50%);
+            background: rgba(255, 255, 255, 0.9);
+            padding: 10px 20px;
+            border-radius: 30px;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+            z-index: 1000;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            animation: bounce 2s infinite;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .scroll-indicator:hover {
+            transform: translateX(-50%) translateY(-5px);
+            box-shadow: 0 6px 20px rgba(0, 0, 0, 0.3);
+        }
+
+        @keyframes bounce {
+            0%, 20%, 50%, 80%, 100% { transform: translateX(-50%) translateY(0); }
+            40% { transform: translateX(-50%) translateY(-10px); }
+            60% { transform: translateX(-50%) translateY(-5px); }
+        }
+
+        .scroll-text {
+            font-weight: bold;
+            color: #764ba2;
+            font-size: 0.9rem;
+        }
+
+        .scroll-arrow {
+            font-size: 1.2rem;
+            color: #4facfe;
+            animation: pulse 1.5s infinite;
+        }
+
+        @keyframes pulse {
+            0% { transform: scale(1); }
+            50% { transform: scale(1.2); }
+            100% { transform: scale(1); }
+        }
+
+        header {
+            background-color: rgba(255, 255, 255, 0.9);
+            padding: 10px;
+            text-align: center;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+            z-index: 10;
+            position: sticky;
+            top: 0;
+        }
+
+        h1 {
+            margin: 0;
+            color: #764ba2;
+            font-size: 2.5rem;
+            text-shadow: 2px 2px 0px #f093fb;
+        }
+
+        .score-container {
+            display: flex;
+            justify-content: space-around;
+            margin-top: 10px;
+            font-size: 1.2rem;
+            font-weight: bold;
+        }
+
+        .score {
+            background-color: #f093fb;
+            padding: 5px 15px;
+            border-radius: 20px;
+            color: white;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+        }
+
+        .level-indicator {
+            background-color: #4facfe;
+            padding: 5px 15px;
+            border-radius: 20px;
+            color: white;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+        }
+
+        .voice-button {
+            background-color: #ff6b9d;
+            color: white;
+            border: none;
+            border-radius: 50%;
+            width: 50px;
+            height: 50px;
+            font-size: 1.5rem;
+            cursor: pointer;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            position: relative;
+        }
+
+        .voice-button:hover {
+            background-color: #ff4d8f;
+            transform: scale(1.1);
+        }
+
+        .voice-button.speaking {
+            animation: pulse 1.5s infinite;
+        }
+
+        @keyframes pulse {
+            0% { box-shadow: 0 0 0 0 rgba(255, 107, 157, 0.7); }
+            70% { box-shadow: 0 0 0 10px rgba(255, 107, 157, 0); }
+            100% { box-shadow: 0 0 0 0 rgba(255, 107, 157, 0); }
+        }
+
+        main {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+            position: relative;
+            min-height: calc(100vh - 150px);
+            scroll-margin-top: 100px;
+        }
+
+        .game-container {
+            background-color: rgba(255, 255, 255, 0.95);
+            border-radius: 20px;
+            padding: 20px;
+            width: 90%;
+            max-width: 1000px;
+            min-height: 500px;
+            display: flex;
+            flex-direction: column;
+            box-shadow: 0 8px 16px rgba(0, 0, 0, 0.2);
+            position: relative;
+            transition: all 0.3s ease;
+        }
+
+        .game-container:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 12px 20px rgba(0, 0, 0, 0.25);
+        }
+
+        .question {
+            text-align: center;
+            font-size: 1.8rem;
+            margin-bottom: 20px;
+            color: #764ba2;
+            font-weight: bold;
+            scroll-margin-top: 20px;
+        }
+
+        .comparison-container {
+            display: flex;
+            justify-content: space-around;
+            align-items: center;
+            margin: 20px 0;
+            min-height: 200px;
+            scroll-margin-top: 20px;
+        }
+
+        .compare-item {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 15px;
+        }
+
+        .item-display {
+            width: 120px;
+            height: 120px;
+            background-color: #ffeaa7;
+            border-radius: 20px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 4rem;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+            transition: transform 0.3s ease;
+        }
+
+        .item-display:hover {
+            transform: scale(1.05);
+        }
+
+        .item-label {
+            font-size: 1.2rem;
+            font-weight: bold;
+            color: #2d3436;
+            text-align: center;
+            background-color: #dfe6e9;
+            padding: 5px 15px;
+            border-radius: 15px;
+        }
+
+        .comparison-symbol {
+            font-size: 3rem;
+            color: #764ba2;
+            font-weight: bold;
+        }
+
+        .sorting-container {
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+            margin: 20px 0;
+            flex: 1;
+            scroll-margin-top: 20px;
+        }
+
+        .sorting-bins {
+            display: flex;
+            justify-content: space-around;
+            gap: 20px;
+            margin-bottom: 20px;
+            flex-wrap: wrap;
+        }
+
+        .sort-bin {
+            flex: 1;
+            min-width: 200px;
+            min-height: 150px;
+            background-color: #e8f5e9;
+            border: 3px dashed #4caf50;
+            border-radius: 20px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            padding: 10px;
+            transition: all 0.3s ease;
+            scroll-margin-top: 20px;
+        }
+
+        .sort-bin.highlight {
+            background-color: #c8e6c9;
+            transform: scale(1.02);
+        }
+
+        .bin-label {
+            font-size: 1.3rem;
+            font-weight: bold;
+            color: #2e7d32;
+            margin-bottom: 10px;
+            background-color: white;
+            padding: 5px 15px;
+            border-radius: 15px;
+        }
+
+        .items-to-sort {
+            display: flex;
+            justify-content: center;
+            gap: 15px;
+            flex-wrap: wrap;
+            min-height: 100px;
+            scroll-margin-top: 20px;
+        }
+
+        .sortable-item {
+            width: 80px;
+            height: 80px;
+            background-color: #ffeaa7;
+            border-radius: 15px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 2.5rem;
+            cursor: pointer;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+            transition: all 0.3s ease;
+        }
+
+        .sortable-item:hover {
+            transform: scale(1.1);
+            box-shadow: 0 6px 12px rgba(0, 0, 0, 0.15);
+        }
+
+        .sortable-item.dragging {
+            opacity: 0.5;
+            transform: scale(1.1);
+        }
+
+        .sortable-item.sorted {
+            opacity: 0.7;
+            cursor: not-allowed;
+        }
+
+        .options-container {
+            display: flex;
+            justify-content: center;
+            gap: 20px;
+            margin-top: 20px;
+            flex-wrap: wrap;
+            scroll-margin-top: 20px;
+        }
+
+        .option {
+            padding: 15px 30px;
+            font-size: 1.3rem;
+            font-weight: bold;
+            border-radius: 20px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+        }
+
+        .option.bigger {
+            background-color: #55efc4;
+            color: white;
+        }
+
+        .option.smaller {
+            background-color: #ff7675;
+            color: white;
+        }
+
+        .option.equal {
+            background-color: #fdcb6e;
+            color: #2d3436;
+        }
+
+        .option:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 6px 12px rgba(0, 0, 0, 0.15);
+        }
+
+        .option.selected {
+            transform: scale(0.9);
+            opacity: 0.6;
+        }
+
+        .feedback {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            font-size: 3rem;
+            font-weight: bold;
+            color: #00b894;
+            text-shadow: 2px 2px 0px #fff;
+            opacity: 0;
+            pointer-events: none;
+            z-index: 100;
+        }
+
+        .correct-animation {
+            animation: correctAnswer 1.5s ease-out;
+        }
+
+        .incorrect-animation {
+            animation: incorrectAnswer 1.5s ease-out;
+        }
+
+        @keyframes correctAnswer {
+            0% { opacity: 0; transform: translate(-50%, -50%) scale(0.5); }
+            50% { opacity: 1; transform: translate(-50%, -50%) scale(1.2); }
+            100% { opacity: 0; transform: translate(-50%, -50%) scale(1); }
+        }
+
+        @keyframes incorrectAnswer {
+            0% { opacity: 0; transform: translate(-50%, -50%) rotate(0deg); }
+            50% { opacity: 1; transform: translate(-50%, -50%) rotate(10deg); }
+            100% { opacity: 0; transform: translate(-50%, -50%) rotate(0deg); }
+        }
+
+        .next-button {
+            background-color: #00b894;
+            color: white;
+            border: none;
+            border-radius: 30px;
+            padding: 15px 30px;
+            font-size: 1.2rem;
+            font-weight: bold;
+            cursor: pointer;
+            margin-top: 20px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+            transition: all 0.3s ease;
+            align-self: center;
+            display: none;
+        }
+
+        .next-button:hover {
+            background-color: #00a085;
+            transform: translateY(-3px);
+            box-shadow: 0 6px 12px rgba(0, 0, 0, 0.15);
+        }
+
+        .next-button.show {
+            display: block;
+        }
+
+        .confetti {
+            position: absolute;
+            width: 10px;
+            height: 10px;
+            background-color: #f093fb;
+            opacity: 0.8;
+            border-radius: 50%;
+            z-index: 1000;
+        }
+
+        .level-indicator-container {
+            display: flex;
+            justify-content: center;
+            margin-top: 10px;
+        }
+
+        .level-dot {
+            width: 15px;
+            height: 15px;
+            border-radius: 50%;
+            background-color: #ccc;
+            margin: 0 5px;
+            transition: all 0.3s ease;
+        }
+
+        .level-dot.active {
+            background-color: #4facfe;
+            transform: scale(1.2);
+        }
+
+        .level-dot.completed {
+            background-color: #00b894;
+        }
+
+        .game-over {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(255, 255, 255, 0.95);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            border-radius: 20px;
+            z-index: 200;
+            display: none;
+        }
+
+        .game-over.show {
+            display: flex;
+        }
+
+        .game-over h2 {
+            font-size: 2.5rem;
+            color: #764ba2;
+            margin-bottom: 20px;
+        }
+
+        .final-score {
+            font-size: 1.8rem;
+            color: #00b894;
+            margin-bottom: 30px;
+        }
+
+        .play-again-button {
+            background-color: #00b894;
+            color: white;
+            border: none;
+            border-radius: 30px;
+            padding: 15px 30px;
+            font-size: 1.2rem;
+            font-weight: bold;
+            cursor: pointer;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+            transition: all 0.3s ease;
+        }
+
+        .play-again-button:hover {
+            background-color: #00a085;
+            transform: translateY(-3px);
+            box-shadow: 0 6px 12px rgba(0, 0, 0, 0.15);
+        }
+
+        .level-complete {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(255, 255, 255, 0.95);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            border-radius: 20px;
+            z-index: 200;
+            display: none;
+        }
+
+        .level-complete.show {
+            display: flex;
+        }
+
+        .level-complete h2 {
+            font-size: 2.5rem;
+            color: #764ba2;
+            margin-bottom: 20px;
+        }
+
+        .level-score {
+            font-size: 1.8rem;
+            color: #00b894;
+            margin-bottom: 30px;
+        }
+
+        .next-level-button {
+            background-color: #00b894;
+            color: white;
+            border: none;
+            border-radius: 30px;
+            padding: 15px 30px;
+            font-size: 1.2rem;
+            font-weight: bold;
+            cursor: pointer;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+            transition: all 0.3s ease;
+        }
+
+        .next-level-button:hover {
+            background-color: #00a085;
+            transform: translateY(-3px);
+            box-shadow: 0 6px 12px rgba(0, 0, 0, 0.15);
+        }
+
+        .star {
+            position: absolute;
+            font-size: 2rem;
+            color: #ffeaa7;
+            animation: twinkle 1.5s infinite alternate;
+            z-index: -1;
+        }
+
+        @keyframes twinkle {
+            0% { opacity: 0.3; }
+            100% { opacity: 1; }
+        }
+
+        .voice-settings {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            background-color: rgba(255, 255, 255, 0.9);
+            padding: 15px;
+            border-radius: 15px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+            z-index: 1000;
+        }
+
+        .voice-speed {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            margin-top: 10px;
+        }
+
+        .voice-speed label {
+            font-weight: bold;
+            color: #333;
+        }
+
+        .voice-speed input {
+            width: 100px;
+        }
+
+        .voice-status {
+            position: absolute;
+            top: -40px;
+            left: 50%;
+            transform: translateX(-50%);
+            background-color: #ff6b9d;
+            color: white;
+            padding: 5px 10px;
+            border-radius: 10px;
+            font-size: 0.8rem;
+            opacity: 0;
+            transition: opacity 0.3s ease;
+            white-space: nowrap;
+        }
+
+        .voice-status.show {
+            opacity: 1;
+        }
+
+        .hint-button {
+            background-color: #fdcb6e;
+            color: #2d3436;
+            border: none;
+            border-radius: 50%;
+            width: 40px;
+            height: 40px;
+            font-size: 1.2rem;
+            cursor: pointer;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+            transition: all 0.3s ease;
+            margin-left: 10px;
+        }
+
+        .hint-button:hover {
+            background-color: #f39c12;
+            transform: scale(1.1);
+        }
+
+        .hint-text {
+            font-size: 1rem;
+            color: #e17055;
+            text-align: center;
+            margin-top: 10px;
+            font-style: italic;
+            min-height: 20px;
+        }
+
+        .size-bar {
+            width: 100px;
+            height: 20px;
+            background-color: #dfe6e9;
+            border-radius: 10px;
+            overflow: hidden;
+            margin-top: 10px;
+        }
+
+        .size-fill {
+            height: 100%;
+            background-color: #74b9ff;
+            transition: width 0.5s ease;
+        }
+
+        /* Scroll to top button */
+        .scroll-to-top {
+            position: fixed;
+            bottom: 80px;
+            right: 20px;
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            color: white;
+            border: none;
+            border-radius: 50%;
+            width: 50px;
+            height: 50px;
+            font-size: 1.5rem;
+            cursor: pointer;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.3);
+            z-index: 1000;
+            display: none;
+            transition: all 0.3s ease;
+        }
+
+        .scroll-to-top:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 6px 20px rgba(0, 0, 0, 0.4);
+        }
+
+        .scroll-to-top.show {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        /* Progress bar */
+        .progress-bar {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 0%;
+            height: 4px;
+            background: linear-gradient(90deg, #f093fb, #4facfe);
+            z-index: 1001;
+            transition: width 0.3s ease;
+        }
+
+        /* Navigation dots */
+        .nav-dots {
+            position: fixed;
+            right: 20px;
+            top: 50%;
+            transform: translateY(-50%);
+            z-index: 999;
+        }
+
+        .nav-dot {
+            width: 12px;
+            height: 12px;
+            border-radius: 50%;
+            background: rgba(255, 255, 255, 0.5);
+            margin: 10px 0;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .nav-dot:hover {
+            background: rgba(255, 255, 255, 0.8);
+            transform: scale(1.2);
+        }
+
+        .nav-dot.active {
+            background: #4facfe;
+            transform: scale(1.3);
+        }
+    </style>
+</head>
+<body>
+    <!-- Progress bar -->
+    <div class="progress-bar" id="progress-bar"></div>
+
+    <!-- Navigation dots -->
+    <div class="nav-dots">
+        <div class="nav-dot active" data-section="game"></div>
+        <div class="nav-dot" data-section="voice-settings"></div>
+    </div>
+
+    <!-- Scroll to top button -->
+    <button class="scroll-to-top" id="scroll-to-top" title="Scroll to top">↑</button>
+
+    <!-- Scroll indicator -->
+    <div class="scroll-indicator" id="scroll-indicator">
+        <span class="scroll-arrow">↓</span>
+        <span class="scroll-text">Scroll to explore</span>
+    </div>
+
+    <header>
+        <h1>Compare & Sort Adventure</h1>
+        <div class="score-container">
+            <div class="score">Score: <span id="score">0</span></div>
+            <div class="level-indicator">Level: <span id="level">1</span>/4</div>
+            <div class="score">Round: <span id="round">1</span>/5</div>
+            <button class="voice-button" id="voice-button" title="Female Voice Assistant">
+                👩‍🏫
+                <div class="voice-status" id="voice-status">Female Voice Active</div>
+            </button>
+            <button class="hint-button" id="hint-button" title="Get a hint!">💡</button>
+        </div>
+        <div class="level-indicator-container">
+            <div class="level-dot active" id="level1-dot"></div>
+            <div class="level-dot" id="level2-dot"></div>
+            <div class="level-dot" id="level3-dot"></div>
+            <div class="level-dot" id="level4-dot"></div>
+        </div>
+    </header>
+
+    <main id="game">
+        <div class="game-container">
+            <div class="question" id="question">Which is bigger?</div>
+            
+            <!-- Comparison container -->
+            <div class="comparison-container" id="comparison-container">
+                <!-- Comparison items will be inserted here -->
+            </div>
+            
+            <!-- Sorting container -->
+            <div class="sorting-container" id="sorting-container" style="display: none;">
+                <!-- Sorting bins and items will be inserted here -->
+            </div>
+            
+            <div class="hint-text" id="hint-text"></div>
+            
+            <div class="options-container" id="options-container">
+                <!-- Options will be inserted here -->
+            </div>
+            
+            <div class="feedback" id="feedback"></div>
+            <button class="next-button" id="next-button">Next Question</button>
+            
+            <!-- Level complete screen -->
+            <div class="level-complete" id="level-complete">
+                <h2>Level Complete!</h2>
+                <div class="level-score">Your Score: <span id="level-score">0</span>/5</div>
+                <button class="next-level-button" id="next-level-button">Next Level</button>
+            </div>
+            
+            <!-- Game over screen -->
+            <div class="game-over" id="game-over">
+                <h2>Amazing Job!</h2>
+                <div class="final-score">Your Final Score: <span id="final-score">0</span>/20</div>
+                <button class="play-again-button" id="play-again-button">Play Again</button>
+            </div>
+        </div>
+    </main>
+
+    <div class="voice-settings" id="voice-settings">
+        <h3>Voice Settings</h3>
+        <div class="voice-speed">
+            <label for="voice-speed-slider">Voice Speed:</label>
+            <input type="range" id="voice-speed-slider" min="0.5" max="1.5" step="0.1" value="0.9">
+            <span id="voice-speed-value">0.9</span>
+        </div>
+    </div>
+
+    <script>
+        // Game data organized by levels
+        const gameData = {
+            level1: [
+                {
+                    question: "Which is bigger?",
+                    type: "compare",
+                    attribute: "size",
+                    item1: { emoji: "🐘", size: 100, label: "Elephant" },
+                    item2: { emoji: "🐰", size: 30, label: "Rabbit" },
+                    answer: "bigger",
+                    hint: "Elephants are huge animals, rabbits are small!"
+                },
+                {
+                    question: "Which is smaller?",
+                    type: "compare",
+                    attribute: "size",
+                    item1: { emoji: "🏢", size: 90, label: "Building" },
+                    item2: { emoji: "🏠", size: 50, label: "House" },
+                    answer: "smaller",
+                    hint: "Buildings are taller than houses!"
+                },
+                {
+                    question: "Which is bigger?",
+                    type: "compare",
+                    attribute: "size",
+                    item1: { emoji: "🌳", size: 70, label: "Tree" },
+                    item2: { emoji: "🌻", size: 20, label: "Flower" },
+                    answer: "bigger",
+                    hint: "Trees grow much taller than flowers!"
+                },
+                {
+                    question: "Which is smaller?",
+                    type: "compare",
+                    attribute: "size",
+                    item1: { emoji: "🚗", size: 60, label: "Car" },
+                    item2: { emoji: "🚌", size: 80, label: "Bus" },
+                    answer: "smaller",
+                    hint: "Buses are longer and bigger than cars!"
+                },
+                {
+                    question: "Which is bigger?",
+                    type: "compare",
+                    attribute: "size",
+                    item1: { emoji: "🍉", size: 65, label: "Watermelon" },
+                    item2: { emoji: "🍇", size: 25, label: "Grapes" },
+                    answer: "bigger",
+                    hint: "Watermelons are huge fruits!"
+                }
+            ],
+            level2: [
+                {
+                    question: "Sort by color: Red or Blue?",
+                    type: "sort",
+                    attribute: "color",
+                    bins: ["Red", "Blue"],
+                    items: [
+                        { emoji: "🍎", color: "Red", label: "Apple" },
+                        { emoji: "🔵", color: "Blue", label: "Blue Circle" },
+                        { emoji: "🍓", color: "Red", label: "Strawberry" },
+                        { emoji: "💙", color: "Blue", label: "Blue Heart" },
+                        { emoji: "🌹", color: "Red", label: "Rose" },
+                        { emoji: "🐳", color: "Blue", label: "Whale" }
+                    ],
+                    hint: "Look at the colors! Red items go in the red bin, blue items in the blue bin!"
+                },
+                {
+                    question: "Sort by type: Animal or Food?",
+                    type: "sort",
+                    attribute: "type",
+                    bins: ["Animals", "Food"],
+                    items: [
+                        { emoji: "🐶", type: "Animals", label: "Dog" },
+                        { emoji: "🍎", type: "Food", label: "Apple" },
+                        { emoji: "🐱", type: "Animals", label: "Cat" },
+                        { emoji: "🍕", type: "Food", label: "Pizza" },
+                        { emoji: "🦋", type: "Animals", label: "Butterfly" },
+                        { emoji: "🍌", type: "Food", label: "Banana" }
+                    ],
+                    hint: "Animals are living creatures, food is what we eat!"
+                },
+                {
+                    question: "Sort by shape: Round or Square?",
+                    type: "sort",
+                    attribute: "shape",
+                    bins: ["Round", "Square"],
+                    items: [
+                        { emoji: "⭕", shape: "Round", label: "Circle" },
+                        { emoji: "⬜", shape: "Square", label: "Square" },
+                        { emoji: "🔵", shape: "Round", label: "Blue Circle" },
+                        { emoji: "🟦", shape: "Square", label: "Blue Square" },
+                        { emoji: "⭐", shape: "Round", label: "Star" },
+                        { emoji: "🟪", shape: "Square", label: "Purple Square" }
+                    ],
+                    hint: "Round things have curves, squares have straight sides!"
+                },
+                {
+                    question: "Sort by season: Summer or Winter?",
+                    type: "sort",
+                    attribute: "season",
+                    bins: ["Summer", "Winter"],
+                    items: [
+                        { emoji: "☀️", season: "Summer", label: "Sun" },
+                        { emoji: "❄️", season: "Winter", label: "Snowflake" },
+                        { emoji: "🏖️", season: "Summer", label: "Beach" },
+                        { emoji: "⛄", season: "Winter", label: "Snowman" },
+                        { emoji: "🌻", season: "Summer", label: "Sunflower" },
+                        { emoji: "🎿", season: "Winter", label: "Skis" }
+                    ],
+                    hint: "Summer is hot and sunny, winter is cold and snowy!"
+                },
+                {
+                    question: "Sort by feeling: Happy or Sad?",
+                    type: "sort",
+                    attribute: "feeling",
+                    bins: ["Happy", "Sad"],
+                    items: [
+                        { emoji: "😊", feeling: "Happy", label: "Happy Face" },
+                        { emoji: "😢", feeling: "Sad", label: "Sad Face" },
+                        { emoji: "😄", feeling: "Happy", label: "Excited" },
+                        { emoji: "😭", feeling: "Sad", label: "Crying" },
+                        { emoji: "🎉", feeling: "Happy", label: "Party" },
+                        { emoji: "💔", feeling: "Sad", label: "Broken Heart" }
+                    ],
+                    hint: "Happy faces smile, sad faces cry!"
+                }
+            ],
+            level3: [
+                {
+                    question: "Which has more?",
+                    type: "compare",
+                    attribute: "quantity",
+                    item1: { emoji: "🍎🍎🍎", quantity: 3, label: "3 Apples" },
+                    item2: { emoji: "🍌🍌", quantity: 2, label: "2 Bananas" },
+                    answer: "more",
+                    hint: "Count the items! Three is more than two!"
+                },
+                {
+                    question: "Which has fewer?",
+                    type: "compare",
+                    attribute: "quantity",
+                    item1: { emoji: "⭐⭐⭐⭐", quantity: 4, label: "4 Stars" },
+                    item2: { emoji: "🌙🌙🌙", quantity: 3, label: "3 Moons" },
+                    answer: "fewer",
+                    hint: "Four is more than three, so three is fewer!"
+                },
+                {
+                    question: "Which is taller?",
+                    type: "compare",
+                    attribute: "height",
+                    item1: { emoji: "🌻", height: 60, label: "Sunflower" },
+                    item2: { emoji: "🌱", height: 20, label: "Sprout" },
+                    answer: "taller",
+                    hint: "Sunflowers grow very tall, sprouts are just starting!"
+                },
+                {
+                    question: "Which is shorter?",
+                    type: "compare",
+                    attribute: "height",
+                    item1: { emoji: "🏔️", height: 90, label: "Mountain" },
+                    item2: { emoji: "⛰️", height: 60, label: "Hill" },
+                    answer: "shorter",
+                    hint: "Mountains are taller than hills!"
+                },
+                {
+                    question: "Which has more?",
+                    type: "compare",
+                    attribute: "quantity",
+                    item1: { emoji: "🐟🐟🐟🐟🐟", quantity: 5, label: "5 Fish" },
+                    item2: { emoji: "🐠🐠🐠", quantity: 3, label: "3 Fish" },
+                    answer: "more",
+                    hint: "Five is more than three!"
+                }
+            ],
+            level4: [
+                {
+                    question: "Sort by size: Big or Small?",
+                    type: "sort",
+                    attribute: "size_category",
+                    bins: ["Big", "Small"],
+                    items: [
+                        { emoji: "🐘", size_category: "Big", label: "Elephant" },
+                        { emoji: "🐭", size_category: "Small", label: "Mouse" },
+                        { emoji: "🏢", size_category: "Big", label: "Building" },
+                        { emoji: "🏠", size_category: "Small", label: "House" },
+                        { emoji: "🚂", size_category: "Big", label: "Train" },
+                        { emoji: "🚗", size_category: "Small", label: "Car" }
+                    ],
+                    hint: "Big things are huge, small things are tiny!"
+                },
+                {
+                    question: "Sort by habitat: Land or Water?",
+                    type: "sort",
+                    attribute: "habitat",
+                    bins: ["Land", "Water"],
+                    items: [
+                        { emoji: "🦁", habitat: "Land", label: "Lion" },
+                        { emoji: "🐠", habitat: "Water", label: "Fish" },
+                        { emoji: "🐘", habitat: "Land", label: "Elephant" },
+                        { emoji: "🐙", habitat: "Water", label: "Octopus" },
+                        { emoji: "🦒", habitat: "Land", label: "Giraffe" },
+                        { emoji: "🐋", habitat: "Water", label: "Whale" }
+                    ],
+                    hint: "Land animals walk on ground, water animals swim!"
+                },
+                {
+                    question: "Sort by weather: Hot or Cold?",
+                    type: "sort",
+                    attribute: "temperature",
+                    bins: ["Hot", "Cold"],
+                    items: [
+                        { emoji: "☀️", temperature: "Hot", label: "Sun" },
+                        { emoji: "❄️", temperature: "Cold", label: "Snow" },
+                        { emoji: "🔥", temperature: "Hot", label: "Fire" },
+                        { emoji: "🧊", temperature: "Cold", label: "Ice" },
+                        { emoji: "🏖️", temperature: "Hot", label: "Beach" },
+                        { emoji: "⛄", temperature: "Cold", label: "Snowman" }
+                    ],
+                    hint: "Hot things make you warm, cold things make you shiver!"
+                },
+                {
+                    question: "Which group has more items?",
+                    type: "compare",
+                    attribute: "quantity",
+                    item1: { emoji: "🍎🍎🍎🍎", quantity: 4, label: "4 Apples" },
+                    item2: { emoji: "🍊🍊🍊🍊🍊", quantity: 5, label: "5 Oranges" },
+                    answer: "more",
+                    hint: "Count carefully! Five is more than four!"
+                },
+                {
+                    question: "Sort by transportation: Flies or Drives?",
+                    type: "sort",
+                    attribute: "transport",
+                    bins: ["Flies", "Drives"],
+                    items: [
+                        { emoji: "✈️", transport: "Flies", label: "Airplane" },
+                        { emoji: "🚗", transport: "Drives", label: "Car" },
+                        { emoji: "🚁", transport: "Flies", label: "Helicopter" },
+                        { emoji: "🚌", transport: "Drives", label: "Bus" },
+                        { emoji: "🦋", transport: "Flies", label: "Butterfly" },
+                        { emoji: "🚲", transport: "Drives", label: "Bicycle" }
+                    ],
+                    hint: "Flying things go up in the sky, driving things stay on the ground!"
+                }
+            ]
+        };
+
+        // Game state
+        let currentLevel = 1;
+        let currentRound = 0;
+        let score = 0;
+        let levelScore = 0;
+        let isAnswered = false;
+        let currentQuestions = [];
+        let voiceEnabled = true;
+        let voiceSpeed = 0.9;
+        let hintUsed = false;
+        let sortedItems = [];
+
+        // DOM elements
+        const questionElement = document.getElementById('question');
+        const comparisonContainer = document.getElementById('comparison-container');
+        const sortingContainer = document.getElementById('sorting-container');
+        const optionsContainer = document.getElementById('options-container');
+        const feedbackElement = document.getElementById('feedback');
+        const nextButton = document.getElementById('next-button');
+        const scoreElement = document.getElementById('score');
+        const levelElement = document.getElementById('level');
+        const roundElement = document.getElementById('round');
+        const levelCompleteElement = document.getElementById('level-complete');
+        const levelScoreElement = document.getElementById('level-score');
+        const nextLevelButton = document.getElementById('next-level-button');
+        const gameOverElement = document.getElementById('game-over');
+        const finalScoreElement = document.getElementById('final-score');
+        const playAgainButton = document.getElementById('play-again-button');
+        const level1Dot = document.getElementById('level1-dot');
+        const level2Dot = document.getElementById('level2-dot');
+        const level3Dot = document.getElementById('level3-dot');
+        const level4Dot = document.getElementById('level4-dot');
+        const voiceButton = document.getElementById('voice-button');
+        const voiceSpeedSlider = document.getElementById('voice-speed-slider');
+        const voiceSpeedValue = document.getElementById('voice-speed-value');
+        const voiceStatus = document.getElementById('voice-status');
+        const hintButton = document.getElementById('hint-button');
+        const hintText = document.getElementById('hint-text');
+        const scrollIndicator = document.getElementById('scroll-indicator');
+        const scrollToTop = document.getElementById('scroll-to-top');
+        const progressBar = document.getElementById('progress-bar');
+
+        // Voice synthesis setup
+        const synth = window.speechSynthesis;
+        let voices = [];
+        let femaleVoice = null;
+
+        function populateVoices() {
+            voices = synth.getVoices();
+            
+            // Prioritize female voices
+            const preferredFemaleVoices = [
+                'Google US English Female',
+                'Google UK English Female',
+                'Microsoft Zira Desktop',
+                'Samantha',
+                'Karen',
+                'Moira',
+                'Joanna',
+                'Kendra',
+                'Kimberly',
+                'Salli'
+            ];
+            
+            for (const preferredName of preferredFemaleVoices) {
+                const found = voices.find(voice => 
+                    voice.name.includes(preferredName)
+                );
+                if (found) {
+                    femaleVoice = found;
+                    break;
+                }
+            }
+            
+            if (!femaleVoice) {
+                femaleVoice = voices.find(voice => 
+                    voice.name.toLowerCase().includes('female')
+                );
+            }
+            
+            if (!femaleVoice && voices.length > 0) {
+                femaleVoice = voices[0];
+            }
+        }
+
+        if (speechSynthesis.onvoiceschanged !== undefined) {
+            speechSynthesis.onvoiceschanged = populateVoices;
+        }
+
+        // Voice functions
+        function speak(text, callback) {
+            if (!voiceEnabled || !synth) {
+                if (callback) callback();
+                return;
+            }
+
+            synth.cancel();
+
+            const utterance = new SpeechSynthesisUtterance(text);
+            
+            if (femaleVoice) {
+                utterance.voice = femaleVoice;
+            }
+            
+            utterance.rate = voiceSpeed;
+            utterance.pitch = 1.3;
+            utterance.volume = 0.9;
+            
+            if (callback) {
+                utterance.onend = callback;
+            }
+            
+            synth.speak(utterance);
+        }
+
+        function speakQuestion() {
+            const currentQuestion = currentQuestions[currentRound];
+            let questionText = currentQuestion.question + " ";
+            
+            if (currentQuestion.type === "compare") {
+                questionText += `On the left, we have ${currentQuestion.item1.label}. On the right, we have ${currentQuestion.item2.label}. `;
+                
+                if (currentQuestion.attribute === "size") {
+                    questionText += `Look at the sizes! Which one is ${currentQuestion.answer}?`;
+                } else if (currentQuestion.attribute === "quantity") {
+                    questionText += `Count the items! Which one has ${currentQuestion.answer}?`;
+                } else if (currentQuestion.attribute === "height") {
+                    questionText += `Look at the heights! Which one is ${currentQuestion.answer}?`;
+                }
+            } else if (currentQuestion.type === "sort") {
+                questionText += `Drag and drop the items into the correct bins. `;
+                questionText += `The bins are for: ${currentQuestion.bins.join(" and ")}.`;
+            }
+            
+            speak(questionText);
+        }
+
+        function speakFeedback(isCorrect) {
+            if (isCorrect) {
+                const encouragements = [
+                    "Excellent! You're great at comparing and sorting!",
+                    "Great job! You understand sizes and categories!",
+                    "Wow! You're a sorting expert!",
+                    "Amazing! You did it perfectly!",
+                    "Super! That's exactly right!",
+                    "Wonderful! You're learning so much!",
+                    "Fantastic! Keep up the great work!",
+                    "Brilliant! You're a comparison champion!"
+                ];
+                const randomEncouragement = encouragements[Math.floor(Math.random() * encouragements.length)];
+                speak(randomEncouragement);
+            } else {
+                const encouragements = [
+                    "Nice try! Look carefully at the differences!",
+                    "Almost there! Keep thinking about the attributes!",
+                    "Good effort! Let's try to find the pattern!",
+                    "Don't worry! Comparing takes practice!",
+                    "Keep trying! You're getting closer!",
+                    "That's okay! Use the hint button if you need help!",
+                    "No worries! Learning to sort takes time!",
+                    "You're doing great! Don't give up!"
+                ];
+                const randomEncouragement = encouragements[Math.floor(Math.random() * encouragements.length)];
+                speak(randomEncouragement);
+            }
+        }
+
+        function speakHint() {
+            const currentQuestion = currentQuestions[currentRound];
+            speak("Here's a hint: " + currentQuestion.hint);
+        }
+
+        function speakLevelComplete() {
+            speak(`Great job! You completed level ${currentLevel} with a score of ${levelScore} out of 5!`);
+        }
+
+        function speakGameOver() {
+            speak(`Amazing! You finished all levels with a final score of ${score} out of 20! You're a compare and sort expert!`);
+        }
+
+        // Voice controls
+        voiceButton.addEventListener('click', () => {
+            voiceEnabled = !voiceEnabled;
+            voiceButton.textContent = voiceEnabled ? '👩‍🏫' : '🔇';
+            
+            if (voiceEnabled) {
+                showVoiceStatus("Female Voice Active");
+                speakQuestion();
+            } else {
+                showVoiceStatus("Voice Muted");
+                synth.cancel();
+            }
+        });
+
+        voiceButton.addEventListener('mouseenter', () => {
+            if (voiceEnabled) {
+                showVoiceStatus("Female Voice Active");
+            } else {
+                showVoiceStatus("Voice Muted");
+            }
+        });
+
+        function showVoiceStatus(message) {
+            voiceStatus.textContent = message;
+            voiceStatus.classList.add('show');
+            setTimeout(() => {
+                voiceStatus.classList.remove('show');
+            }, 2000);
+        }
+
+        voiceSpeedSlider.addEventListener('input', (e) => {
+            voiceSpeed = parseFloat(e.target.value);
+            voiceSpeedValue.textContent = voiceSpeed.toFixed(1);
+        });
+
+        // Hint functionality
+        hintButton.addEventListener('click', () => {
+            if (!hintUsed && !isAnswered) {
+                hintUsed = true;
+                const currentQuestion = currentQuestions[currentRound];
+                hintText.textContent = currentQuestion.hint;
+                speakHint();
+            }
+        });
+
+        // Scroll functionality
+        window.addEventListener('scroll', () => {
+            // Update progress bar
+            const scrollHeight = document.documentElement.scrollHeight - window.innerHeight;
+            const scrollPosition = window.scrollY;
+            const progress = (scrollPosition / scrollHeight) * 100;
+            progressBar.style.width = progress + '%';
+
+            // Show/hide scroll to top button
+            if (scrollPosition > 300) {
+                scrollToTop.classList.add('show');
+            } else {
+                scrollToTop.classList.remove('show');
+            }
+
+            // Hide scroll indicator when scrolled
+            if (scrollPosition > 100) {
+                scrollIndicator.style.display = 'none';
+            } else {
+                scrollIndicator.style.display = 'flex';
+            }
+
+            // Update navigation dots
+            updateNavDots();
+        });
+
+        // Scroll to top
+        scrollToTop.addEventListener('click', () => {
+            window.scrollTo({
+                top: 0,
+                behavior: 'smooth'
+            });
+        });
+
+        // Scroll indicator click
+        scrollIndicator.addEventListener('click', () => {
+            document.getElementById('voice-settings').scrollIntoView({
+                behavior: 'smooth'
+            });
+        });
+
+        // Navigation dots
+        document.querySelectorAll('.nav-dot').forEach(dot => {
+            dot.addEventListener('click', () => {
+                const section = dot.dataset.section;
+                document.getElementById(section).scrollIntoView({
+                    behavior: 'smooth'
+                });
+            });
+        });
+
+        function updateNavDots() {
+            const sections = ['game', 'voice-settings'];
+            const scrollPosition = window.scrollY + window.innerHeight / 2;
+
+            sections.forEach((sectionId, index) => {
+                const section = document.getElementById(sectionId);
+                if (section) {
+                    const sectionTop = section.offsetTop;
+                    const sectionBottom = sectionTop + section.offsetHeight;
+
+                    if (scrollPosition >= sectionTop && scrollPosition <= sectionBottom) {
+                        document.querySelectorAll('.nav-dot').forEach(dot => dot.classList.remove('active'));
+                        document.querySelectorAll('.nav-dot')[index].classList.add('active');
+                    }
+                }
+            });
+        }
+
+        // Initialize the game
+        function initGame() {
+            currentLevel = 1;
+            currentRound = 0;
+            score = 0;
+            levelScore = 0;
+            isAnswered = false;
+            hintUsed = false;
+            sortedItems = [];
+            scoreElement.textContent = score;
+            levelElement.textContent = currentLevel;
+            roundElement.textContent = currentRound + 1;
+            gameOverElement.classList.remove('show');
+            levelCompleteElement.classList.remove('show');
+            nextButton.classList.remove('show');
+            hintText.textContent = '';
+            
+            // Reset level indicators
+            level1Dot.classList.add('active');
+            level1Dot.classList.remove('completed');
+            level2Dot.classList.remove('active', 'completed');
+            level3Dot.classList.remove('active', 'completed');
+            level4Dot.classList.remove('active', 'completed');
+            
+            // Scroll to top
+            window.scrollTo({
+                top: 0,
+                behavior: 'smooth'
+            });
+            
+            // Load first level
+            loadLevel();
+        }
+
+        // Load a level
+        function loadLevel() {
+            currentRound = 0;
+            levelScore = 0;
+            isAnswered = false;
+            hintUsed = false;
+            sortedItems = [];
+            nextButton.classList.remove('show');
+            hintText.textContent = '';
+            
+            // Update level indicator
+            levelElement.textContent = currentLevel;
+            roundElement.textContent = currentRound + 1;
+            
+            // Update level dots
+            if (currentLevel === 1) {
+                level1Dot.classList.add('active');
+                level1Dot.classList.remove('completed');
+                level2Dot.classList.remove('active', 'completed');
+                level3Dot.classList.remove('active', 'completed');
+                level4Dot.classList.remove('active', 'completed');
+            } else if (currentLevel === 2) {
+                level1Dot.classList.remove('active');
+                level1Dot.classList.add('completed');
+                level2Dot.classList.add('active');
+                level2Dot.classList.remove('completed');
+                level3Dot.classList.remove('active', 'completed');
+                level4Dot.classList.remove('active', 'completed');
+            } else if (currentLevel === 3) {
+                level1Dot.classList.remove('active');
+                level1Dot.classList.add('completed');
+                level2Dot.classList.remove('active');
+                level2Dot.classList.add('completed');
+                level3Dot.classList.add('active');
+                level3Dot.classList.remove('completed');
+                level4Dot.classList.remove('active', 'completed');
+            } else if (currentLevel === 4) {
+                level1Dot.classList.remove('active');
+                level1Dot.classList.add('completed');
+                level2Dot.classList.remove('active');
+                level2Dot.classList.add('completed');
+                level3Dot.classList.remove('active');
+                level3Dot.classList.add('completed');
+                level4Dot.classList.add('active');
+                level4Dot.classList.remove('completed');
+            }
+            
+            // Get questions for current level
+            currentQuestions = gameData[`level${currentLevel}`];
+            
+            // Load first question
+            loadQuestion();
+        }
+
+        // Load a question
+        function loadQuestion() {
+            if (currentRound >= currentQuestions.length) {
+                endLevel();
+                return;
+            }
+
+            isAnswered = false;
+            hintUsed = false;
+            sortedItems = [];
+            nextButton.classList.remove('show');
+            hintText.textContent = '';
+            
+            const currentQuestion = currentQuestions[currentRound];
+            questionElement.textContent = currentQuestion.question;
+            
+            // Clear previous content
+            comparisonContainer.innerHTML = '';
+            sortingContainer.innerHTML = '';
+            optionsContainer.innerHTML = '';
+            
+            if (currentQuestion.type === "compare") {
+                // Show comparison container
+                comparisonContainer.style.display = 'flex';
+                sortingContainer.style.display = 'none';
+                
+                // Create comparison items
+                const item1Div = document.createElement('div');
+                item1Div.className = 'compare-item';
+                
+                const item1Display = document.createElement('div');
+                item1Display.className = 'item-display';
+                item1Display.style.fontSize = `${currentQuestion.item1.size || 60}px`;
+                item1Display.textContent = currentQuestion.item1.emoji;
+                
+                const item1Label = document.createElement('div');
+                item1Label.className = 'item-label';
+                item1Label.textContent = currentQuestion.item1.label;
+                
+                item1Div.appendChild(item1Display);
+                item1Div.appendChild(item1Label);
+                
+                const symbolDiv = document.createElement('div');
+                symbolDiv.className = 'comparison-symbol';
+                symbolDiv.textContent = 'VS';
+                
+                const item2Div = document.createElement('div');
+                item2Div.className = 'compare-item';
+                
+                const item2Display = document.createElement('div');
+                item2Display.className = 'item-display';
+                item2Display.style.fontSize = `${currentQuestion.item2.size || 60}px`;
+                item2Display.textContent = currentQuestion.item2.emoji;
+                
+                const item2Label = document.createElement('div');
+                item2Label.className = 'item-label';
+                item2Label.textContent = currentQuestion.item2.label;
+                
+                item2Div.appendChild(item2Display);
+                item2Div.appendChild(item2Label);
+                
+                comparisonContainer.appendChild(item1Div);
+                comparisonContainer.appendChild(symbolDiv);
+                comparisonContainer.appendChild(item2Div);
+                
+                // Create options
+                const options = ['bigger', 'smaller', 'more', 'fewer', 'taller', 'shorter'];
+                const relevantOptions = options.filter(opt => 
+                    currentQuestion.answer === opt || 
+                    (currentQuestion.answer === 'bigger' && opt === 'smaller') ||
+                    (currentQuestion.answer === 'smaller' && opt === 'bigger') ||
+                    (currentQuestion.answer === 'more' && opt === 'fewer') ||
+                    (currentQuestion.answer === 'fewer' && opt === 'more') ||
+                    (currentQuestion.answer === 'taller' && opt === 'shorter') ||
+                    (currentQuestion.answer === 'shorter' && opt === 'taller')
+                );
+                
+                relevantOptions.forEach(option => {
+                    const optionElement = document.createElement('div');
+                    optionElement.className = 'option';
+                    
+                    if (option === 'bigger' || option === 'more' || option === 'taller') {
+                        optionElement.classList.add('bigger');
+                    } else {
+                        optionElement.classList.add('smaller');
+                    }
+                    
+                    optionElement.textContent = option.charAt(0).toUpperCase() + option.slice(1);
+                    optionElement.dataset.answer = option;
+                    
+                    optionElement.addEventListener('click', handleComparisonClick);
+                    
+                    optionsContainer.appendChild(optionElement);
+                });
+                
+            } else if (currentQuestion.type === "sort") {
+                // Show sorting container
+                comparisonContainer.style.display = 'none';
+                sortingContainer.style.display = 'flex';
+                
+                // Create sorting bins
+                const binsDiv = document.createElement('div');
+                binsDiv.className = 'sorting-bins';
+                
+                currentQuestion.bins.forEach(bin => {
+                    const binDiv = document.createElement('div');
+                    binDiv.className = 'sort-bin';
+                    binDiv.dataset.bin = bin;
+                    
+                    const binLabel = document.createElement('div');
+                    binLabel.className = 'bin-label';
+                    binLabel.textContent = bin;
+                    
+                    binDiv.appendChild(binLabel);
+                    binsDiv.appendChild(binDiv);
+                });
+                
+                // Create items to sort
+                const itemsDiv = document.createElement('div');
+                itemsDiv.className = 'items-to-sort';
+                
+                const shuffledItems = [...currentQuestion.items].sort(() => Math.random() - 0.5);
+                shuffledItems.forEach((item, index) => {
+                    const itemElement = document.createElement('div');
+                    itemElement.className = 'sortable-item';
+                    itemElement.textContent = item.emoji;
+                    itemElement.dataset.category = item[currentQuestion.attribute];
+                    itemElement.dataset.label = item.label;
+                    itemElement.draggable = true;
+                    
+                    // Add drag and drop events
+                    itemElement.addEventListener('dragstart', handleDragStart);
+                    itemElement.addEventListener('dragend', handleDragEnd);
+                    
+                    itemsDiv.appendChild(itemElement);
+                });
+                
+                sortingContainer.appendChild(binsDiv);
+                sortingContainer.appendChild(itemsDiv);
+                
+                // Add drop events to bins
+                document.querySelectorAll('.sort-bin').forEach(bin => {
+                    bin.addEventListener('dragover', handleDragOver);
+                    bin.addEventListener('drop', handleDrop);
+                    bin.addEventListener('dragleave', handleDragLeave);
+                });
+            }
+            
+            // Update round counter
+            roundElement.textContent = currentRound + 1;
+            
+            // Add stars for decoration
+            addStars();
+            
+            // Scroll to question
+            questionElement.scrollIntoView({
+                behavior: 'smooth',
+                block: 'center'
+            });
+            
+            // Speak the question
+            setTimeout(() => {
+                speakQuestion();
+            }, 1000);
+        }
+
+        // Handle comparison click
+        function handleComparisonClick(event) {
+            if (isAnswered) return;
+            
+            isAnswered = true;
+            const option = event.currentTarget;
+            const selectedAnswer = option.dataset.answer;
+            const currentQuestion = currentQuestions[currentRound];
+            const isCorrect = selectedAnswer === currentQuestion.answer;
+            
+            // Mark selected option
+            option.classList.add('selected');
+            
+            if (isCorrect) {
+                score++;
+                levelScore++;
+                scoreElement.textContent = score;
+                showFeedback(true);
+                createConfetti();
+            } else {
+                showFeedback(false);
+            }
+            
+            // Speak feedback
+            speakFeedback(isCorrect);
+            
+            nextButton.classList.add('show');
+        }
+
+        // Drag and drop functions
+        let draggedElement = null;
+
+        function handleDragStart(event) {
+            if (isAnswered) return;
+            draggedElement = event.target;
+            event.target.classList.add('dragging');
+        }
+
+        function handleDragEnd(event) {
+            event.target.classList.remove('dragging');
+        }
+
+        function handleDragOver(event) {
+            event.preventDefault();
+            event.currentTarget.classList.add('highlight');
+        }
+
+        function handleDragLeave(event) {
+            event.currentTarget.classList.remove('highlight');
+        }
+
+        function handleDrop(event) {
+            event.preventDefault();
+            event.currentTarget.classList.remove('highlight');
+            
+            if (draggedElement && !isAnswered) {
+                const binCategory = event.currentTarget.dataset.bin;
+                const itemCategory = draggedElement.dataset.category;
+                
+                if (binCategory === itemCategory) {
+                    // Correct placement
+                    draggedElement.classList.add('sorted');
+                    draggedElement.draggable = false;
+                    event.currentTarget.appendChild(draggedElement);
+                    sortedItems.push(draggedElement);
+                    
+                    // Check if all items are sorted
+                    const currentQuestion = currentQuestions[currentRound];
+                    if (sortedItems.length === currentQuestion.items.length) {
+                        isAnswered = true;
+                        score++;
+                        levelScore++;
+                        scoreElement.textContent = score;
+                        showFeedback(true);
+                        createConfetti();
+                        speakFeedback(true);
+                        nextButton.classList.add('show');
+                    }
+                } else {
+                    // Wrong placement - shake the bin
+                    event.currentTarget.style.animation = 'shake 0.5s';
+                    setTimeout(() => {
+                        event.currentTarget.style.animation = '';
+                    }, 500);
+                }
+            }
+        }
+
+        // Add shake animation
+        const shakeStyle = document.createElement('style');
+        shakeStyle.textContent = `
+            @keyframes shake {
+                0%, 100% { transform: translateX(0); }
+                25% { transform: translateX(-10px); }
+                75% { transform: translateX(10px); }
+            }
+        `;
+        document.head.appendChild(shakeStyle);
+
+        // Show feedback
+        function showFeedback(isCorrect) {
+            feedbackElement.textContent = isCorrect ? '✓ Correct!' : '✗ Try Again!';
+            feedbackElement.classList.remove('correct-animation', 'incorrect-animation');
+            
+            if (isCorrect) {
+                feedbackElement.classList.add('correct-animation');
+            } else {
+                feedbackElement.classList.add('incorrect-animation');
+            }
+            
+            // Force reflow to restart animation
+            void feedbackElement.offsetWidth;
+        }
+
+        // Create confetti effect
+        function createConfetti() {
+            const colors = ['#ff6b6b', '#4ecdc4', '#45b7d1', '#f9ca24', '#f0932b', '#eb4d4b', '#6ab04c', '#c44569', '#f093fb', '#4facfe'];
+            
+            for (let i = 0; i < 30; i++) {
+                const confetti = document.createElement('div');
+                confetti.classList.add('confetti');
+                confetti.style.backgroundColor = colors[Math.floor(Math.random() * colors.length)];
+                confetti.style.left = `${Math.random() * 100}%`;
+                confetti.style.top = `${Math.random() * 100}%`;
+                
+                // Random size
+                const size = Math.random() * 10 + 5;
+                confetti.style.width = `${size}px`;
+                confetti.style.height = `${size}px`;
+                
+                // Random shape
+                if (Math.random() < 0.5) {
+                    confetti.style.borderRadius = '50%';
+                } else {
+                    confetti.style.borderRadius = '0';
+                }
+                
+                // Random animation
+                const duration = Math.random() * 2 + 1;
+                const delay = Math.random() * 0.5;
+                
+                confetti.style.animation = `fall ${duration}s ease-out ${delay}s forwards`;
+                
+                document.querySelector('.game-container').appendChild(confetti);
+                
+                // Remove confetti after animation
+                setTimeout(() => {
+                    confetti.remove();
+                }, (duration + delay) * 1000);
+            }
+        }
+
+        // Add decorative stars
+        function addStars() {
+            // Remove existing stars
+            document.querySelectorAll('.star').forEach(star => star.remove());
+            
+            // Add new stars
+            for (let i = 0; i < 5; i++) {
+                const star = document.createElement('div');
+                star.classList.add('star');
+                star.textContent = '⭐';
+                star.style.left = `${Math.random() * 90 + 5}%`;
+                star.style.top = `${Math.random() * 90 + 5}%`;
+                document.querySelector('.game-container').appendChild(star);
+            }
+        }
+
+        // End the level
+        function endLevel() {
+            levelScoreElement.textContent = levelScore;
+            levelCompleteElement.classList.add('show');
+            
+            // Mark current level as completed
+            if (currentLevel === 1) {
+                level1Dot.classList.remove('active');
+                level1Dot.classList.add('completed');
+            } else if (currentLevel === 2) {
+                level2Dot.classList.remove('active');
+                level2Dot.classList.add('completed');
+            } else if (currentLevel === 3) {
+                level3Dot.classList.remove('active');
+                level3Dot.classList.add('completed');
+            } else if (currentLevel === 4) {
+                level4Dot.classList.remove('active');
+                level4Dot.classList.add('completed');
+            }
+            
+            // Speak level complete message
+            speakLevelComplete();
+        }
+
+        // End the game
+        function endGame() {
+            finalScoreElement.textContent = score;
+            gameOverElement.classList.add('show');
+            
+            // Speak game over message
+            speakGameOver();
+        }
+
+        // Event listeners
+        nextButton.addEventListener('click', () => {
+            currentRound++;
+            loadQuestion();
+        });
+        
+        nextLevelButton.addEventListener('click', () => {
+            levelCompleteElement.classList.remove('show');
+            currentLevel++;
+            
+            if (currentLevel > 4) {
+                endGame();
+            } else {
+                loadLevel();
+            }
+        });
+        
+        playAgainButton.addEventListener('click', () => {
+            gameOverElement.classList.remove('show');
+            initGame();
+        });
+
+        // Add falling animation for confetti
+        const style = document.createElement('style');
+        style.textContent = `
+            @keyframes fall {
+                0% {
+                    transform: translateY(0) rotate(0deg);
+                    opacity: 1;
+                }
+                100% {
+                    transform: translateY(300px) rotate(360deg);
+                    opacity: 0;
+                }
+            }
+        `;
+        document.head.appendChild(style);
+
+        // Initialize the game on load
+        window.addEventListener('load', () => {
+            initGame();
+            populateVoices();
+            
+            // Hide scroll indicator after 5 seconds
+            setTimeout(() => {
+                scrollIndicator.style.display = 'none';
+            }, 5000);
+        });
+
+        // Keyboard navigation
+        document.addEventListener('keydown', (e) => {
+            if (e.key === 'ArrowUp') {
+                window.scrollBy({
+                    top: -100,
+                    behavior: 'smooth'
+                });
+            } else if (e.key === 'ArrowDown') {
+                window.scrollBy({
+                    top: 100,
+                    behavior: 'smooth'
+                });
+            } else if (e.key === 'Home') {
+                window.scrollTo({
+                    top: 0,
+                    behavior: 'smooth'
+                });
+            } else if (e.key === 'End') {
+                window.scrollTo({
+                    top: document.documentElement.scrollHeight,
+                    behavior: 'smooth'
+                });
+            }
+        });
+    </script>
+</body>
+</html>
