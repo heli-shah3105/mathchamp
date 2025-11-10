@@ -129,6 +129,14 @@
             perspective: 1000px;
         }
 
+        #game-board-hard {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 10px;
+            width: 100%;
+            perspective: 1000px;
+        }
+
         /* --- Card & Item Styling --- */
         .card, .item {
             aspect-ratio: 1 / 1;
@@ -149,6 +157,11 @@
             font-size: 1.5rem;
             font-weight: 600;
             padding: 10px;
+        }
+
+        .card {
+            transform-style: preserve-3d;
+            transition: transform 0.6s;
         }
 
         .card.flipped {
@@ -182,6 +195,66 @@
             transform: rotateY(180deg);
         }
 
+        /* --- Shape Match Display --- */
+        #shape-match-display {
+            margin-top: 25px;
+            min-height: 70px;
+            padding: 15px 30px;
+            background-color: #FFFFFF;
+            border: 4px dashed var(--button-bg);
+            border-radius: 20px;
+            font-size: 2.2rem;
+            font-weight: 700;
+            color: var(--text-color);
+            text-align: center;
+            box-shadow: 0 5px 0 var(--card-shadow);
+            opacity: 0;
+            transform: scale(0.8) translateY(20px);
+            transition: opacity 0.4s ease, transform 0.4s ease;
+            width: 100%;
+            max-width: 500px;
+        }
+
+        #shape-match-display.show {
+            opacity: 1;
+            transform: scale(1) translateY(0);
+        }
+
+        /* --- Match Notification Popup --- */
+        .match-notification {
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%) scale(0);
+            background: white;
+            padding: 20px 30px;
+            border-radius: 20px;
+            box-shadow: 0 10px 25px rgba(0,0,0,0.3);
+            z-index: 1000;
+            text-align: center;
+            border: 4px solid var(--button-bg);
+            transition: transform 0.3s ease, opacity 0.3s ease;
+            opacity: 0;
+            pointer-events: none;
+            max-width: 80%;
+        }
+
+        .match-notification.show {
+            transform: translate(-50%, -50%) scale(1);
+            opacity: 1;
+        }
+
+        .match-notification .shape-emoji {
+            font-size: 4rem;
+            margin-bottom: 10px;
+        }
+
+        .match-notification .shape-name {
+            font-size: 2rem;
+            font-weight: 700;
+            color: var(--text-color);
+        }
+
         /* --- Shared UI Elements --- */
         .back-btn {
             margin-top: 20px;
@@ -200,6 +273,80 @@
         .back-btn:hover {
             transform: translateY(2px);
             box-shadow: 0 2px 0 var(--text-color);
+        }
+
+        /* --- Timer Display --- */
+        #timer-display {
+            margin: 15px 0;
+            padding: 10px 20px;
+            background-color: #FFFFFF;
+            border: 3px solid var(--text-color);
+            border-radius: 20px;
+            font-size: 1.5rem;
+            font-weight: 700;
+            color: var(--text-color);
+            text-align: center;
+            box-shadow: 0 4px 0 var(--card-shadow);
+        }
+
+        /* --- Hard Level Special Features --- */
+        .hard-controls {
+            display: flex;
+            gap: 15px;
+            margin: 15px 0;
+        }
+
+        .control-btn {
+            padding: 10px 20px;
+            font-size: 1.2rem;
+            font-family: 'Fredoka', sans-serif;
+            font-weight: 600;
+            background: #60A5FA;
+            color: white;
+            border: 3px solid var(--text-color);
+            border-radius: 50px;
+            cursor: pointer;
+            box-shadow: 0 4px 0 var(--text-color);
+            transition: transform 0.1s, box-shadow 0.1s;
+        }
+
+        .control-btn:hover {
+            transform: translateY(2px);
+            box-shadow: 0 2px 0 var(--text-color);
+        }
+
+        .control-btn:active {
+            transform: translateY(4px);
+            box-shadow: none;
+        }
+
+        .control-btn:disabled {
+            background: #9CA3AF;
+            cursor: not-allowed;
+        }
+
+        .peek-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.8);
+            z-index: 150;
+            display: none;
+            justify-content: center;
+            align-items: center;
+            flex-direction: column;
+        }
+
+        .peek-overlay.show {
+            display: flex;
+        }
+
+        .peek-countdown {
+            font-size: 3rem;
+            color: white;
+            margin-top: 20px;
         }
 
         /* --- Confetti Effect --- */
@@ -305,6 +452,16 @@
             50% { transform: rotate(-10deg) scale(1); }
             75% { transform: rotate(10deg) scale(1.1); }
         }
+
+        @keyframes shake {
+            0%, 100% { transform: translateX(0); }
+            25% { transform: translateX(-5px); }
+            75% { transform: translateX(5px); }
+        }
+
+        .shake {
+            animation: shake 0.5s ease-in-out;
+        }
     </style>
 </head>
 <body>
@@ -320,12 +477,14 @@
             <h2>Choose Your Level!</h2>
             <button class="level-btn" onclick="startGame('easy')">Easy</button>
             <button class="level-btn" onclick="startGame('medium')">Medium</button>
+            <button class="level-btn" onclick="startGame('hard')">Hard</button>
         </section>
 
         <!-- Easy Level Screen -->
         <section id="game-screen-easy" class="game-screen">
             <h2>Match the Shape to its Name!</h2>
             <div id="game-board-easy"></div>
+            <div id="shape-match-display"></div>
             <button class="back-btn" onclick="showMenu()">Back to Menu</button>
         </section>
 
@@ -333,9 +492,35 @@
         <section id="game-screen-medium" class="game-screen">
             <h2>Find the Matching Shapes!</h2>
             <div id="game-board-medium"></div>
+            <div id="shape-match-display"></div>
+            <button class="back-btn" onclick="showMenu()">Back to Menu</button>
+        </section>
+
+        <!-- Hard Level Screen -->
+        <section id="game-screen-hard" class="game-screen">
+            <h2>Challenge Mode!</h2>
+            <div id="timer-display">Time: 0:00</div>
+            <div class="hard-controls">
+                <button class="control-btn" id="peek-btn" onclick="startPeek()">Peek (3)</button>
+                <button class="control-btn" id="shuffle-btn" onclick="shuffleUnmatched()">Shuffle (2)</button>
+            </div>
+            <div id="game-board-hard"></div>
+            <div id="shape-match-display"></div>
             <button class="back-btn" onclick="showMenu()">Back to Menu</button>
         </section>
     </main>
+
+    <!-- Peek Overlay -->
+    <div class="peek-overlay" id="peek-overlay">
+        <h2 style="color: white; font-size: 2.5rem;">Memorize the cards!</h2>
+        <div class="peek-countdown" id="peek-countdown">5</div>
+    </div>
+
+    <!-- Match Notification Popup -->
+    <div class="match-notification" id="match-notification">
+        <div class="shape-emoji" id="match-shape-emoji"></div>
+        <div class="shape-name" id="match-shape-name"></div>
+    </div>
 
     <div id="victory-screen">
         <h2>You're a Super Shape Finder!</h2>
@@ -354,12 +539,14 @@
             star: { emoji: '⭐', word: 'Star' },
             heart: { emoji: '❤️', word: 'Heart' },
             diamond: { emoji: '💎', word: 'Diamond' },
-            hexagon: { emoji: '⬡', word: 'Hexagon' }
+            hexagon: { emoji: '⬡', word: 'Hexagon' },
+            pentagon: { emoji: '⬠', word: 'Pentagon' }
         };
 
         const levelConfig = {
             easy: { pairs: 4 },
-            medium: { pairs: 6 }
+            medium: { pairs: 6 },
+            hard: { pairs: 8 }
         };
 
         // --- Game State ---
@@ -367,22 +554,38 @@
         let flippedCards = [];
         let matchedPairs = 0;
         let isProcessing = false;
+        let timerInterval = null;
+        let seconds = 0;
+        let peekCount = 3;
+        let shuffleCount = 2;
+        let gameStarted = false;
 
         // --- DOM Elements ---
         const levelMenu = document.getElementById('level-menu');
         const gameScreens = {
             easy: document.getElementById('game-screen-easy'),
-            medium: document.getElementById('game-screen-medium')
+            medium: document.getElementById('game-screen-medium'),
+            hard: document.getElementById('game-screen-hard')
         };
         const gameBoards = {
             easy: document.getElementById('game-board-easy'),
-            medium: document.getElementById('game-board-medium')
+            medium: document.getElementById('game-board-medium'),
+            hard: document.getElementById('game-board-hard')
         };
         const victoryScreen = document.getElementById('victory-screen');
         const confettiContainer = document.getElementById('confetti-container');
+        const shapeMatchDisplayEl = document.getElementById('shape-match-display');
+        const matchNotification = document.getElementById('match-notification');
+        const matchShapeEmoji = document.getElementById('match-shape-emoji');
+        const matchShapeName = document.getElementById('match-shape-name');
+        const timerDisplay = document.getElementById('timer-display');
+        const peekBtn = document.getElementById('peek-btn');
+        const shuffleBtn = document.getElementById('shuffle-btn');
+        const peekOverlay = document.getElementById('peek-overlay');
+        const peekCountdown = document.getElementById('peek-countdown');
 
         // --- Audio Helper (using Web Audio API for simple beeps) ---
-        const audioContext = new (window.AudioContext || window.webkitAudioContext());
+        const audioContext = new (window.AudioContext || window.webkitAudioContext)();
 
         function playSound(type) {
             const oscillator = audioContext.createOscillator();
@@ -414,6 +617,13 @@
                     oscillator.start(currentTime);
                     oscillator.stop(currentTime + 0.2);
                     break;
+                case 'tick':
+                    oscillator.frequency.setValueAtTime(800, currentTime);
+                    gainNode.gain.setValueAtTime(0.1, currentTime);
+                    gainNode.gain.exponentialRampToValueAtTime(0.01, currentTime + 0.05);
+                    oscillator.start(currentTime);
+                    oscillator.stop(currentTime + 0.05);
+                    break;
             }
         }
 
@@ -423,6 +633,9 @@
             Object.values(gameScreens).forEach(screen => screen.style.display = 'none');
             victoryScreen.style.display = 'none';
             document.body.classList.remove('victory-active'); // Re-enable scrolling
+            shapeMatchDisplayEl.classList.remove('show'); // Hide match message on menu
+            matchNotification.classList.remove('show'); // Hide any active match notifications
+            stopTimer();
         }
 
         function startGame(level) {
@@ -435,12 +648,74 @@
             
             resetState();
             initLevel(level);
+            
+            if (level === 'hard') {
+                resetHardLevelFeatures();
+                // Start with a peek to show all cards
+                setTimeout(() => {
+                    startPeek();
+                    // Start timer after peek
+                    setTimeout(() => {
+                        startTimer();
+                        gameStarted = true;
+                    }, 5500);
+                }, 500);
+            }
         }
 
         function resetState() {
             flippedCards = [];
             matchedPairs = 0;
             isProcessing = false;
+            shapeMatchDisplayEl.classList.remove('show'); // Hide match message on reset
+            matchNotification.classList.remove('show'); // Hide any active match notifications
+            gameStarted = false;
+            stopTimer();
+        }
+
+        function resetHardLevelFeatures() {
+            seconds = 0;
+            peekCount = 3;
+            shuffleCount = 2;
+            updatePeekButton();
+            updateShuffleButton();
+            updateTimerDisplay();
+        }
+
+        // --- Timer Functions ---
+        function startTimer() {
+            timerInterval = setInterval(() => {
+                seconds++;
+                updateTimerDisplay();
+                
+                // Play tick sound every 5 seconds
+                if (seconds % 5 === 0) {
+                    playSound('tick');
+                }
+            }, 1000);
+        }
+
+        function stopTimer() {
+            if (timerInterval) {
+                clearInterval(timerInterval);
+                timerInterval = null;
+            }
+        }
+
+        function updateTimerDisplay() {
+            const minutes = Math.floor(seconds / 60);
+            const secs = seconds % 60;
+            timerDisplay.textContent = `Time: ${minutes}:${secs < 10 ? '0' : ''}${secs}`;
+        }
+
+        function updatePeekButton() {
+            peekBtn.textContent = `Peek (${peekCount})`;
+            peekBtn.disabled = peekCount <= 0;
+        }
+
+        function updateShuffleButton() {
+            shuffleBtn.textContent = `Shuffle (${shuffleCount})`;
+            shuffleBtn.disabled = shuffleCount <= 0;
         }
 
         // --- Level Initialization ---
@@ -453,6 +728,9 @@
                     break;
                 case 'medium':
                     initMediumLevel();
+                    break;
+                case 'hard':
+                    initHardLevel();
                     break;
             }
         }
@@ -506,6 +784,8 @@
                         clickedItem.classList.add('matched');
                         playSound('match');
                         createConfetti();
+                        showShapeMatch(firstEasySelection.dataset.shapeKey); // Show match message
+                        showMatchNotification(firstEasySelection.dataset.shapeKey); // Show popup notification
                         matchedPairs++;
                         isProcessing = false;
                         firstEasySelection = null;
@@ -583,6 +863,8 @@
                     card2.classList.add('matched');
                     playSound('match');
                     createConfetti();
+                    showShapeMatch(shape1); // Show match message
+                    showMatchNotification(shape1); // Show popup notification
                     matchedPairs++;
                     flippedCards = [];
                     isProcessing = false;
@@ -599,6 +881,184 @@
                     isProcessing = false;
                 }, 1200);
             }
+        }
+
+        // --- HARD LEVEL LOGIC ---
+        function initHardLevel() {
+            const shapeKeys = Object.keys(gameData);
+            const selectedShapes = shuffle(shapeKeys).slice(0, levelConfig.hard.pairs);
+            const cardPairs = [...selectedShapes, ...selectedShapes];
+            shuffle(cardPairs);
+
+            cardPairs.forEach((shapeKey, index) => {
+                const card = createHardCard(shapeKey, index);
+                gameBoards.hard.appendChild(card);
+            });
+        }
+
+        function createHardCard(shapeKey, id) {
+            const card = document.createElement('div');
+            card.classList.add('card');
+            card.dataset.shapeKey = shapeKey;
+            card.dataset.id = id;
+
+            const cardFront = document.createElement('div');
+            cardFront.classList.add('card-face', 'card-front');
+            cardFront.textContent = '🍃';
+
+            const cardBack = document.createElement('div');
+            cardBack.classList.add('card-face', 'card-back');
+            cardBack.textContent = gameData[shapeKey].emoji;
+
+            card.appendChild(cardFront);
+            card.appendChild(cardBack);
+            card.addEventListener('click', handleHardClick);
+            return card;
+        }
+
+        function handleHardClick(event) {
+            if (isProcessing || !gameStarted) return;
+            const clickedCard = event.currentTarget;
+            if (clickedCard.classList.contains('flipped') || clickedCard.classList.contains('matched')) return;
+
+            clickedCard.classList.add('flipped');
+            flippedCards.push(clickedCard);
+
+            if (flippedCards.length === 2) {
+                isProcessing = true;
+                checkHardMatch();
+            }
+        }
+
+        function checkHardMatch() {
+            const [card1, card2] = flippedCards;
+            const shape1 = card1.dataset.shapeKey;
+            const shape2 = card2.dataset.shapeKey;
+
+            if (shape1 === shape2) {
+                setTimeout(() => {
+                    card1.classList.add('matched');
+                    card2.classList.add('matched');
+                    playSound('match');
+                    createConfetti();
+                    showShapeMatch(shape1); // Show match message
+                    showMatchNotification(shape1); // Show popup notification
+                    matchedPairs++;
+                    flippedCards = [];
+                    isProcessing = false;
+                    if (matchedPairs === levelConfig.hard.pairs) {
+                        stopTimer();
+                        setTimeout(showVictoryScreen, 500);
+                    }
+                }, 600);
+            } else {
+                setTimeout(() => {
+                    card1.classList.remove('flipped');
+                    card2.classList.remove('flipped');
+                    playSound('nomatch');
+                    flippedCards = [];
+                    isProcessing = false;
+                }, 1200);
+            }
+        }
+
+        // --- Hard Level Special Functions ---
+        function startPeek() {
+            if (peekCount <= 0 || isProcessing) return;
+            
+            peekCount--;
+            updatePeekButton();
+            isProcessing = true;
+            
+            // Show all cards
+            const allCards = document.querySelectorAll('#game-board-hard .card:not(.matched)');
+            allCards.forEach(card => card.classList.add('flipped'));
+            
+            // Show overlay with countdown
+            peekOverlay.classList.add('show');
+            let countdown = 5;
+            peekCountdown.textContent = countdown;
+            
+            const countdownInterval = setInterval(() => {
+                countdown--;
+                peekCountdown.textContent = countdown;
+                
+                if (countdown <= 0) {
+                    clearInterval(countdownInterval);
+                    
+                    // Hide all cards again
+                    allCards.forEach(card => card.classList.remove('flipped'));
+                    
+                    // Hide overlay
+                    peekOverlay.classList.remove('show');
+                    isProcessing = false;
+                }
+            }, 1000);
+        }
+
+        function shuffleUnmatched() {
+            if (shuffleCount <= 0 || isProcessing) return;
+            
+            shuffleCount--;
+            updateShuffleButton();
+            isProcessing = true;
+            
+            // Get all unmatched cards
+            const board = gameBoards.hard;
+            const unmatchedCards = Array.from(board.querySelectorAll('.card:not(.matched)'));
+            
+            // Add shake animation to board
+            board.classList.add('shake');
+            
+            // Extract positions
+            const positions = unmatchedCards.map(card => ({
+                element: card,
+                parent: card.parentNode,
+                nextSibling: card.nextSibling
+            }));
+            
+            // Shuffle positions
+            const shuffledPositions = shuffle(positions);
+            
+            // Apply new positions after animation
+            setTimeout(() => {
+                shuffledPositions.forEach((pos, index) => {
+                    board.appendChild(pos.element);
+                });
+                
+                board.classList.remove('shake');
+                isProcessing = false;
+            }, 500);
+        }
+
+        // --- Shape Match Display Logic ---
+        function showShapeMatch(shapeKey) {
+            const shapeName = gameData[shapeKey].word.toUpperCase();
+            shapeMatchDisplayEl.textContent = `Match found is ${shapeName}!`;
+            shapeMatchDisplayEl.classList.add('show');
+            
+            // Hide the message after a delay
+            setTimeout(() => {
+                shapeMatchDisplayEl.classList.remove('show');
+            }, 2500);
+        }
+
+        // --- Match Notification Popup Logic ---
+        function showMatchNotification(shapeKey) {
+            const shapeEmoji = gameData[shapeKey].emoji;
+            const shapeName = gameData[shapeKey].word.toUpperCase();
+            
+            // Update the notification content
+            matchShapeEmoji.textContent = shapeEmoji;
+            matchShapeName.textContent = `Match found is ${shapeName}!`;
+            
+            // Show the notification
+            matchNotification.classList.add('show');
+            
+            // Hide the notification after 2 seconds
+            setTimeout(() => {
+                matchNotification.classList.remove('show');
+            }, 2000);
         }
 
         // --- Shared Game Functions ---
