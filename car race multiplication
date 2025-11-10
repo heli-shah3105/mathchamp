@@ -486,7 +486,7 @@
         // Game variables
         let gameRunning = false;
         let gamePaused = false;
-        let gameStopped = false; // New variable to completely stop the game
+        let gameStopped = false; // New variable to completely stop game
         let score = 0;
         let coins = 0;
         const BASE_GAME_SPEED = 2; // Constant base speed
@@ -539,63 +539,119 @@
             slowmo: 0
         };
 
-        // Math quiz questions
+        // Simple multiplication questions (numbers 1-5)
         const mathQuestions = [
             {
-                question: "5 × 6 = ?",
-                options: ["25", "30", "35", "40"],
-                correct: 1,
-                hint: "Think of counting by 5s six times: 5, 10, 15, 20, 25, 30",
-                explanation: "5 × 6 means adding 5 six times: 5 + 5 + 5 + 5 + 5 + 5 = 30"
-            },
-            {
-                question: "24 ÷ 4 = ?",
+                question: "2 × 3 = ?",
                 options: ["4", "5", "6", "7"],
                 correct: 2,
-                hint: "Think: how many groups of 4 can you make from 24?",
-                explanation: "24 ÷ 4 asks how many times 4 fits into 24. 4 + 4 + 4 + 4 + 4 + 4 = 24, so the answer is 6"
+                hint: "Count by 2s three times: 2, 4, 6",
+                explanation: "2 × 3 means adding 2 three times: 2 + 2 + 2 = 6"
             },
             {
-                question: "7 × 8 = ?",
-                options: ["48", "56", "64", "72"],
+                question: "4 × 5 = ?",
+                options: ["15", "20", "25", "30"],
                 correct: 1,
-                hint: "Try counting by 7s eight times: 7, 14, 21, 28, 35, 42, 49, 56",
-                explanation: "7 × 8 means adding 7 eight times: 7 + 7 + 7 + 7 + 7 + 7 + 7 + 7 = 56"
+                hint: "Count by 4s five times: 4, 8, 12, 16, 20",
+                explanation: "4 × 5 means adding 4 five times: 4 + 4 + 4 + 4 + 4 = 20"
             },
             {
-                question: "36 ÷ 6 = ?",
-                options: ["4", "5", "6", "7"],
+                question: "3 × 4 = ?",
+                options: ["10", "11", "12", "13"],
                 correct: 2,
-                hint: "Think: how many groups of 6 can you make from 36?",
-                explanation: "36 ÷ 6 asks how many times 6 fits into 36. 6 + 6 + 6 + 6 + 6 + 6 = 36, so the answer is 6"
+                hint: "Count by 3s four times: 3, 6, 9, 12",
+                explanation: "3 × 4 means adding 3 four times: 3 + 3 + 3 + 3 = 12"
             },
             {
-                question: "9 × 4 = ?",
-                options: ["27", "32", "36", "42"],
-                correct: 2,
-                hint: "Try counting by 9s four times: 9, 18, 27, 36",
-                explanation: "9 × 4 means adding 9 four times: 9 + 9 + 9 + 9 = 36"
-            },
-            {
-                question: "45 ÷ 5 = ?",
-                options: ["7", "8", "9", "10"],
-                correct: 2,
-                hint: "Think: how many groups of 5 can you make from 45?",
-                explanation: "45 ÷ 5 asks how many times 5 fits into 45. 5 + 5 + 5 + 5 + 5 + 5 + 5 + 5 + 5 = 45, so the answer is 9"
-            },
-            {
-                question: "6 × 7 = ?",
-                options: ["36", "42", "48", "54"],
+                question: "5 × 3 = ?",
+                options: ["10", "15", "20", "25"],
                 correct: 1,
-                hint: "Try counting by 6s seven times: 6, 12, 18, 24, 30, 36, 42",
-                explanation: "6 × 7 means adding 6 seven times: 6 + 6 + 6 + 6 + 6 + 6 + 6 = 42"
+                hint: "Count by 5s three times: 5, 10, 15",
+                explanation: "5 × 3 means adding 5 three times: 5 + 5 + 5 = 15"
             },
             {
-                question: "32 ÷ 8 = ?",
+                question: "2 × 5 = ?",
+                options: ["8", "9", "10", "11"],
+                correct: 2,
+                hint: "Count by 2s five times: 2, 4, 6, 8, 10",
+                explanation: "2 × 5 means adding 2 five times: 2 + 2 + 2 + 2 + 2 = 10"
+            },
+            {
+                question: "3 × 5 = ?",
+                options: ["12", "13", "14", "15"],
+                correct: 3,
+                hint: "Count by 3s five times: 3, 6, 9, 12, 15",
+                explanation: "3 × 5 means adding 3 five times: 3 + 3 + 3 + 3 + 3 = 15"
+            },
+            {
+                question: "4 × 2 = ?",
+                options: ["6", "7", "8", "9"],
+                correct: 2,
+                hint: "Count by 4s two times: 4, 8",
+                explanation: "4 × 2 means adding 4 two times: 4 + 4 = 8"
+            },
+            {
+                question: "5 × 4 = ?",
+                options: ["18", "19", "20", "21"],
+                correct: 2,
+                hint: "Count by 5s four times: 5, 10, 15, 20",
+                explanation: "5 × 4 means adding 5 four times: 5 + 5 + 5 + 5 = 20"
+            },
+            {
+                question: "1 × 5 = ?",
+                options: ["3", "4", "5", "6"],
+                correct: 2,
+                hint: "Any number times 1 is just that number",
+                explanation: "1 × 5 means adding 1 five times: 1 + 1 + 1 + 1 + 1 = 5"
+            },
+            {
+                question: "3 × 3 = ?",
+                options: ["6", "7", "8", "9"],
+                correct: 3,
+                hint: "Count by 3s three times: 3, 6, 9",
+                explanation: "3 × 3 means adding 3 three times: 3 + 3 + 3 = 9"
+            },
+            {
+                question: "2 × 4 = ?",
+                options: ["6", "7", "8", "9"],
+                correct: 2,
+                hint: "Count by 2s four times: 2, 4, 6, 8",
+                explanation: "2 × 4 means adding 2 four times: 2 + 2 + 2 + 2 = 8"
+            },
+            {
+                question: "5 × 2 = ?",
+                options: ["8", "9", "10", "11"],
+                correct: 2,
+                hint: "Count by 5s two times: 5, 10",
+                explanation: "5 × 2 means adding 5 two times: 5 + 5 = 10"
+            },
+            {
+                question: "4 × 3 = ?",
+                options: ["10", "11", "12", "13"],
+                correct: 2,
+                hint: "Count by 4s three times: 4, 8, 12",
+                explanation: "4 × 3 means adding 4 three times: 4 + 4 + 4 = 12"
+            },
+            {
+                question: "1 × 4 = ?",
                 options: ["2", "3", "4", "5"],
                 correct: 2,
-                hint: "Think: how many groups of 8 can you make from 32?",
-                explanation: "32 ÷ 8 asks how many times 8 fits into 32. 8 + 8 + 8 + 8 = 32, so the answer is 4"
+                hint: "Any number times 1 is just that number",
+                explanation: "1 × 4 means adding 1 four times: 1 + 1 + 1 + 1 = 4"
+            },
+            {
+                question: "2 × 2 = ?",
+                options: ["2", "3", "4", "5"],
+                correct: 2,
+                hint: "Count by 2s two times: 2, 4",
+                explanation: "2 × 2 means adding 2 two times: 2 + 2 = 4"
+            },
+            {
+                question: "3 × 2 = ?",
+                options: ["4", "5", "6", "7"],
+                correct: 2,
+                hint: "Count by 3s two times: 3, 6",
+                explanation: "3 × 2 means adding 3 two times: 3 + 3 = 6"
             }
         ];
 
@@ -1096,7 +1152,7 @@
 
         // Trigger quiz
         function triggerQuiz() {
-            gameStopped = true; // Completely stop the game
+            gameStopped = true; // Completely stop game
             quizAnswered = false;
             
             // Select a random question
@@ -1198,7 +1254,7 @@
                 } else {
                     clearInterval(countdownInterval);
                     countdownContainer.classList.add('hidden');
-                    gameStopped = false; // Resume the game
+                    gameStopped = false; // Resume game
                 }
             }, 1000);
         }
