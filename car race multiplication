@@ -222,7 +222,7 @@
         .bonus-collected {
             position: absolute;
             pointer-events: none;
-            font-size: 28px;
+            font-size: 32px;
             font-weight: bold;
             color: #ff00ff;
             animation: bonusFloat 1.2s ease-out forwards;
@@ -240,6 +240,27 @@
             100% {
                 opacity: 0;
                 transform: translateY(-60px) scale(0.8);
+            }
+        }
+
+        .skip-penalty {
+            position: absolute;
+            pointer-events: none;
+            font-size: 32px;
+            font-weight: bold;
+            color: #ff0000;
+            animation: penaltyFloat 1.5s ease-out forwards;
+            z-index: 15;
+        }
+
+        @keyframes penaltyFloat {
+            0% {
+                opacity: 1;
+                transform: translateY(0) scale(1);
+            }
+            100% {
+                opacity: 0;
+                transform: translateY(-80px) scale(0.5);
             }
         }
 
@@ -424,7 +445,7 @@
                 <p>🚗 Avoid Other Cars</p>
                 <p>⭐ Collect Power-ups</p>
                 <p>🪙 Collect Coins for Points!</p>
-                <p>💎 Rare Bonus for +50 Points!</p>
+                <p>💎 Rare Bonus for +200 Points!</p>
                 <p>🧩 Answer Math Questions for Bonus!</p>
                 <p>🏆 Beat Your High Score!</p>
             </div>
@@ -449,7 +470,7 @@
                 <p id="explanationText"></p>
             </div>
             <div class="quiz-buttons">
-                <button class="quiz-button" id="skipButton" onclick="skipQuiz()">Skip (-25 pts)</button>
+                <button class="quiz-button" id="skipButton" onclick="skipQuiz()">Skip (-100 pts)</button>
                 <button class="quiz-button hidden" id="continueButton" onclick="continueQuiz()">Continue</button>
             </div>
         </div>
@@ -539,7 +560,7 @@
             slowmo: 0
         };
 
-        // Simple multiplication questions (numbers 1-5)
+        // Simple multiplication questions (digits 1-5)
         const mathQuestions = [
             {
                 question: "2 × 3 = ?",
@@ -938,7 +959,7 @@
             ctx.font = 'bold 20px Arial';
             ctx.textAlign = 'center';
             ctx.textBaseline = 'middle';
-            ctx.fillText('+50', bonus.x + 25, bonus.y + 25);
+            ctx.fillText('+200', bonus.x + 25, bonus.y + 25);
             
             // Star sparkle effect
             ctx.fillStyle = 'rgba(255, 255, 255, 0.8)';
@@ -1134,7 +1155,7 @@
                 
                 // Check collection
                 if (checkCollision(playerCar, bonus)) {
-                    score += 50; // Bonus adds 50 points
+                    score += 200; // Bonus adds 200 points
                     createParticle(bonus.x + 25, bonus.y + 25, '#ff00ff');
                     showBonusCollected(bonus.x + 25, bonus.y + 25);
                     bonusButtons = bonusButtons.filter(b => b !== bonus);
@@ -1223,9 +1244,31 @@
         function skipQuiz() {
             if (quizAnswered) return;
             
-            score = Math.max(0, score - 25); // Deduct 25 points for skipping
+            // Deduct 100 points for skipping
+            score = Math.max(0, score - 100);
             updateUI();
-            startCountdown();
+            
+            // Show skip penalty animation
+            showSkipPenalty();
+            
+            // Start countdown after a short delay
+            setTimeout(() => {
+                startCountdown();
+            }, 500);
+        }
+
+        // Show skip penalty animation
+        function showSkipPenalty() {
+            const penaltyElement = document.createElement('div');
+            penaltyElement.className = 'skip-penalty';
+            penaltyElement.textContent = '-100';
+            penaltyElement.style.left = `${playerCar.x + playerCar.width / 2 + canvas.offsetLeft}px`;
+            penaltyElement.style.top = `${playerCar.y + canvas.offsetTop - 50}px`;
+            document.querySelector('.game-container').appendChild(penaltyElement);
+            
+            setTimeout(() => {
+                penaltyElement.remove();
+            }, 1500);
         }
 
         // Continue quiz
@@ -1277,7 +1320,7 @@
         function showBonusCollected(x, y) {
             const bonusElement = document.createElement('div');
             bonusElement.className = 'bonus-collected';
-            bonusElement.textContent = '+50 RARE BONUS!';
+            bonusElement.textContent = '+200 RARE BONUS!';
             bonusElement.style.left = `${x + canvas.offsetLeft}px`;
             bonusElement.style.top = `${y + canvas.offsetTop}px`;
             document.querySelector('.game-container').appendChild(bonusElement);
