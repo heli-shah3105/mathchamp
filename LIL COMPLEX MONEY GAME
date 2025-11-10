@@ -1,0 +1,888 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Piggy's Indian Bazaar Bonanza! 🐷🇮🇳</title>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Fredoka:wght@400;600;700&display=swap');
+
+        body {
+            margin: 0;
+            font-family: 'Fredoka', sans-serif;
+            background: #87CEEB; /* Sky blue */
+            overflow-x: hidden; /* Hide horizontal scroll */
+            position: relative;
+        }
+
+        /* --- Header & HUD --- */
+        .hud {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            background: linear-gradient(90deg, #FF6B6B, #FFE66D, #4ECDC4);
+            padding: 15px;
+            text-align: center;
+            color: white;
+            text-shadow: 1px 1px 2px rgba(0,0,0,0.2);
+            z-index: 1000;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.2);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            box-sizing: border-box;
+        }
+
+        .hud h1 {
+            margin: 0;
+            font-size: 1.8em;
+            font-weight: 700;
+        }
+
+        .hud-info {
+            display: flex;
+            gap: 30px;
+            align-items: center;
+        }
+
+        .wallet-display {
+            background: rgba(255,255,255,0.3);
+            padding: 8px 15px;
+            border-radius: 20px;
+            font-weight: 600;
+            font-size: 1.1em;
+        }
+
+        .stars-display {
+            background: rgba(255,255,255,0.3);
+            padding: 8px 15px;
+            border-radius: 20px;
+            font-weight: 600;
+            font-size: 1.1em;
+        }
+
+        /* --- Scrollable Market --- */
+        .market-container {
+            margin-top: 100px; /* Space for fixed HUD */
+            padding-bottom: 250px; /* More space for payment panel */
+            background: url('https://www.transparenttextures.com/patterns/woven.png'), #f4e4c1; /* Sandy texture */
+            position: relative;
+        }
+
+        .shop-section {
+            min-height: 70vh; /* Reduced height to bring shops closer */
+            padding: 20px 20px; /* Reduced padding */
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            position: relative;
+        }
+        
+        .shop-sign {
+            background: #FFC107;
+            color: #5D4037;
+            padding: 12px 30px; /* Reduced padding */
+            border-radius: 10px;
+            font-size: 1.8em; /* Slightly smaller */
+            font-weight: 700;
+            box-shadow: 5px 5px 0px #5D4037;
+            margin-bottom: 20px; /* Reduced margin */
+            transform: rotate(-2deg);
+            border: 3px dashed #5D4037;
+        }
+
+        .mission-box {
+            background: white;
+            border: 3px solid #4ECDC4;
+            border-radius: 15px;
+            padding: 15px 25px;
+            margin-bottom: 20px; /* Reduced margin */
+            text-align: center;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+            max-width: 700px;
+            animation: pulse 2s infinite;
+        }
+
+        @keyframes pulse {
+            0%, 100% { transform: scale(1); }
+            50% { transform: scale(1.03); }
+        }
+
+        .items-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+            gap: 15px; /* Reduced gap */
+            width: 100%;
+            max-width: 800px;
+        }
+
+        .shop-item {
+            background: white;
+            border-radius: 15px;
+            padding: 12px; /* Reduced padding */
+            text-align: center;
+            cursor: pointer;
+            transition: transform 0.2s, box-shadow 0.2s;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+        }
+        .shop-item:hover {
+            transform: translateY(-8px) scale(1.05);
+            box-shadow: 0 8px 20px rgba(0,0,0,0.15);
+        }
+        .shop-item.in-cart {
+            background: #e0f7fa;
+            border: 2px solid #4ECDC4;
+            cursor: not-allowed;
+            opacity: 0.7;
+        }
+
+        .item-emoji {
+            font-size: 3.5em; /* Slightly smaller */
+            line-height: 1;
+        }
+        .item-name {
+            font-weight: 600;
+            margin: 8px 0 5px 0; /* Reduced margin */
+            color: #333;
+            font-size: 0.95em; /* Slightly smaller */
+        }
+        .item-price {
+            background: #4CAF50;
+            color: white;
+            padding: 4px 12px; /* Reduced padding */
+            border-radius: 20px;
+            font-weight: 700;
+            display: inline-block;
+            font-size: 0.9em; /* Slightly smaller */
+        }
+
+        /* --- Payment Area --- */
+        .payment-panel {
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            width: 100%;
+            background: white;
+            box-shadow: 0 -5px 20px rgba(0,0,0,0.2);
+            border-top: 5px solid #FFC107;
+            z-index: 999;
+            transition: all 0.4s ease-out;
+            transform: translateY(0);
+            max-height: 70vh;
+            overflow-y: auto;
+        }
+
+        .payment-panel.collapsed {
+            padding: 20px;
+            transform: translateY(calc(100% - 120px));
+        }
+
+        .payment-panel.expanded {
+            padding: 20px;
+            transform: translateY(0);
+        }
+
+        .payment-summary {
+            display: flex;
+            justify-content: space-around;
+            margin-bottom: 20px;
+            font-size: 1.2em;
+        }
+
+        .payment-details {
+            display: grid;
+            grid-template-rows: 0fr;
+            transition: grid-template-rows 0.4s ease-out;
+            overflow: hidden;
+        }
+
+        .payment-panel.expanded .payment-details {
+            grid-template-rows: 1fr;
+        }
+        
+        .amount-display {
+            width: 100%;
+            height: 60px;
+            background: #333;
+            border-radius: 10px;
+            margin-bottom: 20px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            color: white;
+            font-weight: bold;
+            font-size: 1.5em;
+            box-shadow: inset 0 2px 5px rgba(0,0,0,0.5);
+        }
+        
+        .value-button-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(70px, 1fr));
+            gap: 10px;
+            max-width: 500px;
+            margin: 0 auto 20px auto;
+        }
+
+        .value-button {
+            padding: 15px 5px;
+            font-size: 1.1em;
+            font-family: 'Fredoka', sans-serif;
+            background: #4ECDC4;
+            color: white;
+            border: none;
+            border-radius: 15px;
+            cursor: pointer;
+            box-shadow: 0 4px 8px rgba(0,0,0,0.2);
+            transition: transform 0.1s, background 0.1s;
+            font-weight: 700;
+        }
+        .value-button:hover { background: #3db8af; }
+        .value-button:active {
+            transform: scale(0.95);
+            background: #2da39a;
+        }
+        .value-button.clear { background: #ff6b6b; }
+        .value-button.clear:hover { background: #e55555; }
+
+        .pay-button {
+            display: block;
+            padding: 15px 40px;
+            font-size: 1.3em;
+            font-family: 'Fredoka', sans-serif;
+            background: linear-gradient(90deg, #FA8BFF 0%, #2BD2FF 52%, #2BFF88 90%);
+            color: white;
+            border: none;
+            border-radius: 50px;
+            cursor: pointer;
+            font-weight: 600;
+            transition: transform 0.2s, background 0.2s;
+            margin: 0 auto;
+        }
+        .pay-button:hover { transform: scale(1.05); }
+        .pay-button:disabled { background: #ccc; cursor: not-allowed; transform: scale(1); }
+
+        /* --- Success Modal --- */
+        .modal {
+            display: none;
+            position: fixed;
+            z-index: 2000;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0,0,0,0.6);
+            justify-content: center;
+            align-items: center;
+        }
+
+        .modal-content {
+            background: white;
+            padding: 40px;
+            border-radius: 20px;
+            text-align: center;
+            animation: modalPop 0.5s cubic-bezier(0.68, -0.55, 0.265, 1.55);
+        }
+        @keyframes modalPop {
+            from { transform: scale(0); }
+            to { transform: scale(1); }
+        }
+        .modal-content h2 { color: #4CAF50; font-size: 2.5em; margin-top: 0;}
+        .modal-content p { font-size: 1.3em; color: #555;}
+        .modal-content button { margin-top: 20px; }
+
+        /* --- Added styles for payment breakdown --- */
+        .payment-breakdown {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+            justify-content: center;
+            margin-bottom: 15px;
+            min-height: 40px;
+        }
+
+        .payment-breakdown-item {
+            background: #4ECDC4;
+            color: white;
+            padding: 5px 10px;
+            border-radius: 15px;
+            font-weight: 600;
+            display: flex;
+            align-items: center;
+            gap: 5px;
+        }
+
+        .payment-breakdown-item .remove-btn {
+            background: none;
+            border: none;
+            color: white;
+            cursor: pointer;
+            font-weight: bold;
+            font-size: 1.1em;
+            padding: 0;
+            width: 20px;
+            height: 20px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 50%;
+        }
+
+        .payment-breakdown-item .remove-btn:hover {
+            background: rgba(255,255,255,0.2);
+        }
+
+        .amount-status {
+            text-align: center;
+            margin-bottom: 15px;
+            font-weight: 600;
+            color: #333;
+        }
+
+        .amount-status.valid {
+            color: #4CAF50;
+        }
+
+        .amount-status.invalid {
+            color: #FF6B6B;
+        }
+
+        .level-indicator {
+            position: absolute;
+            top: 10px;
+            right: 10px;
+            background: rgba(255,255,255,0.8);
+            padding: 5px 15px;
+            border-radius: 20px;
+            font-weight: 600;
+            font-size: 0.9em;
+        }
+
+        .payment-hints {
+            margin-top: 10px;
+            font-size: 0.9em;
+            color: #666;
+            text-align: center;
+        }
+
+        .payment-hint {
+            background: #f0f8ff;
+            padding: 8px 12px;
+            border-radius: 10px;
+            margin: 5px 0;
+            display: inline-block;
+        }
+
+        .hint-toggle {
+            background: none;
+            border: none;
+            color: #4ECDC4;
+            cursor: pointer;
+            font-size: 0.9em;
+            text-decoration: underline;
+            margin-top: 5px;
+        }
+
+    </style>
+</head>
+<body>
+
+    <div class="hud">
+        <h1>🐷 Piggy's Indian Bazaar Bonanza! 🇮🇳</h1>
+        <div class="hud-info">
+            <div class="wallet-display">Wallet: ₹<span id="walletAmount">400</span></div>
+            <div class="stars-display">⭐ Stars: <span id="starsCount">0</span></div>
+        </div>
+    </div>
+
+    <div class="market-container" id="marketContainer">
+        <!-- Shops will be dynamically generated here -->
+    </div>
+
+    <div class="payment-panel collapsed" id="paymentPanel">
+        <div class="payment-summary">
+            <div>Total Bill: ₹<span id="totalBill">0</span></div>
+            <div>You Paid: ₹<span id="amountPaid">0</span></div>
+        </div>
+        
+        <button class="pay-button" id="payButton" onclick="expandPayment()" disabled>Pay Now</button>
+
+        <div class="payment-details">
+            <div class="amount-status" id="amountStatus"></div>
+            <div class="payment-breakdown" id="paymentBreakdown"></div>
+            <div class="amount-display" id="amountDisplay">
+                Add up to the Total!
+            </div>
+            <div class="value-button-grid" id="valueButtonGrid">
+                <!-- Value buttons will be generated by JS -->
+            </div>
+        </div>
+    </div>
+
+    <div id="successModal" class="modal">
+        <div class="modal-content">
+            <h2>🎉 Purchase Successful! 🎉</h2>
+            <p id="modalMessage">You bought everything!</p>
+            <p>You earned <span id="starsEarned">1</span> ⭐ Star!</p>
+            <button class="play-again-btn" onclick="nextLevel()">Next Mission!</button>
+        </div>
+    </div>
+
+    <script>
+        // --- GAME STATE ---
+        const gameState = {
+            wallet: 400, // Wallet set to 400 as requested
+            stars: 0,
+            currentLevel: 0,
+            cart: [],
+            totalBill: 0,
+            amountPaid: 0,
+            paymentBreakdown: [], // Track individual payment amounts
+            showHints: false
+        };
+
+        const shopData = [
+            { 
+                name: "Toy Shop", 
+                sign: "🤖 The Magic Toy Shop 🧸", 
+                items: [
+                    { id: 't1', name: 'Toy Car', emoji: '🚗', price: 50 }, 
+                    { id: 't2', name: 'Doll', emoji: '🧸', price: 75 }, 
+                    { id: 't3', name: 'Kite', emoji: '🪁', price: 20 },
+                    { id: 't4', name: 'Puzzle', emoji: '🧩', price: 35 },
+                    { id: 't5', name: 'Robot', emoji: '🤖', price: 90 }
+                ] 
+            },
+            { 
+                name: "Sweet Shop", 
+                sign: "🍬 Mithai Magic Corner 🍭", 
+                items: [
+                    { id: 's1', name: 'Laddu', emoji: '🧡', price: 10 }, 
+                    { id: 's2', name: 'Jalebi', emoji: '🟠', price: 15 }, 
+                    { id: 's3', name: 'Barfi', emoji: '⬜', price: 12 },
+                    { id: 's4', name: 'Rasgulla', emoji: '⚪', price: 18 },
+                    { id: 's5', name: 'Gulab Jamun', emoji: '🟤', price: 22 }
+                ] 
+            },
+            { 
+                name: "Stationery Shop", 
+                sign: "📚 The Study Spot 📝", 
+                items: [
+                    { id: 'st1', name: 'Pencil Box', emoji: '✏️', price: 40 }, 
+                    { id: 'st2', name: 'Notebook', emoji: '📒', price: 25 }, 
+                    { id: 'st3', name: 'Colors', emoji: '🎨', price: 30 },
+                    { id: 'st4', name: 'Eraser', emoji: '🧼', price: 5 },
+                    { id: 'st5', name: 'Sharpener', emoji: '✂️', price: 8 }
+                ] 
+            },
+            { 
+                name: "Fruit Shop", 
+                sign: "🍎 Fresh Fruit Paradise 🍌", 
+                items: [
+                    { id: 'f1', name: 'Apple', emoji: '🍎', price: 15 }, 
+                    { id: 'f2', name: 'Banana', emoji: '🍌', price: 8 }, 
+                    { id: 'f3', name: 'Orange', emoji: '🍊', price: 12 },
+                    { id: 'f4', name: 'Mango', emoji: '🥭', price: 25 },
+                    { id: 'f5', name: 'Grapes', emoji: '🍇', price: 30 }
+                ] 
+            }
+        ];
+        
+        const missions = [
+            { 
+                list: ['t1'], 
+                description: "Buy the Toy Car for ₹50.",
+                stars: 1,
+                total: 50,
+                hints: [
+                    "50 = 50",
+                    "50 = 30 + 20",
+                    "50 = 20 + 20 + 10",
+                    "50 = 10 + 10 + 10 + 10 + 10"
+                ]
+            },
+            { 
+                list: ['s1', 's2'], 
+                description: "Buy Laddu and Jalebi for ₹25.",
+                stars: 1,
+                total: 25,
+                hints: [
+                    "25 = 20 + 5",
+                    "25 = 15 + 10",
+                    "25 = 10 + 10 + 5",
+                    "25 = 5 + 5 + 5 + 5 + 5"
+                ]
+            },
+            { 
+                list: ['st3', 't3'], 
+                description: "Buy Colors and a Kite for ₹50.",
+                stars: 1,
+                total: 50,
+                hints: [
+                    "50 = 50",
+                    "50 = 30 + 20",
+                    "50 = 20 + 20 + 10",
+                    "50 = 10 + 10 + 10 + 10 + 10"
+                ]
+            },
+            { 
+                list: ['s1', 'st2', 't3'], 
+                description: "Buy Laddu, a Notebook, and a Kite for ₹55.",
+                stars: 1,
+                total: 55,
+                hints: [
+                    "55 = 50 + 5",
+                    "55 = 30 + 25",
+                    "55 = 20 + 20 + 15",
+                    "55 = 15 + 15 + 15 + 10"
+                ]
+            },
+            { 
+                list: ['t2', 's4', 'st1'], 
+                description: "Buy a Doll, Rasgulla, and Pencil Box for ₹133.",
+                stars: 2,
+                total: 133,
+                hints: [
+                    "133 = 100 + 30 + 2 + 1",
+                    "133 = 50 + 50 + 30 + 2 + 1",
+                    "133 = 50 + 30 + 20 + 15 + 10 + 5 + 2 + 1",
+                    "133 = 100 + 20 + 10 + 2 + 1"
+                ]
+            },
+            { 
+                list: ['t5', 's3', 'st4', 'f2'], 
+                description: "Buy a Robot, Barfi, Eraser, and Banana for ₹127.",
+                stars: 2,
+                total: 127,
+                hints: [
+                    "127 = 100 + 20 + 5 + 2",
+                    "127 = 50 + 50 + 20 + 5 + 2",
+                    "127 = 50 + 30 + 20 + 15 + 10 + 2",
+                    "127 = 100 + 15 + 10 + 2"
+                ]
+            },
+            { 
+                list: ['t4', 's5', 'st5', 'f1', 'f3'], 
+                description: "Buy a Puzzle, Gulab Jamun, Sharpener, Apple, and Orange for ₹96.",
+                stars: 2,
+                total: 96,
+                hints: [
+                    "96 = 50 + 30 + 15 + 1",
+                    "96 = 50 + 20 + 15 + 10 + 1",
+                    "96 = 30 + 30 + 20 + 15 + 1",
+                    "96 = 50 + 20 + 20 + 5 + 1"
+                ]
+            },
+            { 
+                list: ['t1', 't3', 's2', 's4', 'st2', 'st3'], 
+                description: "Buy Toy Car, Kite, Jalebi, Rasgulla, Notebook, and Colors for ₹160.",
+                stars: 3,
+                total: 160,
+                hints: [
+                    "160 = 100 + 50 + 10",
+                    "160 = 50 + 50 + 30 + 20 + 10",
+                    "160 = 100 + 30 + 20 + 5 + 5",
+                    "160 = 50 + 50 + 30 + 15 + 10 + 5"
+                ]
+            },
+            { 
+                list: ['t2', 't5', 's1', 's3', 's5', 'st1', 'f4'], 
+                description: "Buy Doll, Robot, Laddu, Barfi, Gulab Jamun, Pencil Box, and Mango for ₹294.",
+                stars: 3,
+                total: 294,
+                hints: [
+                    "294 = 100 + 100 + 50 + 30 + 10 + 2 + 2",
+                    "294 = 100 + 100 + 50 + 20 + 15 + 5 + 2 + 2",
+                    "294 = 100 + 50 + 50 + 50 + 30 + 10 + 2 + 2",
+                    "294 = 100 + 100 + 50 + 20 + 20 + 2 + 2"
+                ]
+            },
+            { 
+                list: ['t1', 't4', 's2', 's4', 'st3', 'st5', 'f1', 'f3', 'f5'], 
+                description: "Buy Toy Car, Puzzle, Jalebi, Rasgulla, Colors, Sharpener, Apple, Orange, and Grapes for ₹195.",
+                stars: 3,
+                total: 195,
+                hints: [
+                    "195 = 100 + 50 + 30 + 15",
+                    "195 = 100 + 50 + 20 + 15 + 10",
+                    "195 = 50 + 50 + 50 + 30 + 15",
+                    "195 = 100 + 50 + 20 + 20 + 5"
+                ]
+            }
+        ];
+
+        // --- DOM ELEMENTS ---
+        const marketContainer = document.getElementById('marketContainer');
+        const paymentPanel = document.getElementById('paymentPanel');
+        const modal = document.getElementById('successModal');
+        const valueButtonGrid = document.getElementById('valueButtonGrid');
+        const amountDisplay = document.getElementById('amountDisplay');
+        const payButton = document.getElementById('payButton');
+        const paymentBreakdown = document.getElementById('paymentBreakdown');
+        const amountStatus = document.getElementById('amountStatus');
+
+        // --- INITIALIZATION ---
+        function init() {
+            renderMarket();
+            loadMission(gameState.currentLevel);
+            renderValueButtons();
+            updateHUD();
+        }
+
+        function renderMarket() {
+            marketContainer.innerHTML = '';
+            
+            // Add level indicator
+            const levelIndicator = document.createElement('div');
+            levelIndicator.className = 'level-indicator';
+            levelIndicator.textContent = `Level ${gameState.currentLevel + 1}`;
+            marketContainer.appendChild(levelIndicator);
+            
+            shopData.forEach(shop => {
+                const shopSection = document.createElement('div');
+                shopSection.className = 'shop-section';
+                shopSection.innerHTML = `
+                    <div class="shop-sign">${shop.sign}</div>
+                    <div class="items-grid">
+                        ${shop.items.map(item => `
+                            <div class="shop-item" data-item-id="${item.id}" data-price="${item.price}" data-name="${item.name}">
+                                <div class="item-emoji">${item.emoji}</div>
+                                <div class="item-name">${item.name}</div>
+                                <div class="item-price">₹${item.price}</div>
+                            </div>
+                        `).join('')}
+                    </div>
+                `;
+                marketContainer.appendChild(shopSection);
+            });
+            document.querySelectorAll('.shop-item').forEach(itemEl => {
+                itemEl.addEventListener('click', () => toggleCartItem(itemEl));
+            });
+        }
+
+        function loadMission(levelIndex) {
+            if (levelIndex >= missions.length) {
+                alert("Congratulations! You've completed all missions! You're a shopping master!");
+                gameState.currentLevel = 0; 
+                levelIndex = 0;
+            }
+            const mission = missions[levelIndex];
+            
+            // Create mission box if it doesn't exist
+            let missionBox = document.querySelector('.mission-box');
+            if (!missionBox) {
+                missionBox = document.createElement('div');
+                missionBox.className = 'mission-box';
+                marketContainer.appendChild(missionBox);
+            }
+            
+            // Move mission box to top
+            marketContainer.insertBefore(missionBox, marketContainer.firstChild);
+            
+            // Create payment hints HTML
+            const hintsHTML = gameState.showHints ? 
+                `<div class="payment-hints">
+                    <strong>Payment Hints:</strong><br>
+                    ${mission.hints.map(hint => `<div class="payment-hint">${hint}</div>`).join('')}
+                </div>` : '';
+            
+            missionBox.innerHTML = `
+                <strong>Mission ${levelIndex + 1}:</strong> ${mission.description}
+                <br><small>Reward: ${mission.stars} ⭐ ${mission.stars > 1 ? 'Stars' : 'Star'}</small>
+                ${hintsHTML}
+                <button class="hint-toggle" onclick="toggleHints()">
+                    ${gameState.showHints ? 'Hide' : 'Show'} Payment Hints
+                </button>
+            `;
+            gameState.cart = [];
+            document.querySelectorAll('.shop-item').forEach(el => el.classList.remove('in-cart'));
+            updateCart();
+            
+            // Update level indicator
+            document.querySelector('.level-indicator').textContent = `Level ${levelIndex + 1}`;
+        }
+        
+        function toggleHints() {
+            gameState.showHints = !gameState.showHints;
+            loadMission(gameState.currentLevel);
+        }
+        
+        function toggleCartItem(itemEl) {
+            const itemId = itemEl.dataset.itemId;
+            const price = parseInt(itemEl.dataset.price);
+            
+            // Check if user can afford the item
+            const potentialTotal = gameState.cart.reduce((sum, item) => sum + item.price, 0) + 
+                                 (gameState.cart.some(c => c.id === itemId) ? 0 : price);
+            
+            if (potentialTotal > gameState.wallet) {
+                alert(`You don't have enough money! You only have ₹${gameState.wallet} in your wallet.`);
+                return;
+            }
+            
+            if (gameState.cart.some(c => c.id === itemId)) {
+                gameState.cart = gameState.cart.filter(c => c.id !== itemId);
+                itemEl.classList.remove('in-cart');
+            } else {
+                gameState.cart.push({ id: itemId, price: price });
+                itemEl.classList.add('in-cart');
+            }
+            updateCart();
+        }
+
+        function updateCart() {
+            gameState.totalBill = gameState.cart.reduce((sum, item) => sum + item.price, 0);
+            document.getElementById('totalBill').textContent = gameState.totalBill;
+            
+            payButton.disabled = gameState.totalBill === 0;
+
+            if (paymentPanel.classList.contains('expanded')) {
+                collapsePayment();
+            }
+        }
+        
+        // --- PAYMENT LOGIC (ADDITIVE BUTTONS) ---
+        function expandPayment() {
+            paymentPanel.classList.remove('collapsed');
+            paymentPanel.classList.add('expanded');
+            payButton.textContent = 'Confirm Payment';
+            payButton.onclick = processPayment;
+            updatePaymentDisplay(); // To set the correct disabled state
+        }
+
+        function collapsePayment() {
+            paymentPanel.classList.remove('expanded');
+            paymentPanel.classList.add('collapsed');
+            payButton.textContent = 'Pay Now';
+            payButton.onclick = expandPayment;
+            clearPaymentInput();
+        }
+
+        function renderValueButtons() {
+            // Added more payment options as requested
+            const values = [1, 2, 5, 10, 15, 20, 30, 50, 100, 'Clear'];
+            valueButtonGrid.innerHTML = '';
+            values.forEach(value => {
+                const buttonEl = document.createElement('button');
+                buttonEl.className = 'value-button';
+                if (value === 'Clear') buttonEl.className += ' clear';
+                buttonEl.textContent = value === 'Clear' ? value : `+₹${value}`;
+                buttonEl.dataset.value = value;
+                buttonEl.onclick = () => handleValueClick(value);
+                valueButtonGrid.appendChild(buttonEl);
+            });
+        }
+
+        function handleValueClick(value) {
+            if (value === 'Clear') {
+                clearPaymentInput();
+            } else {
+                // Check if adding this amount would exceed the total bill
+                if (gameState.amountPaid + value > gameState.totalBill) {
+                    alert(`Adding ₹${value} would exceed your total bill of ₹${gameState.totalBill}.`);
+                    return;
+                }
+                
+                // Add the value to payment breakdown
+                gameState.paymentBreakdown.push(value);
+                gameState.amountPaid += value;
+            }
+            updatePaymentDisplay();
+        }
+
+        function updatePaymentDisplay() {
+            amountDisplay.textContent = `You Paid: ₹${gameState.amountPaid}`;
+            document.getElementById('amountPaid').textContent = gameState.amountPaid;
+
+            // Update payment breakdown display
+            paymentBreakdown.innerHTML = '';
+            gameState.paymentBreakdown.forEach((amount, index) => {
+                const breakdownItem = document.createElement('div');
+                breakdownItem.className = 'payment-breakdown-item';
+                breakdownItem.innerHTML = `
+                    ₹${amount}
+                    <button class="remove-btn" onclick="removePaymentAmount(${index})">×</button>
+                `;
+                paymentBreakdown.appendChild(breakdownItem);
+            });
+
+            // Update status message
+            if (gameState.amountPaid === gameState.totalBill) {
+                amountStatus.textContent = "Perfect! You've paid the exact amount!";
+                amountStatus.className = 'amount-status valid';
+            } else if (gameState.amountPaid > gameState.totalBill) {
+                amountStatus.textContent = `You've paid ₹${gameState.amountPaid - gameState.totalBill} too much!`;
+                amountStatus.className = 'amount-status invalid';
+            } else {
+                amountStatus.textContent = `You need ₹${gameState.totalBill - gameState.amountPaid} more!`;
+                amountStatus.className = 'amount-status';
+            }
+
+            if (paymentPanel.classList.contains('expanded')) {
+                payButton.disabled = (gameState.amountPaid !== gameState.totalBill);
+            }
+        }
+
+        function removePaymentAmount(index) {
+            const amount = gameState.paymentBreakdown[index];
+            gameState.paymentBreakdown.splice(index, 1);
+            gameState.amountPaid -= amount;
+            updatePaymentDisplay();
+        }
+
+        function clearPaymentInput() {
+            gameState.amountPaid = 0;
+            gameState.paymentBreakdown = [];
+            updatePaymentDisplay();
+        }
+
+        function processPayment() {
+            if (gameState.amountPaid !== gameState.totalBill) return;
+
+            // Check if the user bought exactly what was required for the mission
+            const mission = missions[gameState.currentLevel];
+            const missionItems = mission.list;
+            const cartItems = gameState.cart.map(item => item.id);
+            
+            const hasAllItems = missionItems.every(item => cartItems.includes(item));
+            const hasExtraItems = cartItems.length > missionItems.length;
+            
+            if (!hasAllItems || hasExtraItems) {
+                alert(`Mission ${gameState.currentLevel + 1} requires exactly: ${missionItems.map(id => {
+                    // Find the item name from all shops
+                    for (const shop of shopData) {
+                        const item = shop.items.find(i => i.id === id);
+                        if (item) return item.name;
+                    }
+                    return id;
+                }).join(', ')}. Please select exactly these items.`);
+                return;
+            }
+
+            gameState.wallet -= gameState.totalBill;
+            gameState.stars += mission.stars;
+            
+            modal.style.display = 'flex';
+            document.getElementById('modalMessage').textContent = `You paid ₹${gameState.amountPaid} and completed Mission ${gameState.currentLevel + 1}!`;
+            document.getElementById('starsEarned').textContent = mission.stars;
+            updateHUD();
+        }
+
+        function nextLevel() {
+            modal.style.display = 'none';
+            gameState.currentLevel++;
+            collapsePayment();
+            loadMission(gameState.currentLevel);
+        }
+
+        function updateHUD() {
+            document.getElementById('walletAmount').textContent = gameState.wallet;
+            document.getElementById('starsCount').textContent = gameState.stars;
+        }
+
+        // --- START THE GAME ---
+        init();
+
+    </script>
+</body>
+</html>
