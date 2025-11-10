@@ -1,0 +1,605 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Mani's Magical Money Market!</title>
+    <style>
+        /* --- Basic Setup & Fonts --- */
+        @import url('https://fonts.googleapis.com/css2?family=Fredoka:wght@400;600;700&display=swap');
+
+        body {
+            font-family: 'Fredoka', sans-serif;
+            background: linear-gradient(135deg, #ffecd2 0%, #fcb69f 100%);
+            margin: 0;
+            padding: 20px;
+            display: flex;
+            justify-content: center;
+            align-items: flex-start;
+            min-height: 100vh;
+            overflow-x: hidden;
+        }
+
+        /* --- Main Game Container --- */
+        #game-container {
+            width: 90%;
+            max-width: 800px;
+            background-color: #ffffff;
+            border-radius: 25px;
+            box-shadow: 0 15px 35px rgba(0, 0, 0, 0.2);
+            padding: 30px;
+            text-align: center;
+            position: relative;
+            overflow: hidden;
+            margin-bottom: 40px;
+        }
+
+        /* --- Animated Background Shapes --- */
+        .bg-shape {
+            position: absolute;
+            border-radius: 50%;
+            opacity: 0.1;
+            animation: float 20s infinite ease-in-out;
+            z-index: 0;
+        }
+        .shape1 { width: 150px; height: 150px; background: #ff6b6b; top: -50px; left: -50px; animation-delay: 0s; }
+        .shape2 { width: 200px; height: 200px; background: #4ecdc4; bottom: -70px; right: -70px; animation-delay: 5s; }
+        .shape3 { width: 100px; height: 100px; background: #ffe66d; top: 50%; left: 10%; animation-delay: 10s; }
+
+        @keyframes float {
+            0%, 100% { transform: translateY(0) rotate(0deg); }
+            33% { transform: translateY(-20px) rotate(120deg); }
+            66% { transform: translateY(20px) rotate(240deg); }
+        }
+
+        /* --- Game Sections --- */
+        .screen {
+            position: relative;
+            z-index: 1;
+            display: none; /* All screens are hidden by default */
+        }
+        .screen.active { display: block; } /* Only the active screen is shown */
+
+        h1 {
+            color: #ff6b6b;
+            font-size: 2.5em;
+            margin-bottom: 10px;
+            text-shadow: 2px 2px 0px #ffe66d;
+        }
+
+        h2 {
+            color: #4ecdc4;
+            font-size: 2em;
+        }
+        
+        h3 { /* New style for level select */
+            color: #f9a825;
+            font-size: 1.8em;
+            margin-top: 20px;
+        }
+
+        .character {
+            font-size: 4em;
+            margin: 20px 0;
+            animation: bounce 2s infinite;
+        }
+
+        @keyframes bounce {
+            0%, 20%, 50%, 80%, 100% { transform: translateY(0); }
+            40% { transform: translateY(-20px); }
+            60% { transform: translateY(-10px); }
+        }
+
+        /* --- Buttons --- */
+        .btn {
+            background-color: #ffe66d;
+            color: #333;
+            border: none;
+            padding: 15px 30px;
+            font-size: 1.2em;
+            font-family: 'Fredoka', sans-serif;
+            font-weight: 600;
+            border-radius: 50px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+            margin: 10px;
+        }
+
+        .btn:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 6px 15px rgba(0,0,0,0.2);
+            background-color: #ffd93d;
+        }
+
+        .btn:disabled {
+            background-color: #cccccc;
+            cursor: not-allowed;
+            transform: none;
+        }
+
+        /* --- Game Area --- */
+        #customer-area {
+            margin: 20px 0;
+            padding: 20px;
+            background-color: #f0f8ff;
+            border-radius: 15px;
+            min-height: 150px;
+        }
+
+        #customer-emoji {
+            font-size: 5em;
+        }
+
+        #speech-bubble {
+            background: white;
+            border-radius: 20px;
+            padding: 15px;
+            margin-top: 10px;
+            display: inline-block;
+            position: relative;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+        }
+        #speech-bubble:before {
+            content: '';
+            position: absolute;
+            top: -10px;
+            left: 50%;
+            transform: translateX(-50%);
+            border-left: 10px solid transparent;
+            border-right: 10px solid transparent;
+            border-bottom: 10px solid white;
+        }
+
+        /* --- Money Options --- */
+        #money-options {
+            display: flex;
+            justify-content: center;
+            flex-wrap: wrap;
+            gap: 15px;
+            margin: 20px 0;
+        }
+
+        .money-option {
+            background: #e0f7fa;
+            border: 3px solid #4ecdc4;
+            border-radius: 50%;
+            width: 100px;
+            height: 100px;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            text-align: center;
+            font-size: 1.2em;
+            font-weight: 600;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            position: relative;
+        }
+
+        .money-option:hover {
+            transform: scale(1.05);
+            background: #b2ebf2;
+        }
+
+        .money-option.selected {
+            background: #ffe66d;
+            border-color: #f9a825;
+            transform: scale(1.1);
+        }
+
+        .money-option .coin-emoji {
+            font-size: 2em;
+        }
+        
+        .money-option .coin-value {
+            position: absolute;
+            bottom: 5px;
+            right: 10px;
+            background: #333;
+            color: #ffe66d;
+            font-size: 0.9em;
+            padding: 2px 6px;
+            border-radius: 10px;
+            font-weight: 700;
+        }
+        
+        .question-coin {
+            display: inline-flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            width: 80px;
+            height: 80px;
+            background: #e0f7fa;
+            border: 3px solid #4ecdc4;
+            border-radius: 50%;
+            position: relative;
+            vertical-align: middle;
+        }
+        .question-coin .coin-emoji {
+            font-size: 1.8em;
+        }
+        .question-coin .coin-value {
+            position: absolute;
+            bottom: 4px;
+            right: 8px;
+            background: #333;
+            color: #ffe66d;
+            font-size: 0.8em;
+            padding: 2px 5px;
+            border-radius: 10px;
+            font-weight: 700;
+        }
+
+        /* --- Feedback Messages --- */
+        #feedback {
+            margin-top: 20px;
+            font-size: 1.3em;
+            font-weight: 600;
+            min-height: 40px;
+        }
+
+        .success { color: #2e7d32; }
+        .error { color: #c62828; }
+
+        /* --- Stars Reward --- */
+        .star {
+            display: inline-block;
+            color: #ffd700;
+            font-size: 2em;
+            animation: starPop 0.5s ease-out;
+        }
+
+        @keyframes starPop {
+            0% { transform: scale(0) rotate(0deg); opacity: 0; }
+            50% { transform: scale(1.2) rotate(180deg); }
+            100% { transform: scale(1) rotate(360deg); opacity: 1; }
+        }
+    </style>
+</head>
+<body>
+
+    <div id="game-container">
+        <!-- Animated Background Shapes -->
+        <div class="bg-shape shape1"></div>
+        <div class="bg-shape shape2"></div>
+        <div class="bg-shape shape3"></div>
+
+        <!-- Welcome / Level Select Screen -->
+        <div id="welcome-screen" class="screen active">
+            <h1>Mani's Magical Money Market!</h1>
+            <div class="character">🧙‍♂️</div>
+            <h2>Hi! I'm Mani the Money Magician!</h2>
+            <p>Choose a level to start learning!</p>
+            
+            <h3>Easy Level</h3>
+            <p>Learn to identify coins and make simple payments.</p>
+            <button class="btn" onclick="startLevel('easy')">Start Easy Level</button>
+            
+            <h3>Medium Level</h3>
+            <p>Challenge yourself! You must use exactly TWO coins for every answer!</p>
+            <button class="btn" onclick="startLevel('medium')">Start Medium Level</button>
+        </div>
+
+        <!-- Main Game Screen -->
+        <div id="game-screen" class="screen">
+            <h1 id="level-title">Mani's Magical Money Market!</h1>
+            
+            <div id="customer-area">
+                <div id="customer-emoji"></div>
+                <div id="speech-bubble"></div>
+            </div>
+
+            <h2 id="instruction-text"></h2>
+
+            <div id="money-options"></div>
+
+            <button class="btn" id="pay-button" onclick="checkAnswer()" style="display: none;">Pay Now!</button>
+
+            <div id="feedback"></div>
+        </div>
+
+        <!-- End Screen -->
+        <div id="end-screen" class="screen">
+            <h1>Level Complete!</h1>
+            <div class="character">🧙‍♂️</div>
+            <h2>You're a true Money Magician!</h2>
+            <p>You earned <span id="final-stars"></span> stars!</p>
+            <button class="btn" onclick="goToLevelSelect()">Choose Another Level</button>
+            <button class="btn" onclick="location.reload()">Play Again</button>
+        </div>
+    </div>
+
+    <script>
+        // --- Game Data ---
+        const COINS = {
+            1: { name: "One Rupee", emoji: "🪙" },
+            2: { name: "Two Rupees", emoji: "🪙" },
+            5: { name: "Five Rupees", emoji: "🪙" },
+            10: { name: "Ten Rupees", emoji: "🪙" },
+            20: { name: "Twenty Rupees", emoji: "🪙" },
+            50: { name: "Fifty Rupees", emoji: "🪙" },
+            100: { name: "One Hundred Rupees", emoji: "🪙" },
+        };
+
+        const CUSTOMERS = [
+            { name: "Golu the Monkey", emoji: "🐵", item: "Banana", itemEmoji: "🍌" },
+            { name: "Meenu the Elephant", emoji: "🐘", item: "Lollipop", itemEmoji: "🍭" },
+            { name: "Piku the Parrot", emoji: "🦜", item: "Balloon", itemEmoji: "🎈" },
+            { name: "Bunty the Rabbit", emoji: "🐰", item: "Carrot", itemEmoji: "🥕" },
+        ];
+
+        // --- Game State ---
+        let currentLevel = 'easy';
+        let stars = 0;
+        let currentCustomer = null;
+        let currentPrice = 0;
+        let correctAnswer = [];
+        let playerSelection = [];
+        let questionType = '';
+
+        // --- DOM Elements ---
+        const screens = document.querySelectorAll('.screen');
+        const welcomeScreen = document.getElementById('welcome-screen');
+        const gameScreen = document.getElementById('game-screen');
+        const endScreen = document.getElementById('end-screen');
+        const levelTitle = document.getElementById('level-title');
+        const customerEmoji = document.getElementById('customer-emoji');
+        const speechBubble = document.getElementById('speech-bubble');
+        const instructionText = document.getElementById('instruction-text');
+        const moneyOptionsDiv = document.getElementById('money-options');
+        const feedbackDiv = document.getElementById('feedback');
+        const payButton = document.getElementById('pay-button');
+
+        // --- Screen Management ---
+        function showScreen(screenId) {
+            screens.forEach(screen => screen.classList.remove('active'));
+            document.getElementById(screenId).classList.add('active');
+        }
+
+        function goToLevelSelect() {
+            stars = 0; // Reset stars for a new level
+            showScreen('welcome-screen');
+        }
+
+        // --- Game Logic Functions ---
+
+        function startLevel(level) {
+            currentLevel = level;
+            stars = 0;
+            showScreen('game-screen');
+            levelTitle.textContent = `${level.charAt(0).toUpperCase() + level.slice(1)} Level`;
+            setupRound();
+        }
+
+        function setupRound() {
+            clearFeedback();
+            playerSelection = [];
+            payButton.style.display = 'none';
+            
+            currentCustomer = CUSTOMERS[Math.floor(Math.random() * CUSTOMERS.length)];
+            customerEmoji.textContent = currentCustomer.emoji;
+            
+            if (currentLevel === 'easy') {
+                if (stars < 2) questionType = 'identify';
+                else if (stars < 5) questionType = 'simple_payment';
+                else questionType = 'combination';
+            } else { // Medium Level
+                // All questions in medium are now two-coin challenges
+                if (stars < 3) questionType = 'two_coin_payment';
+                else if (stars < 6) questionType = 'two_coin_change';
+                else questionType = 'two_coin_payment_hard';
+            }
+            
+            switch(questionType) {
+                case 'identify':
+                    setupIdentify();
+                    break;
+                case 'simple_payment':
+                    setupSimplePayment(false);
+                    break;
+                case 'combination':
+                    setupCombination(false);
+                    break;
+                case 'two_coin_payment':
+                    setupTwoCoinChallenge(false); // false = smaller values
+                    break;
+                case 'two_coin_change':
+                    setupTwoCoinChallenge(true); // true = change problem
+                    break;
+                case 'two_coin_payment_hard':
+                    setupTwoCoinChallenge(false, true); // true = larger values
+                    break;
+            }
+        }
+
+        function setupIdentify() {
+            const coinValues = Object.keys(COINS).map(Number);
+            const correctCoin = coinValues[Math.floor(Math.random() * coinValues.length)];
+            correctAnswer = [correctCoin];
+            
+            const questionCoinHTML = `
+                <div class="question-coin">
+                    <span class="coin-emoji">${COINS[correctCoin].emoji}</span>
+                    <span class="coin-value">${correctCoin}</span>
+                </div>
+            `;
+            speechBubble.innerHTML = `Which coin is this? <br> ${questionCoinHTML}`;
+            instructionText.textContent = "Can you find the matching coin?";
+            
+            displayMoneyOptions(coinValues, false);
+        }
+
+        function setupSimplePayment(useLargeValues) {
+            const prices = useLargeValues ? [10, 20, 50, 100] : [1, 2, 5, 10];
+            currentPrice = prices[Math.floor(Math.random() * prices.length)];
+            correctAnswer = [currentPrice];
+            
+            speechBubble.innerHTML = `I want to buy a ${currentCustomer.itemEmoji} ${currentCustomer.item}! <br> It costs <strong>${currentPrice} Rupees</strong>.`;
+            instructionText.textContent = "Which single coin or note can we use?";
+            
+            displayMoneyOptions(prices, false);
+        }
+        
+        function setupCombination(useLargerCoins) {
+            const maxPrice = useLargerCoins ? 40 : 15;
+            const availableCoins = useLargerCoins ? [1, 2, 5, 10, 20] : [1, 2, 5];
+            currentPrice = Math.floor(Math.random() * (maxPrice - 5)) + 6;
+            correctAnswer = findCombination(currentPrice, availableCoins);
+            
+            speechBubble.innerHTML = `I want to buy a ${currentCustomer.itemEmoji} ${currentCustomer.item}! <br> It costs <strong>${currentPrice} Rupees</strong>.`;
+            instructionText.textContent = `We need to make ${currentPrice} Rupees. Click the coins to add them up!`;
+            
+            displayMoneyOptions(availableCoins, true);
+        }
+        
+        // --- NEW: The Two-Coin Challenge Logic ---
+        function setupTwoCoinChallenge(isChange, useLargeValues = false) {
+            const availableCoins = useLargeValues ? [10, 20, 50, 100] : [1, 2, 5, 10, 20];
+            
+            let targetSum;
+            if (isChange) {
+                const playerMoney = availableCoins[Math.floor(Math.random() * availableCoins.length)];
+                const itemPrice = [1, 2, 5, 10].filter(p => p < playerMoney - 1)[Math.floor(Math.random() * [1, 2, 5, 10].filter(p => p < playerMoney - 1).length)];
+                targetSum = playerMoney - itemPrice;
+                speechBubble.innerHTML = `I'll buy the ${currentCustomer.itemEmoji} ${currentCustomer.item} with this ${playerMoney} Rupee note! <br> It costs <strong>${itemPrice} Rupees</strong>.`;
+                instructionText.textContent = `How much change should we give back? (Use exactly TWO coins!)`;
+            } else {
+                // Generate a price that is the sum of two random coins
+                let coin1 = availableCoins[Math.floor(Math.random() * availableCoins.length)];
+                let coin2 = availableCoins[Math.floor(Math.random() * availableCoins.length)];
+                targetSum = coin1 + coin2;
+                speechBubble.innerHTML = `I want to buy a ${currentCustomer.itemEmoji} ${currentCustomer.item}! <br> It costs <strong>${targetSum} Rupees</strong>.`;
+                instructionText.textContent = `You must use exactly TWO coins to pay!`;
+            }
+            
+            currentPrice = targetSum;
+            correctAnswer = findTwoCoinCombination(targetSum, availableCoins);
+            displayMoneyOptions(availableCoins, true); // Allow multiple selection
+        }
+
+        function findTwoCoinCombination(target, availableCoins) {
+            for (let i = 0; i < availableCoins.length; i++) {
+                for (let j = i; j < availableCoins.length; j++) { // j=i to allow using the same coin twice (e.g., 10+10)
+                    if (availableCoins[i] + availableCoins[j] === target) {
+                        return [availableCoins[i], availableCoins[j]];
+                    }
+                }
+            }
+            // Fallback if no combination is found (should not happen with our logic)
+            return [target, 0]; 
+        }
+
+        function displayMoneyOptions(values, allowMultiple) {
+            moneyOptionsDiv.innerHTML = '';
+            values.forEach(value => {
+                const optionDiv = document.createElement('div');
+                optionDiv.className = 'money-option';
+                optionDiv.dataset.value = value;
+                optionDiv.innerHTML = `
+                    <span class="coin-emoji">${COINS[value].emoji}</span>
+                    <span class="coin-value">${value}</span>
+                `;
+                optionDiv.onclick = () => selectMoney(value, allowMultiple);
+                moneyOptionsDiv.appendChild(optionDiv);
+            });
+        }
+
+        function selectMoney(value, allowMultiple) {
+            if (!allowMultiple) {
+                document.querySelectorAll('.money-option').forEach(opt => opt.classList.remove('selected'));
+                event.target.closest('.money-option').classList.add('selected');
+                playerSelection = [value];
+                payButton.style.display = 'inline-block';
+            } else {
+                const option = event.target.closest('.money-option');
+                // For medium level, enforce a two-coin selection
+                if (currentLevel === 'medium') {
+                    if (playerSelection.includes(value)) {
+                        playerSelection = playerSelection.filter(v => v !== value);
+                        option.classList.remove('selected');
+                    } else {
+                        if (playerSelection.length >= 2) {
+                            // If already 2 are selected, remove the first one before adding the new one
+                            const firstValue = playerSelection.shift();
+                            document.querySelector(`.money-option[data-value="${firstValue}"]`).classList.remove('selected');
+                        }
+                        playerSelection.push(value);
+                        option.classList.add('selected');
+                    }
+                } else { // Easy level logic
+                    if (playerSelection.includes(value)) {
+                        playerSelection = playerSelection.filter(v => v !== value);
+                        option.classList.remove('selected');
+                    } else {
+                        playerSelection.push(value);
+                        option.classList.add('selected');
+                    }
+                }
+                
+                const total = playerSelection.reduce((sum, val) => sum + val, 0);
+                const target = questionType.includes('change') ? (currentPrice) : currentPrice; // In this new logic, currentPrice IS the target sum
+                instructionText.textContent = `You need ${target} Rupees. Your selection is ${total} Rupees.`;
+                
+                if (playerSelection.length === 2 && total === target) {
+                    payButton.style.display = 'inline-block';
+                } else {
+                    payButton.style.display = 'none';
+                }
+            }
+        }
+
+        function checkAnswer() {
+            const playerTotal = playerSelection.reduce((sum, val) => sum + val, 0);
+            const correctTotal = correctAnswer.reduce((sum, val) => sum + val, 0);
+
+            if (playerTotal === correctTotal && playerSelection.length === correctAnswer.length) {
+                showFeedback(true);
+                stars++;
+                if (stars >= 7) {
+                    setTimeout(() => {
+                        document.getElementById('final-stars').textContent = stars;
+                        showScreen('end-screen');
+                    }, 2000);
+                } else {
+                    setTimeout(setupRound, 2500);
+                }
+            } else {
+                showFeedback(false);
+                 setTimeout(() => {
+                    playerSelection = [];
+                    document.querySelectorAll('.money-option.selected').forEach(opt => opt.classList.remove('selected'));
+                    instructionText.textContent = `You need ${currentPrice} Rupees. Your selection is 0 Rupees.`;
+                    payButton.style.display = 'none';
+                }, 2000);
+            }
+        }
+
+        function showFeedback(isCorrect) {
+            feedbackDiv.innerHTML = '';
+            if (isCorrect) {
+                feedbackDiv.className = 'success';
+                feedbackDiv.innerHTML = `🎉 That's brilliant! ${currentCustomer.emoji} is so happy! 🌟`;
+                addStarAnimation();
+            } else {
+                feedbackDiv.className = 'error';
+                feedbackDiv.innerHTML = `🤔 Oops! That's not quite right. Remember, you must use exactly two coins!`;
+            }
+        }
+
+        function clearFeedback() {
+            feedbackDiv.className = '';
+            feedbackDiv.innerHTML = '';
+        }
+        
+        function addStarAnimation() {
+            const star = document.createElement('span');
+            star.className = 'star';
+            star.textContent = '⭐';
+            feedbackDiv.appendChild(star);
+        }
+    </script>
+</body>
+</html>
