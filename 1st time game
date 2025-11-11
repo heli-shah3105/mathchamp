@@ -1,0 +1,909 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Poppy's Time-Topping Adventure!</title>
+    <style>
+        /* --- CSS for Fun, Colorful, Animated Style --- */
+        @import url('https://fonts.googleapis.com/css2?family=Fredoka:wght@400;600;700&display=swap');
+
+        :root {
+            --poppy-pink: #FFB6C1;
+            --tick-blue: #3498db;
+            --tock-red: #e74c3c;
+            --clock-gold: #FFD700;
+            --bg-purple-1: #667eea;
+            --bg-purple-2: #764ba2;
+            --hint-color: #FF9800;
+            --level4-color: #9C27B0;
+        }
+
+        body {
+            font-family: 'Fredoka', sans-serif;
+            background: linear-gradient(135deg, var(--bg-purple-1) 0%, var(--bg-purple-2) 100%);
+            display: flex;
+            justify-content: center;
+            align-items: flex-start;
+            min-height: 100vh;
+            margin: 0;
+            overflow: auto;
+            color: #fff;
+            padding-top: 20px;
+        }
+
+        .screen {
+            display: none;
+            flex-direction: column;
+            align-items: center;
+            width: 100%;
+            max-width: 900px;
+            padding: 20px;
+            box-sizing: border-box;
+        }
+        .screen.active {
+            display: flex;
+        }
+
+        /* Start Screen */
+        #start-screen h1 {
+            font-size: 4em;
+            text-shadow: 3px 3px 6px rgba(0,0,0,0.3);
+            animation: float 3s ease-in-out infinite;
+        }
+        @keyframes float {
+            0%, 100% { transform: translateY(0px); }
+            50% { transform: translateY(-10px); }
+        }
+        #start-button {
+            margin-top: 30px;
+            padding: 20px 50px;
+            font-size: 2em;
+            font-weight: 700;
+            color: #fff;
+            background: linear-gradient(45deg, #f093fb 0%, #f5576c 100%);
+            border: none;
+            border-radius: 50px;
+            cursor: pointer;
+            box-shadow: 0 4px 15px rgba(245, 87, 108, 0.4);
+            transition: transform 0.2s;
+        }
+        #start-button:hover { transform: scale(1.05); }
+
+        /* Game Screen */
+        #game-screen {
+            flex-direction: column;
+        }
+        #game-header {
+            display: flex;
+            justify-content: space-between;
+            width: 100%;
+            align-items: center;
+            margin-bottom: 20px;
+            background: rgba(255, 255, 255, 0.1);
+            padding: 10px 20px;
+            border-radius: 20px;
+        }
+        #level-indicator {
+            font-size: 1.5em;
+            font-weight: 600;
+        }
+        .level-4 {
+            color: var(--level4-color);
+            text-shadow: 0 0 10px rgba(156, 39, 176, 0.5);
+            animation: glow 2s infinite alternate;
+        }
+        @keyframes glow {
+            from { text-shadow: 0 0 5px rgba(156, 39, 176, 0.5); }
+            to { text-shadow: 0 0 15px rgba(156, 39, 176, 0.8); }
+        }
+        #crystal-counter {
+            display: flex;
+            align-items: center;
+            font-size: 1.2em;
+            font-weight: 600;
+        }
+        .crystal {
+            width: 30px;
+            height: 30px;
+            background: linear-gradient(45deg, #f093fb 0%, #f5576c 100%);
+            margin-right: 10px;
+            clip-path: polygon(50% 0%, 100% 38%, 82% 100%, 18% 100%, 0% 38%);
+            animation: sparkle 2s infinite;
+        }
+        @keyframes sparkle { 
+            0%, 100% { transform: scale(1) rotate(0deg); } 
+            50% { transform: scale(1.1) rotate(180deg); } 
+        }
+
+        #challenge-display {
+            font-size: 2em;
+            font-weight: 700;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.3);
+            text-align: center;
+            height: 50px;
+            margin-bottom: 20px;
+        }
+        .level-4-challenge {
+            color: var(--level4-color);
+            text-shadow: 0 0 10px rgba(156, 39, 176, 0.5);
+        }
+
+        #hint-display {
+            font-size: 1.2em;
+            font-weight: 600;
+            text-align: center;
+            height: 30px;
+            margin-bottom: 10px;
+            color: var(--hint-color);
+            text-shadow: 1px 1px 2px rgba(0,0,0,0.3);
+            transition: opacity 0.3s;
+        }
+
+        #game-area {
+            display: flex;
+            justify-content: space-around;
+            align-items: center;
+            width: 100%;
+            flex-grow: 1;
+        }
+        
+        /* Poppy Character */
+        #poppy {
+            width: 150px;
+            height: 150px;
+            background: var(--poppy-pink);
+            border-radius: 50%;
+            position: relative;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.2);
+            animation: bounce 2s infinite;
+        }
+        #poppy::before, #poppy::after { 
+            content: ''; 
+            position: absolute; 
+            width: 20px; 
+            height: 20px; 
+            background: #333; 
+            border-radius: 50%; 
+            top: 50px; 
+        }
+        #poppy::before { left: 40px; }
+        #poppy::after { right: 40px; }
+        #poppy-mouth { 
+            position: absolute; 
+            width: 60px; 
+            height: 30px; 
+            border-bottom: 5px solid #333; 
+            border-radius: 0 0 60px 60px; 
+            bottom: 40px; 
+        }
+        #poppy-hat { 
+            position: absolute; 
+            width: 0; 
+            height: 0; 
+            border-left: 50px solid transparent; 
+            border-right: 50px solid transparent; 
+            border-bottom: 70px solid #fff; 
+            top: -60px; 
+        }
+        @keyframes bounce { 
+            0%, 100% { transform: translateY(0); } 
+            50% { transform: translateY(-20px); } 
+        }
+
+        /* Clock */
+        #clock-wrapper { 
+            position: relative; 
+            width: 350px; 
+            height: 350px; 
+            user-select: none; 
+            -webkit-user-select: none; 
+        }
+        #clock-face {
+            width: 100%; 
+            height: 100%;
+            background: #f0f8ff;
+            border-radius: 50%;
+            border: 15px solid var(--clock-gold);
+            position: relative;
+            box-shadow: 0 0 30px rgba(255, 215, 0, 0.5);
+        }
+        .clock-face-level-4 {
+            border-color: var(--level4-color);
+            box-shadow: 0 0 30px rgba(156, 39, 176, 0.5);
+        }
+        .clock-number { 
+            position: absolute; 
+            font-size: 2em; 
+            font-weight: 700; 
+            color: #333; 
+            text-shadow: 1px 1px 2px #fff; 
+        }
+        .clock-number.twelve { top: 10px; left: 50%; transform: translateX(-50%); }
+        .clock-number.three { right: 10px; top: 50%; transform: translateY(-50%); }
+        .clock-number.six { bottom: 10px; left: 50%; transform: translateX(-50%); }
+        .clock-number.nine { left: 10px; top: 50%; transform: translateY(-50%); }
+        
+        /* Minute marks */
+        .minute-mark {
+            position: absolute;
+            width: 4px;
+            height: 4px;
+            background: #ccc;
+            border-radius: 50%;
+            top: 5px;
+            left: 50%;
+            transform-origin: center 170px;
+        }
+        .minute-mark.five-minute { background: #999; width: 6px; height: 6px; }
+
+        .hand {
+            position: absolute;
+            transform-origin: center bottom;
+            bottom: 50%;
+            left: 50%;
+            border-radius: 10px;
+            cursor: grab;
+            z-index: 2;
+            transition: transform 0.1s;
+        }
+        .hand:active { cursor: grabbing; }
+        #hour-hand { 
+            width: 12px; 
+            height: 80px; 
+            background: var(--tock-red); 
+            margin-left: -6px; 
+            z-index: 2; 
+            transform-origin: 50% 90%;
+        }
+        #minute-hand { 
+            width: 8px; 
+            height: 110px; 
+            background: var(--tick-blue); 
+            margin-left: -4px; 
+            z-index: 3; 
+            transform-origin: 50% 90%;
+        }
+        #center-dot { 
+            position: absolute; 
+            width: 20px; 
+            height: 20px; 
+            background: #333; 
+            border-radius: 50%; 
+            top: 50%; 
+            left: 50%; 
+            transform: translate(-50%, -50%); 
+            z-index: 10; 
+        }
+
+        /* Sundae Machine */
+        #sundae-machine {
+            width: 150px; 
+            height: 250px;
+            background: #ecf0f1;
+            border-radius: 20px;
+            position: relative;
+            display: flex; 
+            flex-direction: column; 
+            align-items: center; 
+            justify-content: flex-end;
+            overflow: hidden;
+            border: 5px solid #34495e;
+        }
+        #sundae-bowl {
+            width: 120px; 
+            height: 80px;
+            background: linear-gradient(to bottom, #e74c3c, #c0392b);
+            border-radius: 0 0 60px 60px;
+            position: relative;
+            margin-bottom: 10px;
+        }
+        .sundae-layer { 
+            position: absolute; 
+            width: 100%; 
+            border-radius: 50%; 
+            left: 0; 
+        }
+        .scoop-vanilla { background: #FFF8DC; height: 30px; bottom: 60px; }
+        .scoop-chocolate { background: #6F4E37; height: 30px; bottom: 90px; }
+        .sprinkles { 
+            background: repeating-linear-gradient(45deg, #ff0000, #ff0000 5px, #00ff00 5px, #00ff00 10px, #0000ff 10px, #0000ff 15px); 
+            height: 10px; 
+            bottom: 120px; 
+        }
+        .cherry { 
+            background: #dc143c; 
+            width: 30px; 
+            height: 30px; 
+            border-radius: 50%; 
+            bottom: 130px; 
+            left: 50%; 
+            transform: translateX(-50%); 
+        }
+        .whipped-cream {
+            background: #ffffff;
+            height: 20px;
+            bottom: 150px;
+            border-radius: 50% 50% 0 0;
+        }
+
+        #controls { 
+            margin-top: 20px; 
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+        #challenge-button {
+            padding: 15px 40px; 
+            font-size: 1.5em; 
+            font-weight: 700;
+            color: #fff; 
+            background: linear-gradient(45deg, #f093fb 0%, #f5576c 100%);
+            border: none; 
+            border-radius: 50px; 
+            cursor: pointer;
+            box-shadow: 0 4px 15px rgba(245, 87, 108, 0.4);
+            transition: transform 0.2s;
+            animation: pulse 2s infinite;
+        }
+        .level-4-button {
+            background: linear-gradient(45deg, var(--level4-color), #E91E63);
+            box-shadow: 0 4px 15px rgba(156, 39, 176, 0.4);
+            animation: pulse-level4 2s infinite;
+        }
+        @keyframes pulse-level4 { 
+            0% { box-shadow: 0 4px 15px rgba(156, 39, 176, 0.4); } 
+            50% { box-shadow: 0 4px 25px rgba(156, 39, 176, 0.8); } 
+            100% { box-shadow: 0 4px 15px rgba(156, 39, 176, 0.4); } 
+        }
+        #challenge-button:hover { transform: translateY(-3px); }
+        @keyframes pulse { 
+            0% { box-shadow: 0 4px 15px rgba(245, 87, 108, 0.4); } 
+            50% { box-shadow: 0 4px 25px rgba(245, 87, 108, 0.8); } 
+            100% { box-shadow: 0 4px 15px rgba(245, 87, 108, 0.4); } 
+        }
+
+        #hint-button {
+            margin-top: 10px;
+            padding: 8px 20px;
+            font-size: 1em;
+            font-weight: 600;
+            color: #fff;
+            background: var(--hint-color);
+            border: none;
+            border-radius: 20px;
+            cursor: pointer;
+            transition: transform 0.2s;
+        }
+        #hint-button:hover { transform: scale(1.05); }
+
+        /* Victory Screen */
+        #victory-screen h1 { font-size: 4em; color: var(--clock-gold); }
+        #victory-message { font-size: 1.5em; margin: 20px 0; }
+        #play-again-button {
+            padding: 15px 40px; 
+            font-size: 1.5em; 
+            font-weight: 700;
+            color: #fff; 
+            background: linear-gradient(45deg, #56ab2f, #a8e063);
+            border: none; 
+            border-radius: 50px; 
+            cursor: pointer;
+            transition: transform 0.2s;
+        }
+        #play-again-button:hover { transform: scale(1.05); }
+
+        /* Confetti */
+        .confetti {
+            position: fixed;
+            width: 10px;
+            height: 10px;
+            background: #f0f;
+            position: absolute;
+            animation: confetti-fall 3s linear forwards;
+        }
+        @keyframes confetti-fall {
+            to {
+                transform: translateY(100vh) rotate(360deg);
+                opacity: 0;
+            }
+        }
+    </style>
+</head>
+<body>
+
+    <!-- Start Screen -->
+    <div id="start-screen" class="screen active">
+        <h1>Poppy's Time-Topping Adventure!</h1>
+        <button id="start-button">Let's Play!</button>
+    </div>
+
+    <!-- Game Screen -->
+    <div id="game-screen" class="screen">
+        <div id="game-header">
+            <div id="level-indicator">Level: 1</div>
+            <div id="crystal-counter"><div class="crystal"></div><span id="crystal-count">0</span></div>
+        </div>
+        <div id="challenge-display">Press the button for a new challenge!</div>
+        <div id="hint-display"></div>
+        <div id="game-area">
+            <div id="poppy"><div id="poppy-hat"></div><div id="poppy-mouth"></div></div>
+            <div id="clock-wrapper">
+                <div id="clock-face">
+                    <!-- Minute marks will be generated by JS -->
+                    <div class="clock-number twelve">12</div>
+                    <div class="clock-number three">3</div>
+                    <div class="clock-number six">6</div>
+                    <div class="clock-number nine">9</div>
+                    <div id="hour-hand" class="hand"></div>
+                    <div id="minute-hand" class="hand"></div>
+                    <div id="center-dot"></div>
+                </div>
+            </div>
+            <div id="sundae-machine"><div id="sundae-bowl"></div></div>
+        </div>
+        <div id="controls">
+            <button id="challenge-button">NEW CHALLENGE!</button>
+            <button id="hint-button">Need a hint?</button>
+        </div>
+    </div>
+
+    <!-- Victory Screen -->
+    <div id="victory-screen" class="screen">
+        <h1>🎉 You Did It! 🎉</h1>
+        <p id="victory-message">You've mastered time with Poppy!</p>
+        <button id="play-again-button">Play Again</button>
+    </div>
+
+    <script>
+        // --- JavaScript for Game Logic ---
+
+        const screens = {
+            start: document.getElementById('start-screen'),
+            game: document.getElementById('game-screen'),
+            victory: document.getElementById('victory-screen')
+        };
+
+        const elements = {
+            startButton: document.getElementById('start-button'),
+            playAgainButton: document.getElementById('play-again-button'),
+            hourHand: document.getElementById('hour-hand'),
+            minuteHand: document.getElementById('minute-hand'),
+            clockFace: document.getElementById('clock-face'),
+            challengeButton: document.getElementById('challenge-button'),
+            challengeDisplay: document.getElementById('challenge-display'),
+            hintDisplay: document.getElementById('hint-display'),
+            hintButton: document.getElementById('hint-button'),
+            crystalCountEl: document.getElementById('crystal-count'),
+            sundaeBowl: document.getElementById('sundae-bowl'),
+            levelIndicator: document.getElementById('level-indicator')
+        };
+
+        let gameState = {
+            currentLevel: 1,
+            crystalCount: 0,
+            sundaeLayers: 0,
+            currentChallenge: null,
+            isDragging: null,
+            challengesPerLevel: 5,
+            challengesCompletedThisLevel: 0,
+            wrongAttempts: 0
+        };
+
+        // --- Screen Management ---
+        function showScreen(screenName) {
+            Object.values(screens).forEach(screen => screen.classList.remove('active'));
+            screens[screenName].classList.add('active');
+        }
+
+        // --- Clock Setup ---
+        function createMinuteMarks() {
+            for (let i = 0; i < 60; i++) {
+                const mark = document.createElement('div');
+                mark.classList.add('minute-mark');
+                if (i % 5 === 0) {
+                    mark.classList.add('five-minute');
+                }
+                mark.style.transform = `rotate(${i * 6}deg)`;
+                elements.clockFace.appendChild(mark);
+            }
+        }
+
+        // Update clock appearance based on level
+        function updateClockAppearance() {
+            if (gameState.currentLevel === 4) {
+                elements.clockFace.classList.add('clock-face-level-4');
+                elements.challengeButton.classList.add('level-4-button');
+                elements.levelIndicator.classList.add('level-4');
+            } else {
+                elements.clockFace.classList.remove('clock-face-level-4');
+                elements.challengeButton.classList.remove('level-4-button');
+                elements.levelIndicator.classList.remove('level-4');
+            }
+        }
+
+        // --- FIXED Clock Hand Dragging Logic ---
+        function startDrag(e, hand) {
+            gameState.isDragging = hand;
+            e.preventDefault();
+        }
+
+        function drag(e) {
+            if (!gameState.isDragging) return;
+            e.preventDefault();
+
+            // Get the clock's position and dimensions
+            const rect = elements.clockFace.getBoundingClientRect();
+            const centerX = rect.left + rect.width / 2;
+            const centerY = rect.top + rect.height / 2;
+
+            // Get the mouse/touch position
+            const clientX = e.type.includes('touch') ? e.touches[0].clientX : e.clientX;
+            const clientY = e.type.includes('touch') ? e.touches[0].clientY : e.clientY;
+
+            // Calculate the angle between the center of the clock and the cursor
+            const deltaX = clientX - centerX;
+            const deltaY = clientY - centerY;
+            const angle = Math.atan2(deltaY, deltaX);
+            
+            // Convert the angle to degrees and adjust for clock orientation (0° at top)
+            let degrees = angle * (180 / Math.PI) + 90;
+            if (degrees < 0) degrees += 360;
+
+            // Apply the rotation to the hand
+            gameState.isDragging.style.transform = `rotate(${degrees}deg)`;
+        }
+
+        function stopDrag() {
+            if (!gameState.isDragging) return;
+            
+            const hand = gameState.isDragging;
+            const snap = hand.id === 'hour-hand' ? 30 : 6; // 30 deg for hours, 6 for minutes
+            
+            // Get the current rotation from the element's style
+            const currentRotation = getHandRotation(hand);
+            const snappedAngle = Math.round(currentRotation / snap) * snap;
+            
+            hand.style.transform = `rotate(${snappedAngle}deg)`;
+            
+            // Check for a correct answer after the hand has snapped into place
+            setTimeout(checkAnswer, 100); // Small delay to ensure style is applied
+            
+            gameState.isDragging = null;
+        }
+
+        elements.hourHand.addEventListener('mousedown', (e) => startDrag(e, elements.hourHand));
+        elements.minuteHand.addEventListener('mousedown', (e) => startDrag(e, elements.minuteHand));
+        document.addEventListener('mousemove', drag);
+        document.addEventListener('mouseup', stopDrag);
+
+        // Touch events for mobile
+        elements.hourHand.addEventListener('touchstart', (e) => startDrag(e, elements.hourHand));
+        elements.minuteHand.addEventListener('touchstart', (e) => startDrag(e, elements.minuteHand));
+        document.addEventListener('touchmove', drag);
+        document.addEventListener('touchend', stopDrag);
+
+        // --- Game Logic ---
+        function getHandRotation(hand) {
+            const transform = window.getComputedStyle(hand).transform;
+            if (transform === 'none') return 0;
+            const values = transform.split('(')[1].split(')')[0].split(',');
+            const a = values[0];
+            const b = values[1];
+            let angle = Math.atan2(b, a) * (180 / Math.PI);
+            return angle < 0 ? angle + 360 : angle;
+        }
+
+        function checkAnswer() {
+            if (!gameState.currentChallenge) return;
+
+            const hourRotation = getHandRotation(elements.hourHand);
+            const minuteRotation = getHandRotation(elements.minuteHand);
+
+            // Convert rotation to time values
+            const currentHour = Math.round(hourRotation / 30) % 12 || 12;
+            const currentMinute = Math.round(minuteRotation / 6) % 60;
+
+            let isCorrect = false;
+            const challenge = gameState.currentChallenge;
+
+            if (challenge.type === 'hour') {
+                isCorrect = (currentHour === challenge.hour);
+            } else if (challenge.type === 'minute') {
+                isCorrect = (currentMinute === challenge.minute);
+            } else if (challenge.type === 'full') {
+                isCorrect = (currentHour === challenge.hour && currentMinute === challenge.minute);
+            } else if (challenge.type === 'quarter') {
+                isCorrect = (currentHour === challenge.hour && currentMinute === challenge.minute);
+            }
+
+            if (isCorrect) {
+                onCorrectAnswer(challenge);
+            } else {
+                onWrongAnswer(challenge, currentHour, currentMinute);
+            }
+        }
+
+        function onCorrectAnswer(challenge) {
+            gameState.crystalCount += challenge.points;
+            elements.crystalCountEl.textContent = gameState.crystalCount;
+            addSundaeLayer(challenge.reward);
+            createConfetti();
+            
+            gameState.challengesCompletedThisLevel++;
+            gameState.wrongAttempts = 0;
+            elements.hintDisplay.textContent = "";
+            
+            if (gameState.challengesCompletedThisLevel >= gameState.challengesPerLevel) {
+                levelUp();
+            } else {
+                elements.challengeDisplay.textContent = "Awesome! Ready for another?";
+                gameState.currentChallenge = null;
+            }
+        }
+
+        function onWrongAnswer(challenge, currentHour, currentMinute) {
+            gameState.wrongAttempts++;
+            
+            // Provide hints based on the type of challenge and number of wrong attempts
+            let hint = "";
+            
+            if (challenge.type === 'hour') {
+                if (currentHour < challenge.hour) {
+                    hint = "Try moving the hour hand a bit further clockwise.";
+                } else if (currentHour > challenge.hour) {
+                    hint = "Try moving the hour hand a bit counter-clockwise.";
+                }
+            } else if (challenge.type === 'minute') {
+                if (currentMinute < challenge.minute) {
+                    hint = "The minute hand needs to move further clockwise.";
+                } else if (currentMinute > challenge.minute) {
+                    hint = "The minute hand needs to move back counter-clockwise.";
+                }
+            } else if (challenge.type === 'full') {
+                if (currentHour !== challenge.hour) {
+                    if (currentHour < challenge.hour) {
+                        hint = "The hour hand needs to move further clockwise.";
+                    } else {
+                        hint = "The hour hand needs to move back counter-clockwise.";
+                    }
+                } else if (currentMinute !== challenge.minute) {
+                    if (currentMinute < challenge.minute) {
+                        hint = "The minute hand needs to move further clockwise.";
+                    } else {
+                        hint = "The minute hand needs to move back counter-clockwise.";
+                    }
+                }
+            } else if (challenge.type === 'quarter') {
+                if (currentHour !== challenge.hour) {
+                    if (currentHour < challenge.hour) {
+                        hint = "The hour hand needs to move further clockwise.";
+                    } else {
+                        hint = "The hour hand needs to move back counter-clockwise.";
+                    }
+                } else if (currentMinute !== challenge.minute) {
+                    if (currentMinute < challenge.minute) {
+                        hint = "The minute hand needs to move further clockwise.";
+                    } else {
+                        hint = "The minute hand needs to move back counter-clockwise.";
+                    }
+                }
+            }
+            
+            // If still no hint or multiple wrong attempts, give more specific hints
+            if (gameState.wrongAttempts >= 2) {
+                if (challenge.type === 'hour') {
+                    hint = `Look for the number ${challenge.hour} on the clock and point the hour hand there.`;
+                } else if (challenge.type === 'minute') {
+                    hint = `Each number represents 5 minutes. For ${challenge.minute} minutes, point to ${challenge.minute/5}.`;
+                } else if (challenge.type === 'full') {
+                    hint = `Set the hour hand to ${challenge.hour} and the minute hand to ${challenge.minute} minutes.`;
+                } else if (challenge.type === 'quarter') {
+                    hint = `Set the hour hand to ${challenge.hour} and the minute hand to ${challenge.minute} minutes.`;
+                }
+            }
+            
+            if (gameState.wrongAttempts >= 3) {
+                if (challenge.type === 'hour') {
+                    hint = `The hour hand should point directly at ${challenge.hour}.`;
+                } else if (challenge.type === 'minute') {
+                    hint = `The minute hand should point at the ${challenge.minute/5} on the clock.`;
+                } else if (challenge.type === 'full') {
+                    hint = `For ${challenge.hour}:${challenge.minute < 10 ? '0' + challenge.minute : challenge.minute}, hour at ${challenge.hour}, minute at ${challenge.minute}.`;
+                } else if (challenge.type === 'quarter') {
+                    hint = `For ${challenge.text}, hour at ${challenge.hour}, minute at ${challenge.minute}.`;
+                }
+            }
+            
+            elements.hintDisplay.textContent = hint;
+            elements.hintDisplay.style.opacity = "1";
+        }
+
+        function provideHint() {
+            if (!gameState.currentChallenge) {
+                elements.hintDisplay.textContent = "First, get a challenge by clicking 'NEW CHALLENGE!'";
+                elements.hintDisplay.style.opacity = "1";
+                return;
+            }
+            
+            const challenge = gameState.currentChallenge;
+            let hint = "";
+            
+            if (challenge.type === 'hour') {
+                hint = `Look for the number ${challenge.hour} on the clock face. The hour hand should point directly at it.`;
+            } else if (challenge.type === 'minute') {
+                hint = `Each number on the clock represents 5 minutes. For ${challenge.minute} minutes, the minute hand should point to the ${challenge.minute/5}.`;
+            } else if (challenge.type === 'full') {
+                hint = `Set the hour hand to ${challenge.hour} and the minute hand to ${challenge.minute} minutes (pointing at ${challenge.minute/5}).`;
+            } else if (challenge.type === 'quarter') {
+                hint = `Set the hour hand to ${challenge.hour} and the minute hand to ${challenge.minute} minutes (pointing at ${challenge.minute/5}).`;
+            }
+            
+            elements.hintDisplay.textContent = hint;
+            elements.hintDisplay.style.opacity = "1";
+        }
+
+        function levelUp() {
+            gameState.currentLevel++;
+            if (gameState.currentLevel > 4) {
+                showVictoryScreen();
+            } else {
+                elements.levelIndicator.textContent = `Level: ${gameState.currentLevel}`;
+                elements.challengeDisplay.textContent = `Level ${gameState.currentLevel} Unlocked! Way to go!`;
+                gameState.challengesCompletedThisLevel = 0;
+                gameState.currentChallenge = null;
+                gameState.wrongAttempts = 0;
+                elements.hintDisplay.textContent = "";
+                resetSundae();
+                updateClockAppearance();
+            }
+        }
+
+        function showVictoryScreen() {
+            showScreen('victory');
+            document.getElementById('victory-message').textContent = `You collected ${gameState.crystalCount} Time Crystals!`;
+        }
+
+        function addSundaeLayer(reward) {
+            const layer = document.createElement('div');
+            layer.className = `sundae-layer ${reward}`;
+            elements.sundaeBowl.appendChild(layer);
+            gameState.sundaeLayers++;
+        }
+
+        function resetSundae() {
+            elements.sundaeBowl.innerHTML = '';
+            gameState.sundaeLayers = 0;
+        }
+
+        function createConfetti() {
+            for (let i = 0; i < 50; i++) {
+                setTimeout(() => {
+                    const confetti = document.createElement('div');
+                    confetti.classList.add('confetti');
+                    confetti.style.left = Math.random() * 100 + '%';
+                    confetti.style.background = `hsl(${Math.random() * 360}, 100%, 50%)`;
+                    confetti.style.animationDelay = Math.random() * 0.5 + 's';
+                    document.body.appendChild(confetti);
+                    setTimeout(() => confetti.remove(), 3000);
+                }, i * 30);
+            }
+        }
+
+        function generateChallenge() {
+            if (gameState.currentChallenge) return; // Don't overwrite an existing challenge
+
+            let newChallenge;
+            const level = gameState.currentLevel;
+
+            if (level === 1) { // Only hour challenges
+                const hour = Math.floor(Math.random() * 12) + 1;
+                newChallenge = { type: 'hour', hour: hour, minute: 0, points: 1, reward: 'scoop-vanilla' };
+                elements.challengeDisplay.textContent = `Show me ${hour} o'clock!`;
+            } else if (level === 2) { // Hour and Minute challenges
+                if (Math.random() < 0.5) {
+                    const hour = Math.floor(Math.random() * 12) + 1;
+                    newChallenge = { type: 'hour', hour: hour, minute: 0, points: 1, reward: 'scoop-vanilla' };
+                    elements.challengeDisplay.textContent = `Show me ${hour} o'clock!`;
+                } else {
+                    const minuteNum = Math.floor(Math.random() * 12);
+                    const minute = minuteNum * 5;
+                    newChallenge = { type: 'minute', hour: 0, minute: minute, points: 2, reward: 'sprinkles' };
+                    elements.challengeDisplay.textContent = `Show me ${minute} minutes!`;
+                }
+            } else if (level === 3) { // Full challenges
+                const hour = Math.floor(Math.random() * 12) + 1;
+                const minuteNum = Math.floor(Math.random() * 12);
+                const minute = minuteNum * 5;
+                const minuteText = minute < 10 ? `0${minute}` : minute;
+                newChallenge = { type: 'full', hour: hour, minute: minute, points: 3, reward: 'cherry' };
+                elements.challengeDisplay.textContent = `Can you make ${hour}:${minuteText}?`;
+            } else if (level === 4) { // Quarter-hour and more complex challenges
+                const challengeTypes = ['quarter', 'complex'];
+                const challengeType = challengeTypes[Math.floor(Math.random() * challengeTypes.length)];
+                
+                if (challengeType === 'quarter') {
+                    const hour = Math.floor(Math.random() * 12) + 1;
+                    const quarterOptions = [
+                        {minute: 15, text: `quarter past ${hour}`},
+                        {minute: 30, text: `half past ${hour}`},
+                        {minute: 45, text: `quarter to ${hour === 12 ? 1 : hour + 1}`}
+                    ];
+                    const quarter = quarterOptions[Math.floor(Math.random() * quarterOptions.length)];
+                    
+                    // Adjust hour for "quarter to" times
+                    let displayHour = hour;
+                    if (quarter.minute === 45) {
+                        displayHour = hour === 12 ? 1 : hour + 1;
+                    }
+                    
+                    newChallenge = { 
+                        type: 'quarter', 
+                        hour: displayHour, 
+                        minute: quarter.minute, 
+                        text: quarter.text,
+                        points: 4, 
+                        reward: 'whipped-cream' 
+                    };
+                    elements.challengeDisplay.textContent = `Show me ${quarter.text}!`;
+                    elements.challengeDisplay.classList.add('level-4-challenge');
+                } else { // complex
+                    const hour = Math.floor(Math.random() * 12) + 1;
+                    // More specific minutes that aren't just multiples of 5
+                    const minuteOptions = [7, 13, 22, 28, 34, 41, 49, 53, 58];
+                    const minute = minuteOptions[Math.floor(Math.random() * minuteOptions.length)];
+                    const minuteText = minute < 10 ? `0${minute}` : minute;
+                    newChallenge = { 
+                        type: 'full', 
+                        hour: hour, 
+                        minute: minute, 
+                        points: 4, 
+                        reward: 'whipped-cream' 
+                    };
+                    elements.challengeDisplay.textContent = `Can you make ${hour}:${minuteText}?`;
+                    elements.challengeDisplay.classList.add('level-4-challenge');
+                }
+            }
+            gameState.currentChallenge = newChallenge;
+            gameState.wrongAttempts = 0;
+            elements.hintDisplay.textContent = "";
+        }
+
+        function resetGame() {
+            gameState = {
+                currentLevel: 1,
+                crystalCount: 0,
+                sundaeLayers: 0,
+                currentChallenge: null,
+                isDragging: null,
+                challengesPerLevel: 5,
+                challengesCompletedThisLevel: 0,
+                wrongAttempts: 0
+            };
+            elements.crystalCountEl.textContent = '0';
+            elements.levelIndicator.textContent = 'Level: 1';
+            elements.challengeDisplay.textContent = 'Press the button for a new challenge!';
+            elements.challengeDisplay.classList.remove('level-4-challenge');
+            elements.hintDisplay.textContent = "";
+            resetSundae();
+            elements.hourHand.style.transform = 'rotate(0deg)';
+            elements.minuteHand.style.transform = 'rotate(0deg)';
+            updateClockAppearance();
+            showScreen('game');
+        }
+
+        // --- Event Listeners ---
+        elements.startButton.addEventListener('click', () => showScreen('game'));
+        elements.playAgainButton.addEventListener('click', resetGame);
+        elements.challengeButton.addEventListener('click', generateChallenge);
+        elements.hintButton.addEventListener('click', provideHint);
+
+        // --- Initialization ---
+        createMinuteMarks();
+
+    </script>
+</body>
+</html>
