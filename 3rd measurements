@@ -361,14 +361,6 @@
             color: #666;
         }
 
-        .scroll-indicator {
-            text-align: center;
-            padding: 20px;
-            color: white;
-            font-size: 1.2em;
-            animation: bounce 2s infinite;
-        }
-
         .content-wrapper {
             min-height: 100vh;
             display: flex;
@@ -421,10 +413,6 @@
                     <button class="level-btn time-btn" onclick="startLevel('time')">
                         ⏰ Time Conversions
                     </button>
-                </div>
-                
-                <div class="scroll-indicator">
-                    ⬇️ 8 Questions Per Level - Test Your Skills! ⬇️
                 </div>
             </div>
 
@@ -528,11 +516,6 @@
             </div>
 
             <div class="feedback" id="feedback"></div>
-        </div>
-
-        <div style="height: 100px; text-align: center; color: white; padding: 20px;">
-            <p>🎮 Keep scrolling down to see everything! 🎮</p>
-            <p>⬇️ More content below ⬇️</p>
         </div>
     </div>
 
