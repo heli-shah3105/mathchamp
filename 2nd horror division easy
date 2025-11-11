@@ -1,3 +1,4 @@
+<!-- 2nd std division -->
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -30,7 +31,7 @@
         #gameContainer {
             position: relative;
             width: 100%;
-            max-width: 900px;
+            max-width: 1200px;
             height: 100vh;
             max-height: 600px;
             background: #000;
@@ -38,13 +39,30 @@
             box-shadow: 0 0 30px rgba(0, 0, 0, 0.8);
         }
         
+        #gameWorld {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 2400px; /* Double the width for extended gameplay */
+            height: 100%;
+        }
+        
         #gameCanvas {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 2400px; /* Match the game world width */
+            height: 100%;
+            image-rendering: optimizeSpeed;
+        }
+        
+        #viewport {
             position: absolute;
             top: 0;
             left: 0;
             width: 100%;
             height: 100%;
-            image-rendering: optimizeSpeed;
+            overflow: hidden;
         }
         
         #ui {
@@ -457,11 +475,64 @@
             z-index: 20;
             animation: pulse 1.5s infinite;
         }
+        
+        .minimap {
+            position: absolute;
+            bottom: 20px;
+            right: 20px;
+            width: 150px;
+            height: 60px;
+            background: rgba(0, 0, 0, 0.7);
+            border: 1px solid #4a0000;
+            border-radius: 5px;
+            z-index: 20;
+        }
+        
+        .minimap-viewport {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 50%;
+            height: 100%;
+            border: 1px solid #4CAF50;
+            background: rgba(76, 175, 80, 0.1);
+        }
+        
+        .minimap-player {
+            position: absolute;
+            width: 4px;
+            height: 4px;
+            background: #4CAF50;
+            border-radius: 50%;
+            transform: translate(-50%, -50%);
+        }
+        
+        .minimap-scroll {
+            position: absolute;
+            width: 3px;
+            height: 3px;
+            background: #ff0;
+            border-radius: 50%;
+            transform: translate(-50%, -50%);
+        }
+        
+        .minimap-door {
+            position: absolute;
+            width: 6px;
+            height: 6px;
+            background: #4CAF50;
+            border-radius: 50%;
+            transform: translate(-50%, -50%);
+        }
     </style>
 </head>
 <body>
     <div id="gameContainer">
-        <canvas id="gameCanvas"></canvas>
+        <div id="viewport">
+            <div id="gameWorld">
+                <canvas id="gameCanvas"></canvas>
+            </div>
+        </div>
         
         <div id="ui">
             <div class="hud">
@@ -481,6 +552,13 @@
                     <span>📚</span>
                     <span id="level">Level 1</span>
                 </div>
+            </div>
+            
+            <div class="minimap">
+                <div class="minimap-viewport" id="minimapViewport"></div>
+                <div class="minimap-player" id="minimapPlayer"></div>
+                <div id="minimapScrolls"></div>
+                <div class="minimap-door" id="minimapDoor"></div>
             </div>
         </div>
         
@@ -535,15 +613,32 @@
     <script>
         const canvas = document.getElementById('gameCanvas');
         const ctx = canvas.getContext('2d');
+        const viewport = document.getElementById('viewport');
+        const gameWorld = document.getElementById('gameWorld');
         
         // Set canvas size
         function resizeCanvas() {
-            canvas.width = window.innerWidth < 900 ? window.innerWidth : 900;
-            canvas.height = window.innerHeight < 600 ? window.innerHeight : 600;
+            const containerWidth = window.innerWidth < 1200 ? window.innerWidth : 1200;
+            const containerHeight = window.innerHeight < 600 ? window.innerHeight : 600;
+            
+            // Set viewport size
+            viewport.style.width = containerWidth + 'px';
+            viewport.style.height = containerHeight + 'px';
+            
+            // Set canvas size (double width for extended gameplay)
+            canvas.width = 2400;
+            canvas.height = containerHeight;
+            
+            // Set game world size
+            gameWorld.style.width = '2400px';
+            gameWorld.style.height = containerHeight + 'px';
         }
         
         resizeCanvas();
         window.addEventListener('resize', resizeCanvas);
+        
+        // Camera/viewport position
+        let viewportX = 0;
         
         // Game state
         let gameRunning = false;
@@ -711,10 +806,32 @@
             });
         });
         
+        // Update camera to follow player
+        function updateCamera() {
+            // Calculate the ideal viewport position to center the player
+            const viewportWidth = viewport.offsetWidth;
+            const idealViewportX = player.x - viewportWidth / 2;
+            
+            // Clamp the viewport to the game world bounds
+            viewportX = Math.max(0, Math.min(canvas.width - viewportWidth, idealViewportX));
+            
+            // Update the game world position
+            gameWorld.style.transform = `translateX(${-viewportX}px)`;
+            
+            // Update minimap viewport position
+            const minimapViewport = document.getElementById('minimapViewport');
+            minimapViewport.style.left = (viewportX / canvas.width * 100) + '%';
+            
+            // Update minimap player position
+            const minimapPlayer = document.getElementById('minimapPlayer');
+            minimapPlayer.style.left = (player.x / canvas.width * 100) + '%';
+            minimapPlayer.style.top = (player.y / canvas.height * 100) + '%';
+        }
+        
         // Player class
         class Player {
             constructor() {
-                this.x = canvas.width / 2;
+                this.x = canvas.width / 4; // Start in the left quarter of the extended world
                 this.y = canvas.height / 2;
                 this.width = 30;
                 this.height = 40;
@@ -949,10 +1066,14 @@
             
             generatePatrolPoints() {
                 return [
-                    { x: 100, y: 100 },
-                    { x: canvas.width - 100, y: 100 },
-                    { x: canvas.width - 100, y: canvas.height - 100 },
-                    { x: 100, y: canvas.height - 100 }
+                    { x: 300, y: 100 },
+                    { x: 900, y: 100 },
+                    { x: 1500, y: 100 },
+                    { x: 2100, y: 100 },
+                    { x: 2100, y: canvas.height - 100 },
+                    { x: 1500, y: canvas.height - 100 },
+                    { x: 900, y: canvas.height - 100 },
+                    { x: 300, y: canvas.height - 100 }
                 ];
             }
             
@@ -1656,21 +1777,34 @@
             
             // Create hiding spots
             hidingSpots = [
-                new HidingSpot(150, 150, 'bed'),
-                new HidingSpot(canvas.width - 150, 150, 'wardrobe'),
-                new HidingSpot(150, canvas.height - 150, 'cabinet'),
-                new HidingSpot(canvas.width - 150, canvas.height - 150, 'bed'),
-                new HidingSpot(canvas.width / 2, 150, 'wardrobe'),
-                new HidingSpot(canvas.width / 2, canvas.height - 150, 'cabinet')
+                new HidingSpot(300, 150, 'bed'),
+                new HidingSpot(600, 150, 'wardrobe'),
+                new HidingSpot(900, 150, 'cabinet'),
+                new HidingSpot(1200, 150, 'bed'),
+                new HidingSpot(1500, 150, 'wardrobe'),
+                new HidingSpot(1800, 150, 'cabinet'),
+                new HidingSpot(2100, 150, 'bed'),
+                new HidingSpot(300, canvas.height - 150, 'wardrobe'),
+                new HidingSpot(600, canvas.height - 150, 'cabinet'),
+                new HidingSpot(900, canvas.height - 150, 'bed'),
+                new HidingSpot(1200, canvas.height - 150, 'wardrobe'),
+                new HidingSpot(1500, canvas.height - 150, 'cabinet'),
+                new HidingSpot(1800, canvas.height - 150, 'bed'),
+                new HidingSpot(2100, canvas.height - 150, 'wardrobe')
             ];
             
             // Create math scrolls
             mathScrolls = [
-                new MathScroll(250, 250),
-                new MathScroll(canvas.width - 250, 250),
-                new MathScroll(canvas.width / 2, canvas.height / 2),
-                new MathScroll(250, canvas.height - 250),
-                new MathScroll(canvas.width - 250, canvas.height - 250)
+                new MathScroll(400, 250),
+                new MathScroll(800, 250),
+                new MathScroll(1200, 250),
+                new MathScroll(1600, 250),
+                new MathScroll(2000, 250),
+                new MathScroll(400, canvas.height - 250),
+                new MathScroll(800, canvas.height - 250),
+                new MathScroll(1200, canvas.height - 250),
+                new MathScroll(1600, canvas.height - 250),
+                new MathScroll(2000, canvas.height - 250)
             ];
             
             // Create door
@@ -1694,6 +1828,30 @@
             document.getElementById('batteryFill').style.width = battery + '%';
             document.getElementById('sanityFill').style.width = sanity + '%';
             document.getElementById('level').textContent = `Level ${currentLevel}`;
+            
+            // Update minimap
+            updateMinimap();
+        }
+        
+        // Update minimap
+        function updateMinimap() {
+            // Clear existing scroll markers
+            const minimapScrolls = document.getElementById('minimapScrolls');
+            minimapScrolls.innerHTML = '';
+            
+            // Add scroll markers
+            mathScrolls.forEach(scroll => {
+                const marker = document.createElement('div');
+                marker.className = 'minimap-scroll';
+                marker.style.left = (scroll.x / canvas.width * 100) + '%';
+                marker.style.top = (scroll.y / canvas.height * 100) + '%';
+                minimapScrolls.appendChild(marker);
+            });
+            
+            // Update door position
+            const minimapDoor = document.getElementById('minimapDoor');
+            minimapDoor.style.left = (door.x / canvas.width * 100) + '%';
+            minimapDoor.style.top = (door.y / canvas.height * 100) + '%';
         }
         
         // Show math puzzle
@@ -1867,61 +2025,45 @@
             // Draw walls
             ctx.fillStyle = '#1a1a1a';
             ctx.fillRect(0, 0, canvas.width, 50);
-            ctx.fillRect(0, 0, 50, canvas.height);
-            ctx.fillRect(canvas.width - 50, 0, 50, canvas.height);
             
             // Draw wallpaper pattern
             ctx.strokeStyle = '#111';
             ctx.lineWidth = 1;
-            for (let i = 50; i < canvas.width - 50; i += 30) {
+            for (let i = 0; i < canvas.width; i += 30) {
                 for (let j = 50; j < canvas.height - 50; j += 30) {
                     ctx.strokeRect(i, j, 30, 30);
                 }
             }
             
             // Draw windows with moonlight
-            ctx.fillStyle = 'rgba(100, 100, 150, 0.2)';
-            ctx.fillRect(100, 80, 80, 80);
-            ctx.fillRect(canvas.width - 180, 80, 80, 80);
-            
-            // Window frames
-            ctx.strokeStyle = '#333';
-            ctx.lineWidth = 3;
-            ctx.strokeRect(100, 80, 80, 80);
-            ctx.strokeRect(canvas.width - 180, 80, 80, 80);
-            ctx.beginPath();
-            ctx.moveTo(140, 80);
-            ctx.lineTo(140, 160);
-            ctx.moveTo(100, 120);
-            ctx.lineTo(180, 120);
-            ctx.moveTo(canvas.width - 140, 80);
-            ctx.lineTo(canvas.width - 140, 160);
-            ctx.moveTo(canvas.width - 180, 120);
-            ctx.lineTo(canvas.width - 100, 120);
-            ctx.stroke();
-            
-            // Draw moonlight beams
-            const gradient1 = ctx.createLinearGradient(100, 80, 140, 400);
-            gradient1.addColorStop(0, 'rgba(200, 200, 255, 0.1)');
-            gradient1.addColorStop(1, 'rgba(200, 200, 255, 0)');
-            ctx.fillStyle = gradient1;
-            ctx.beginPath();
-            ctx.moveTo(100, 80);
-            ctx.lineTo(180, 80);
-            ctx.lineTo(140, 400);
-            ctx.closePath();
-            ctx.fill();
-            
-            const gradient2 = ctx.createLinearGradient(canvas.width - 180, 80, canvas.width - 140, 400);
-            gradient2.addColorStop(0, 'rgba(200, 200, 255, 0.1)');
-            gradient2.addColorStop(1, 'rgba(200, 200, 255, 0)');
-            ctx.fillStyle = gradient2;
-            ctx.beginPath();
-            ctx.moveTo(canvas.width - 180, 80);
-            ctx.lineTo(canvas.width - 100, 80);
-            ctx.lineTo(canvas.width - 140, 400);
-            ctx.closePath();
-            ctx.fill();
+            const windowPositions = [300, 600, 900, 1200, 1500, 1800, 2100];
+            windowPositions.forEach(x => {
+                ctx.fillStyle = 'rgba(100, 100, 150, 0.2)';
+                ctx.fillRect(x - 40, 80, 80, 80);
+                
+                // Window frames
+                ctx.strokeStyle = '#333';
+                ctx.lineWidth = 3;
+                ctx.strokeRect(x - 40, 80, 80, 80);
+                ctx.beginPath();
+                ctx.moveTo(x, 80);
+                ctx.lineTo(x, 160);
+                ctx.moveTo(x - 40, 120);
+                ctx.lineTo(x + 40, 120);
+                ctx.stroke();
+                
+                // Draw moonlight beams
+                const gradient = ctx.createLinearGradient(x, 80, x, 400);
+                gradient.addColorStop(0, 'rgba(200, 200, 255, 0.1)');
+                gradient.addColorStop(1, 'rgba(200, 200, 255, 0)');
+                ctx.fillStyle = gradient;
+                ctx.beginPath();
+                ctx.moveTo(x - 40, 80);
+                ctx.lineTo(x + 40, 80);
+                ctx.lineTo(x, 400);
+                ctx.closePath();
+                ctx.fill();
+            });
             
             // Add dust particles
             if (Math.random() < 0.1) {
@@ -2039,6 +2181,9 @@
             drawSanityEffects();
             
             ctx.restore();
+            
+            // Update camera to follow player
+            updateCamera();
             
             // Update power-up timer
             if (powerUpActive) {
