@@ -1,0 +1,887 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Conversion Champions - Measurement Game!</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Comic Sans MS', cursive, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px 0;
+            overflow-y: auto;
+        }
+
+        .game-container {
+            width: 90%;
+            max-width: 900px;
+            margin: 0 auto;
+            background: rgba(255, 255, 255, 0.95);
+            border-radius: 30px;
+            padding: 30px;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+            animation: slideIn 0.5s ease-out;
+            margin-bottom: 50px;
+        }
+
+        @keyframes slideIn {
+            from {
+                transform: translateY(-50px);
+                opacity: 0;
+            }
+            to {
+                transform: translateY(0);
+                opacity: 1;
+            }
+        }
+
+        .header {
+            text-align: center;
+            margin-bottom: 30px;
+        }
+
+        h1 {
+            color: #764ba2;
+            font-size: 2.5em;
+            text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.1);
+            animation: bounce 2s infinite;
+        }
+
+        @keyframes bounce {
+            0%, 100% { transform: translateY(0); }
+            50% { transform: translateY(-10px); }
+        }
+
+        .level-selector {
+            display: flex;
+            justify-content: center;
+            gap: 20px;
+            margin-bottom: 30px;
+            flex-wrap: wrap;
+        }
+
+        .level-btn {
+            padding: 15px 30px;
+            font-size: 1.2em;
+            border: none;
+            border-radius: 20px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-weight: bold;
+            color: white;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .level-btn:before {
+            content: '';
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            width: 0;
+            height: 0;
+            border-radius: 50%;
+            background: rgba(255, 255, 255, 0.3);
+            transform: translate(-50%, -50%);
+            transition: width 0.6s, height 0.6s;
+        }
+
+        .level-btn:hover:before {
+            width: 300px;
+            height: 300px;
+        }
+
+        .level-btn:hover {
+            transform: translateY(-5px) scale(1.05);
+            box-shadow: 0 10px 20px rgba(0, 0, 0, 0.2);
+        }
+
+        .weight-btn {
+            background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+        }
+
+        .distance-btn {
+            background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);
+        }
+
+        .time-btn {
+            background: linear-gradient(135deg, #43e97b 0%, #38f9d7 100%);
+        }
+
+        .game-area {
+            display: none;
+            animation: fadeIn 0.5s ease-out;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+
+        .game-area.active {
+            display: block;
+        }
+
+        .conversion-display {
+            background: linear-gradient(135deg, #ffecd2 0%, #fcb69f 100%);
+            padding: 25px;
+            border-radius: 20px;
+            margin-bottom: 25px;
+            text-align: center;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+        }
+
+        .conversion-formula {
+            font-size: 1.8em;
+            color: #333;
+            margin-bottom: 15px;
+            font-weight: bold;
+        }
+
+        .conversion-arrow {
+            font-size: 2em;
+            color: #764ba2;
+            margin: 10px 0;
+            animation: pulse 1.5s infinite;
+        }
+
+        @keyframes pulse {
+            0%, 100% { transform: scale(1); }
+            50% { transform: scale(1.2); }
+        }
+
+        .question-box {
+            background: linear-gradient(135deg, #e0c3fc 0%, #8ec5fc 100%);
+            padding: 25px;
+            border-radius: 20px;
+            margin-bottom: 25px;
+            text-align: center;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+        }
+
+        .question {
+            font-size: 1.6em;
+            color: #333;
+            margin-bottom: 20px;
+        }
+
+        .visual-aid {
+            font-size: 3em;
+            margin: 20px 0;
+            animation: bounce 2s infinite;
+        }
+
+        .options {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+            gap: 15px;
+            margin-top: 20px;
+        }
+
+        .option-btn {
+            padding: 20px;
+            font-size: 1.2em;
+            border: 3px solid transparent;
+            border-radius: 15px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            background: white;
+            color: #333;
+            font-weight: bold;
+            position: relative;
+        }
+
+        .option-btn:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
+            border-color: #764ba2;
+        }
+
+        .option-btn.correct {
+            background: linear-gradient(135deg, #43e97b 0%, #38f9d7 100%);
+            color: white;
+            animation: correctAnswer 0.5s ease-out;
+        }
+
+        .option-btn.incorrect {
+            background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+            color: white;
+            animation: shake 0.5s ease-out;
+        }
+
+        @keyframes correctAnswer {
+            0% { transform: scale(1); }
+            50% { transform: scale(1.2); }
+            100% { transform: scale(1); }
+        }
+
+        @keyframes shake {
+            0%, 100% { transform: translateX(0); }
+            25% { transform: translateX(-10px); }
+            75% { transform: translateX(10px); }
+        }
+
+        .score-board {
+            display: flex;
+            justify-content: space-around;
+            margin-bottom: 20px;
+            padding: 15px;
+            background: linear-gradient(135deg, #a8edea 0%, #fed6e3 100%);
+            border-radius: 15px;
+        }
+
+        .score-item {
+            text-align: center;
+        }
+
+        .score-label {
+            font-size: 0.9em;
+            color: #666;
+        }
+
+        .score-value {
+            font-size: 2em;
+            font-weight: bold;
+            color: #764ba2;
+        }
+
+        .feedback {
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            padding: 30px 50px;
+            border-radius: 20px;
+            font-size: 2em;
+            font-weight: bold;
+            color: white;
+            z-index: 1000;
+            display: none;
+            animation: feedbackPop 0.5s ease-out;
+        }
+
+        @keyframes feedbackPop {
+            0% { transform: translate(-50%, -50%) scale(0); }
+            50% { transform: translate(-50%, -50%) scale(1.2); }
+            100% { transform: translate(-50%, -50%) scale(1); }
+        }
+
+        .feedback.success {
+            background: linear-gradient(135deg, #43e97b 0%, #38f9d7 100%);
+        }
+
+        .feedback.error {
+            background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+        }
+
+        .back-btn {
+            margin-top: 20px;
+            padding: 12px 25px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border: none;
+            border-radius: 15px;
+            font-size: 1.1em;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .back-btn:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
+        }
+
+        .stars {
+            font-size: 2em;
+            color: #ffd700;
+            text-align: center;
+            margin: 20px 0;
+        }
+
+        .star {
+            display: inline-block;
+            animation: starSpin 3s linear infinite;
+        }
+
+        @keyframes starSpin {
+            from { transform: rotate(0deg); }
+            to { transform: rotate(360deg); }
+        }
+
+        .progress-bar {
+            width: 100%;
+            height: 30px;
+            background: #e0e0e0;
+            border-radius: 15px;
+            overflow: hidden;
+            margin-bottom: 20px;
+        }
+
+        .progress-fill {
+            height: 100%;
+            background: linear-gradient(90deg, #43e97b 0%, #38f9d7 100%);
+            transition: width 0.5s ease-out;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-weight: bold;
+        }
+
+        .confetti {
+            position: fixed;
+            width: 10px;
+            height: 10px;
+            background: #f0f;
+            position: absolute;
+            animation: confettiFall 3s linear;
+            pointer-events: none;
+        }
+
+        @keyframes confettiFall {
+            to {
+                transform: translateY(100vh) rotate(360deg);
+                opacity: 0;
+            }
+        }
+
+        .conversion-hint {
+            background: rgba(255, 255, 255, 0.8);
+            padding: 10px;
+            border-radius: 10px;
+            margin: 10px 0;
+            font-size: 1.1em;
+            color: #666;
+        }
+
+        .scroll-indicator {
+            text-align: center;
+            padding: 20px;
+            color: white;
+            font-size: 1.2em;
+            animation: bounce 2s infinite;
+        }
+
+        .content-wrapper {
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            padding: 20px 0;
+        }
+
+        @media (max-width: 768px) {
+            .game-container {
+                width: 95%;
+                padding: 20px;
+            }
+            
+            h1 {
+                font-size: 2em;
+            }
+            
+            .question {
+                font-size: 1.3em;
+            }
+            
+            .options {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="content-wrapper">
+        <div class="game-container">
+            <div class="header">
+                <h1>🔄 Conversion Champions 🔄</h1>
+                <div class="stars">
+                    <span class="star">⭐</span>
+                    <span class="star">⭐</span>
+                    <span class="star">⭐</span>
+                </div>
+            </div>
+
+            <div id="menuScreen">
+                <div class="level-selector">
+                    <button class="level-btn weight-btn" onclick="startLevel('weight')">
+                        ⚖️ Weight Conversions
+                    </button>
+                    <button class="level-btn distance-btn" onclick="startLevel('distance')">
+                        📏 Distance Conversions
+                    </button>
+                    <button class="level-btn time-btn" onclick="startLevel('time')">
+                        ⏰ Time Conversions
+                    </button>
+                </div>
+                
+                <div class="scroll-indicator">
+                    ⬇️ 8 Questions Per Level - Test Your Skills! ⬇️
+                </div>
+            </div>
+
+            <div id="weightLevel" class="game-area">
+                <div class="conversion-display">
+                    <div class="conversion-formula">💡 Remember: 1 kg = 1000 g</div>
+                    <div class="conversion-arrow">⬇️</div>
+                    <div class="conversion-hint">To convert kg to g: Multiply by 1000</div>
+                    <div class="conversion-hint">To convert g to kg: Divide by 1000</div>
+                </div>
+                <div class="score-board">
+                    <div class="score-item">
+                        <div class="score-label">Score</div>
+                        <div class="score-value" id="weightScore">0</div>
+                    </div>
+                    <div class="score-item">
+                        <div class="score-label">Question</div>
+                        <div class="score-value" id="weightQuestionNum">1/8</div>
+                    </div>
+                </div>
+                <div class="progress-bar">
+                    <div class="progress-fill" id="weightProgress" style="width: 12.5%">12.5%</div>
+                </div>
+                <div class="question-box">
+                    <div class="visual-aid" id="weightVisual">⚖️</div>
+                    <div class="question" id="weightQuestion"></div>
+                    <div class="options" id="weightOptions"></div>
+                </div>
+                <button class="back-btn" onclick="backToMenu()">← Back to Menu</button>
+                
+                <div style="height: 200px; background: linear-gradient(135deg, #ffecd2 0%, #fcb69f 100%); border-radius: 20px; margin-top: 20px; padding: 20px; text-align: center;">
+                    <h3 style="color: #764ba2; margin-bottom: 10px;">💡 Pro Tip!</h3>
+                    <p style="color: #333;">Remember: "kilo" means 1000! So 1 kilogram = 1000 grams</p>
+                </div>
+            </div>
+
+            <div id="distanceLevel" class="game-area">
+                <div class="conversion-display">
+                    <div class="conversion-formula">💡 Remember: 1 km = 1000 m</div>
+                    <div class="conversion-arrow">⬇️</div>
+                    <div class="conversion-hint">To convert km to m: Multiply by 1000</div>
+                    <div class="conversion-hint">To convert m to km: Divide by 1000</div>
+                </div>
+                <div class="score-board">
+                    <div class="score-item">
+                        <div class="score-label">Score</div>
+                        <div class="score-value" id="distanceScore">0</div>
+                    </div>
+                    <div class="score-item">
+                        <div class="score-label">Question</div>
+                        <div class="score-value" id="distanceQuestionNum">1/8</div>
+                    </div>
+                </div>
+                <div class="progress-bar">
+                    <div class="progress-fill" id="distanceProgress" style="width: 12.5%">12.5%</div>
+                </div>
+                <div class="question-box">
+                    <div class="visual-aid" id="distanceVisual">📏</div>
+                    <div class="question" id="distanceQuestion"></div>
+                    <div class="options" id="distanceOptions"></div>
+                </div>
+                <button class="back-btn" onclick="backToMenu()">← Back to Menu</button>
+                
+                <div style="height: 200px; background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%); border-radius: 20px; margin-top: 20px; padding: 20px; text-align: center;">
+                    <h3 style="color: white; margin-bottom: 10px;">💡 Pro Tip!</h3>
+                    <p style="color: white;">Think about it: 1000 meters is a long walk - that's 1 kilometer!</p>
+                </div>
+            </div>
+
+            <div id="timeLevel" class="game-area">
+                <div class="conversion-display">
+                    <div class="conversion-formula">💡 Remember: 1 hour = 60 minutes</div>
+                    <div class="conversion-arrow">⬇️</div>
+                    <div class="conversion-hint">To convert hours to minutes: Multiply by 60</div>
+                    <div class="conversion-hint">To convert minutes to hours: Divide by 60</div>
+                </div>
+                <div class="score-board">
+                    <div class="score-item">
+                        <div class="score-label">Score</div>
+                        <div class="score-value" id="timeScore">0</div>
+                    </div>
+                    <div class="score-item">
+                        <div class="score-label">Question</div>
+                        <div class="score-value" id="timeQuestionNum">1/8</div>
+                    </div>
+                </div>
+                <div class="progress-bar">
+                    <div class="progress-fill" id="timeProgress" style="width: 12.5%">12.5%</div>
+                </div>
+                <div class="question-box">
+                    <div class="visual-aid" id="timeVisual">⏰</div>
+                    <div class="question" id="timeQuestion"></div>
+                    <div class="options" id="timeOptions"></div>
+                </div>
+                <button class="back-btn" onclick="backToMenu()">← Back to Menu</button>
+                
+                <div style="height: 200px; background: linear-gradient(135deg, #43e97b 0%, #38f9d7 100%); border-radius: 20px; margin-top: 20px; padding: 20px; text-align: center;">
+                    <h3 style="color: white; margin-bottom: 10px;">💡 Pro Tip!</h3>
+                    <p style="color: white;">There are 60 minutes in an hour - just like 60 seconds in a minute!</p>
+                </div>
+            </div>
+
+            <div class="feedback" id="feedback"></div>
+        </div>
+
+        <div style="height: 100px; text-align: center; color: white; padding: 20px;">
+            <p>🎮 Keep scrolling down to see everything! 🎮</p>
+            <p>⬇️ More content below ⬇️</p>
+        </div>
+    </div>
+
+    <script>
+        let currentLevel = null;
+        let currentQuestion = 0;
+        let score = 0;
+        let answered = false;
+
+        const weightQuestions = [
+            {
+                question: "Convert 2 kilograms to grams:",
+                visual: "🏋️",
+                options: ["200 grams", "2000 grams", "20 grams", "20000 grams"],
+                correct: 1
+            },
+            {
+                question: "Convert 5000 grams to kilograms:",
+                visual: "🥖",
+                options: ["5 kg", "50 kg", "0.5 kg", "500 kg"],
+                correct: 0
+            },
+            {
+                question: "Convert 3.5 kilograms to grams:",
+                visual: "🎒",
+                options: ["350 grams", "35 grams", "3500 grams", "35000 grams"],
+                correct: 2
+            },
+            {
+                question: "Convert 750 grams to kilograms:",
+                visual: "🍎",
+                options: ["7.5 kg", "0.75 kg", "75 kg", "0.075 kg"],
+                correct: 1
+            },
+            {
+                question: "Convert 0.25 kilograms to grams:",
+                visual: "🍬",
+                options: ["25 grams", "250 grams", "2.5 grams", "2500 grams"],
+                correct: 1
+            },
+            {
+                question: "Convert 4.75 kilograms to grams:",
+                visual: "🎁",
+                options: ["475 grams", "4750 grams", "47500 grams", "47.5 grams"],
+                correct: 1
+            },
+            {
+                question: "Convert 1250 grams to kilograms:",
+                visual: "🍗",
+                options: ["1.25 kg", "12.5 kg", "0.125 kg", "125 kg"],
+                correct: 0
+            },
+            {
+                question: "Convert 8.2 kilograms to grams:",
+                visual: "🏆",
+                options: ["820 grams", "8200 grams", "82 grams", "82000 grams"],
+                correct: 1
+            }
+        ];
+
+        const distanceQuestions = [
+            {
+                question: "Convert 3 kilometers to meters:",
+                visual: "🚗",
+                options: ["30 meters", "300 meters", "3000 meters", "30000 meters"],
+                correct: 2
+            },
+            {
+                question: "Convert 5000 meters to kilometers:",
+                visual: "🏃",
+                options: ["5 km", "50 km", "0.5 km", "500 km"],
+                correct: 0
+            },
+            {
+                question: "Convert 2.5 kilometers to meters:",
+                visual: "🚴",
+                options: ["250 meters", "25 meters", "2500 meters", "25000 meters"],
+                correct: 2
+            },
+            {
+                question: "Convert 750 meters to kilometers:",
+                visual: "🏊",
+                options: ["7.5 km", "0.75 km", "75 km", "0.075 km"],
+                correct: 1
+            },
+            {
+                question: "Convert 0.1 kilometers to meters:",
+                visual: "🚶",
+                options: ["10 meters", "100 meters", "1 meter", "1000 meters"],
+                correct: 1
+            },
+            {
+                question: "Convert 6.8 kilometers to meters:",
+                visual: "🚂",
+                options: ["680 meters", "6800 meters", "68 meters", "68000 meters"],
+                correct: 1
+            },
+            {
+                question: "Convert 3250 meters to kilometers:",
+                visual: "🏍️",
+                options: ["3.25 km", "32.5 km", "0.325 km", "325 km"],
+                correct: 0
+            },
+            {
+                question: "Convert 0.05 kilometers to meters:",
+                visual: "🚲",
+                options: ["5 meters", "50 meters", "500 meters", "0.5 meters"],
+                correct: 1
+            }
+        ];
+
+        const timeQuestions = [
+            {
+                question: "Convert 3 hours to minutes:",
+                visual: "🎬",
+                options: ["30 minutes", "180 minutes", "300 minutes", "60 minutes"],
+                correct: 1
+            },
+            {
+                question: "Convert 120 minutes to hours:",
+                visual: "⚽",
+                options: ["1 hour", "2 hours", "12 hours", "0.2 hours"],
+                correct: 1
+            },
+            {
+                question: "Convert 2.5 hours to minutes:",
+                visual: "📚",
+                options: ["25 minutes", "150 minutes", "250 minutes", "125 minutes"],
+                correct: 1
+            },
+            {
+                question: "Convert 45 minutes to hours:",
+                visual: "🍕",
+                options: ["0.75 hours", "4.5 hours", "0.45 hours", "45 hours"],
+                correct: 0
+            },
+            {
+                question: "Convert 0.5 hours to minutes:",
+                visual: "🎮",
+                options: ["5 minutes", "50 minutes", "30 minutes", "0.5 minutes"],
+                correct: 2
+            },
+            {
+                question: "Convert 4.25 hours to minutes:",
+                visual: "🎪",
+                options: ["42.5 minutes", "425 minutes", "255 minutes", "42.5 minutes"],
+                correct: 2
+            },
+            {
+                question: "Convert 195 minutes to hours:",
+                visual: "🎨",
+                options: ["1.95 hours", "19.5 hours", "3.25 hours", "0.195 hours"],
+                correct: 2
+            },
+            {
+                question: "Convert 0.75 hours to minutes:",
+                visual: "🎯",
+                options: ["7.5 minutes", "75 minutes", "45 minutes", "750 minutes"],
+                correct: 2
+            }
+        ];
+
+        function startLevel(level) {
+            currentLevel = level;
+            currentQuestion = 0;
+            score = 0;
+            answered = false;
+
+            document.getElementById('menuScreen').style.display = 'none';
+            document.querySelectorAll('.game-area').forEach(area => {
+                area.classList.remove('active');
+            });
+
+            document.getElementById(level + 'Level').classList.add('active');
+            loadQuestion();
+            
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+        }
+
+        function loadQuestion() {
+            answered = false;
+            let questions, prefix;
+            
+            switch(currentLevel) {
+                case 'weight':
+                    questions = weightQuestions;
+                    prefix = 'weight';
+                    break;
+                case 'distance':
+                    questions = distanceQuestions;
+                    prefix = 'distance';
+                    break;
+                case 'time':
+                    questions = timeQuestions;
+                    prefix = 'time';
+                    break;
+            }
+
+            if (currentQuestion >= questions.length) {
+                endLevel();
+                return;
+            }
+
+            const q = questions[currentQuestion];
+            document.getElementById(prefix + 'Visual').textContent = q.visual;
+            document.getElementById(prefix + 'Question').textContent = q.question;
+            document.getElementById(prefix + 'Score').textContent = score;
+            document.getElementById(prefix + 'QuestionNum').textContent = `${currentQuestion + 1}/8`;
+            
+            const progress = ((currentQuestion + 1) / questions.length) * 100;
+            const progressBar = document.getElementById(prefix + 'Progress');
+            progressBar.style.width = progress + '%';
+            progressBar.textContent = Math.round(progress) + '%';
+
+            const optionsContainer = document.getElementById(prefix + 'Options');
+            optionsContainer.innerHTML = '';
+
+            q.options.forEach((option, index) => {
+                const btn = document.createElement('button');
+                btn.className = 'option-btn';
+                btn.textContent = option;
+                btn.onclick = () => checkAnswer(index, q.correct);
+                optionsContainer.appendChild(btn);
+            });
+        }
+
+        function checkAnswer(selected, correct) {
+            if (answered) return;
+            answered = true;
+
+            const prefix = currentLevel;
+            const buttons = document.querySelectorAll(`#${prefix}Options .option-btn`);
+            
+            if (selected === correct) {
+                buttons[selected].classList.add('correct');
+                score++;
+                showFeedback('Correct! 🎉', true);
+                createConfetti();
+            } else {
+                buttons[selected].classList.add('incorrect');
+                buttons[correct].classList.add('correct');
+                showFeedback('Try Again! 💪', false);
+            }
+
+            setTimeout(() => {
+                currentQuestion++;
+                loadQuestion();
+            }, 2000);
+        }
+
+        function showFeedback(message, isSuccess) {
+            const feedback = document.getElementById('feedback');
+            feedback.textContent = message;
+            feedback.className = 'feedback ' + (isSuccess ? 'success' : 'error');
+            feedback.style.display = 'block';
+
+            setTimeout(() => {
+                feedback.style.display = 'none';
+            }, 1500);
+        }
+
+        function createConfetti() {
+            for (let i = 0; i < 20; i++) {
+                setTimeout(() => {
+                    const confetti = document.createElement('div');
+                    confetti.className = 'confetti';
+                    confetti.style.left = Math.random() * 100 + '%';
+                    confetti.style.background = `hsl(${Math.random() * 360}, 100%, 50%)`;
+                    confetti.style.animationDelay = Math.random() * 0.5 + 's';
+                    document.body.appendChild(confetti);
+
+                    setTimeout(() => {
+                        confetti.remove();
+                    }, 3000);
+                }, i * 50);
+            }
+        }
+
+        function endLevel() {
+            const prefix = currentLevel;
+            const percentage = (score / 8) * 100;
+            let message = '';
+            let stars = '';
+            
+            if (percentage >= 87.5) {
+                message = 'Outstanding! You\'re a Conversion Master! 🏆';
+                stars = '⭐⭐⭐';
+                createConfetti();
+            } else if (percentage >= 75) {
+                message = 'Excellent work! Almost perfect! 🌟';
+                stars = '⭐⭐';
+            } else if (percentage >= 62.5) {
+                message = 'Great job! Keep practicing! 💫';
+                stars = '⭐';
+            } else {
+                message = 'Good try! Review the formulas and try again! 💪';
+                stars = '📚';
+            }
+
+            const gameArea = document.getElementById(prefix + 'Level');
+            gameArea.innerHTML = `
+                <div class="conversion-display">
+                    <div class="conversion-formula">🎊 Level Complete! 🎊</div>
+                </div>
+                <div class="question-box">
+                    <div class="visual-aid">🏆</div>
+                    <h2 style="font-size: 2em; color: #764ba2; margin: 20px 0;">Conversion Champion!</h2>
+                    <div style="font-size: 3em; margin: 20px 0;">${stars}</div>
+                    <p style="font-size: 1.5em; margin: 20px 0;">Your Score: ${score}/8</p>
+                    <p style="font-size: 1.2em; color: #666;">${message}</p>
+                    <div style="margin-top: 30px;">
+                        <button class="level-btn ${prefix}-btn" onclick="startLevel('${prefix}')">Play Again</button>
+                        <button class="back-btn" onclick="backToMenu()" style="margin-left: 10px;">Back to Menu</button>
+                    </div>
+                </div>
+                
+                <div style="height: 300px; background: linear-gradient(135deg, #ffecd2 0%, #fcb69f 100%); border-radius: 20px; margin-top: 20px; padding: 20px;">
+                    <h3 style="color: #764ba2; text-align: center; margin-bottom: 15px;">🎯 Your Results 🎯</h3>
+                    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 15px;">
+                        <div style="background: white; padding: 15px; border-radius: 10px; text-align: center;">
+                            <div style="font-size: 2em;">${score}</div>
+                            <div style="color: #666;">Correct Answers</div>
+                        </div>
+                        <div style="background: white; padding: 15px; border-radius: 10px; text-align: center;">
+                            <div style="font-size: 2em;">${8 - score}</div>
+                            <div style="color: #666;">Wrong Answers</div>
+                        </div>
+                    </div>
+                    <div style="background: white; padding: 15px; border-radius: 10px; text-align: center; margin-top: 15px;">
+                        <div style="font-size: 2em; color: #43e97b;">${Math.round(percentage)}%</div>
+                        <div style="color: #666;">Success Rate</div>
+                    </div>
+                    <div style="background: white; padding: 15px; border-radius: 10px; text-align: center; margin-top: 15px;">
+                        <div style="font-size: 1.5em; color: #764ba2;">${stars}</div>
+                        <div style="color: #666;">Performance Rating</div>
+                    </div>
+                </div>
+            `;
+        }
+
+        function backToMenu() {
+            document.querySelectorAll('.game-area').forEach(area => {
+                area.classList.remove('active');
+            });
+            document.getElementById('menuScreen').style.display = 'block';
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+        }
+
+        document.documentElement.style.scrollBehavior = 'smooth';
+    </script>
+</body>
+</html>
