@@ -1,0 +1,2319 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Math Granny's Haunting - Educational Horror</title>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Creepster&family=Nosifer&family=Griffy&family=Merriweather:wght@300;400&display=swap');
+        
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            user-select: none;
+            -webkit-user-select: none;
+            -webkit-touch-callout: none;
+        }
+        
+        body {
+            font-family: 'Merriweather', serif;
+            background: #000;
+            overflow: hidden;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            position: relative;
+        }
+        
+        #gameContainer {
+            position: relative;
+            width: 100%;
+            max-width: 1400px;
+            height: 100vh;
+            max-height: 700px;
+            background: #000;
+            overflow: hidden;
+            box-shadow: 0 0 30px rgba(0, 0, 0, 0.8);
+        }
+        
+        #gameCanvas {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            image-rendering: optimizeSpeed;
+        }
+        
+        #ui {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+            z-index: 10;
+        }
+        
+        .hud {
+            position: absolute;
+            top: 20px;
+            left: 20px;
+            right: 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+        }
+        
+        .hud-item {
+            background: rgba(0, 0, 0, 0.7);
+            border: 1px solid #4a0000;
+            padding: 10px 15px;
+            border-radius: 5px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            color: #ccc;
+            font-size: 14px;
+        }
+        
+        .battery-bar {
+            width: 100px;
+            height: 10px;
+            background: rgba(0, 0, 0, 0.5);
+            border: 1px solid #4a0000;
+            position: relative;
+        }
+        
+        .battery-fill {
+            height: 100%;
+            background: linear-gradient(to right, #4a0000, #ff0000);
+            width: 70%;
+            transition: width 0.3s ease;
+        }
+        
+        .sanity-bar {
+            width: 100px;
+            height: 10px;
+            background: rgba(0, 0, 0, 0.5);
+            border: 1px solid #4a0000;
+            position: relative;
+        }
+        
+        .sanity-fill {
+            height: 100%;
+            background: linear-gradient(to right, #4a0000, #8b008b);
+            width: 100%;
+            transition: width 0.3s ease;
+        }
+        
+        #startScreen {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(135deg, #000000 0%, #1a0000 100%);
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            z-index: 100;
+            overflow: hidden;
+        }
+        
+        #startScreen::before {
+            content: "";
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="100" height="100" viewBox="0 0 100 100"><rect width="100" height="100" fill="none"/><path d="M0,0 L100,100 M100,0 L0,100" stroke="rgba(255,0,0,0.03)" stroke-width="1"/></svg>');
+            opacity: 0.5;
+        }
+        
+        #startScreen h1 {
+            font-family: 'Nosifer', cursive;
+            font-size: 48px;
+            color: #8b0000;
+            text-shadow: 0 0 20px rgba(139, 0, 0, 0.8);
+            margin-bottom: 20px;
+            letter-spacing: 2px;
+            animation: pulse 2s infinite;
+            z-index: 1;
+        }
+        
+        @keyframes pulse {
+            0%, 100% { opacity: 0.8; }
+            50% { opacity: 1; }
+        }
+        
+        #startScreen p {
+            font-family: 'Merriweather', serif;
+            font-size: 16px;
+            color: #ccc;
+            margin-bottom: 30px;
+            max-width: 600px;
+            text-align: center;
+            line-height: 1.6;
+            z-index: 1;
+        }
+        
+        .menu-btn {
+            padding: 12px 30px;
+            font-family: 'Griffy', cursive;
+            font-size: 18px;
+            background: transparent;
+            color: #8b0000;
+            border: 2px solid #8b0000;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            margin: 10px;
+            letter-spacing: 1px;
+            z-index: 1;
+        }
+        
+        .menu-btn:hover {
+            background: #8b0000;
+            color: #fff;
+            box-shadow: 0 0 15px rgba(139, 0, 0, 0.8);
+        }
+        
+        .difficulty-selector {
+            display: flex;
+            gap: 10px;
+            margin: 20px 0;
+            z-index: 1;
+        }
+        
+        .difficulty-btn {
+            padding: 8px 20px;
+            font-family: 'Griffy', cursive;
+            font-size: 16px;
+            background: transparent;
+            color: #8b0000;
+            border: 1px solid #8b0000;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+        
+        .difficulty-btn.active {
+            background: #8b0000;
+            color: #fff;
+        }
+        
+        #mathPuzzle {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            background: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="400" height="300" viewBox="0 0 400 300"><rect width="400" height="300" fill="%23f5f0e1"/><rect x="20" y="20" width="360" height="260" fill="none" stroke="%238b4513" stroke-width="4" stroke-dasharray="10,5"/></svg>');
+            background-size: cover;
+            padding: 40px;
+            border-radius: 5px;
+            box-shadow: 0 10px 40px rgba(0,0,0,0.8);
+            display: none;
+            z-index: 100;
+            text-align: center;
+            animation: slideIn 0.5s ease-out;
+        }
+        
+        @keyframes slideIn {
+            0% {
+                transform: translate(-50%, -50%) scale(0.8);
+                opacity: 0;
+            }
+            100% {
+                transform: translate(-50%, -50%) scale(1);
+                opacity: 1;
+            }
+        }
+        
+        #mathPuzzle h2 {
+            font-family: 'Creepster', cursive;
+            color: #8b0000;
+            margin-bottom: 20px;
+            font-size: 28px;
+            text-shadow: 1px 1px 3px rgba(0,0,0,0.5);
+        }
+        
+        #mathPuzzle p {
+            font-family: 'Griffy', cursive;
+            font-size: 24px;
+            color: #333;
+            margin-bottom: 25px;
+            line-height: 1.5;
+        }
+        
+        .answer-buttons {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 15px;
+        }
+        
+        .answer-btn {
+            padding: 15px 25px;
+            font-family: 'Griffy', cursive;
+            font-size: 22px;
+            font-weight: bold;
+            border: none;
+            border-radius: 5px;
+            background: #f5f0e1;
+            color: #333;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.3);
+            border: 2px solid #8b4513;
+        }
+        
+        .answer-btn:hover {
+            background: #8b0000;
+            color: #fff;
+            transform: translateY(-3px);
+            box-shadow: 0 6px 15px rgba(139, 0, 0, 0.6);
+        }
+        
+        #gameOverScreen {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.9);
+            display: none;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            z-index: 100;
+        }
+        
+        #gameOverScreen h2 {
+            font-family: 'Nosifer', cursive;
+            font-size: 42px;
+            color: #8b0000;
+            margin-bottom: 20px;
+            text-shadow: 0 0 20px rgba(139, 0, 0, 0.8);
+        }
+        
+        #gameOverScreen p {
+            font-family: 'Merriweather', serif;
+            font-size: 18px;
+            color: #ccc;
+            margin-bottom: 30px;
+            max-width: 600px;
+            text-align: center;
+        }
+        
+        #levelCompleteScreen {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.9);
+            display: none;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            z-index: 100;
+        }
+        
+        #levelCompleteScreen h2 {
+            font-family: 'Nosifer', cursive;
+            font-size: 42px;
+            color: #4CAF50;
+            margin-bottom: 20px;
+            text-shadow: 0 0 20px rgba(76, 175, 80, 0.8);
+        }
+        
+        #levelCompleteScreen p {
+            font-family: 'Merriweather', serif;
+            font-size: 18px;
+            color: #ccc;
+            margin-bottom: 30px;
+            max-width: 600px;
+            text-align: center;
+        }
+        
+        #controls {
+            position: absolute;
+            bottom: 20px;
+            left: 50%;
+            transform: translateX(-50%);
+            display: flex;
+            gap: 20px;
+            z-index: 20;
+        }
+        
+        .control-btn {
+            width: 60px;
+            height: 60px;
+            background: rgba(0, 0, 0, 0.7);
+            border: 2px solid #4a0000;
+            border-radius: 50%;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            color: #ccc;
+            font-size: 24px;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            pointer-events: auto;
+        }
+        
+        .control-btn:active {
+            background: #4a0000;
+            transform: scale(0.95);
+        }
+        
+        .control-pad {
+            position: absolute;
+            bottom: 100px;
+            left: 50px;
+            width: 120px;
+            height: 120px;
+            pointer-events: auto;
+        }
+        
+        .control-pad-btn {
+            position: absolute;
+            width: 40px;
+            height: 40px;
+            background: rgba(0, 0, 0, 0.7);
+            border: 2px solid #4a0000;
+            border-radius: 5px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            color: #ccc;
+            font-size: 18px;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+        
+        .control-pad-btn:active {
+            background: #4a0000;
+            transform: scale(0.95);
+        }
+        
+        .control-pad-up {
+            top: 0;
+            left: 40px;
+        }
+        
+        .control-pad-down {
+            bottom: 0;
+            left: 40px;
+        }
+        
+        .control-pad-left {
+            top: 40px;
+            left: 0;
+        }
+        
+        .control-pad-right {
+            top: 40px;
+            right: 0;
+        }
+        
+        .glitch {
+            animation: glitch 0.3s infinite;
+        }
+        
+        @keyframes glitch {
+            0% { transform: translate(0); }
+            20% { transform: translate(-2px, 2px); }
+            40% { transform: translate(-2px, -2px); }
+            60% { transform: translate(2px, 2px); }
+            80% { transform: translate(2px, -2px); }
+            100% { transform: translate(0); }
+        }
+        
+        .heartbeat {
+            animation: heartbeat 0.8s infinite;
+        }
+        
+        @keyframes heartbeat {
+            0%, 100% { transform: scale(1); }
+            50% { transform: scale(1.05); }
+        }
+        
+        .door-interaction {
+            position: absolute;
+            bottom: 20px;
+            left: 50%;
+            transform: translateX(-50%);
+            background: rgba(0, 0, 0, 0.7);
+            border: 2px solid #4CAF50;
+            padding: 10px 20px;
+            border-radius: 5px;
+            color: #4CAF50;
+            font-family: 'Griffy', cursive;
+            font-size: 16px;
+            display: none;
+            z-index: 20;
+            animation: pulse 1.5s infinite;
+        }
+        
+        .minimap {
+            position: absolute;
+            top: 80px;
+            right: 20px;
+            width: 200px;
+            height: 100px;
+            background: rgba(0, 0, 0, 0.8);
+            border: 2px solid #4a0000;
+            border-radius: 5px;
+            z-index: 15;
+        }
+        
+        .minimap-dot {
+            position: absolute;
+            width: 4px;
+            height: 4px;
+            border-radius: 50%;
+        }
+        
+        .minimap-player {
+            background: #4CAF50;
+        }
+        
+        .minimap-granny {
+            background: #ff0000;
+        }
+        
+        .minimap-scroll {
+            background: #ffff00;
+        }
+        
+        .minimap-door {
+            background: #00ffff;
+        }
+    </style>
+</head>
+<body>
+    <div id="gameContainer">
+        <canvas id="gameCanvas"></canvas>
+        
+        <div id="ui">
+            <div class="hud">
+                <div class="hud-item">
+                    <span>🔦</span>
+                    <div class="battery-bar">
+                        <div class="battery-fill" id="batteryFill"></div>
+                    </div>
+                </div>
+                <div class="hud-item">
+                    <span>🧠</span>
+                    <div class="sanity-bar">
+                        <div class="sanity-fill" id="sanityFill"></div>
+                    </div>
+                </div>
+                <div class="hud-item">
+                    <span>📚</span>
+                    <span id="level">Level 1</span>
+                </div>
+                <div class="hud-item">
+                    <span>🗺️</span>
+                    <span id="roomIndicator">Room 1</span>
+                </div>
+            </div>
+            
+            <div class="minimap" id="minimap"></div>
+        </div>
+        
+        <div id="startScreen">
+            <h1>MATH GRANNY'S HAUNTING</h1>
+            <p>You're trapped in Granny's haunted mansion. Explore the endless halls, solve division problems to gain powers and fight back, or fail and face her wrath. Your mind is your only weapon...</p>
+            
+            <div class="difficulty-selector">
+                <button class="difficulty-btn active" data-difficulty="easy">Easy</button>
+                <button class="difficulty-btn" data-difficulty="normal">Normal</button>
+                <button class="difficulty-btn" data-difficulty="hard">Hard</button>
+            </div>
+            
+            <button class="menu-btn" onclick="startGame()">BEGIN NIGHTMARE</button>
+        </div>
+        
+        <div id="mathPuzzle">
+            <h2>📖 Solve to Survive</h2>
+            <p id="questionText"></p>
+            <div class="answer-buttons" id="answerButtons"></div>
+        </div>
+        
+        <div id="gameOverScreen">
+            <h2>GAME OVER</h2>
+            <p id="deathMessage">Granny got you... Your mind couldn't handle the pressure.</p>
+            <button class="menu-btn" onclick="restartGame()">TRY AGAIN</button>
+            <button class="menu-btn" onclick="backToMenu()">MAIN MENU</button>
+        </div>
+        
+        <div id="levelCompleteScreen">
+            <h2>LEVEL COMPLETE!</h2>
+            <p>You've solved all the division problems and escaped Granny's grasp... for now.</p>
+            <button class="menu-btn" onclick="nextLevel()">NEXT LEVEL</button>
+        </div>
+        
+        <div class="door-interaction" id="doorInteraction">Press SPACE to enter the next level</div>
+        
+        <div class="control-pad">
+            <div class="control-pad-btn control-pad-up" data-direction="up">↑</div>
+            <div class="control-pad-btn control-pad-down" data-direction="down">↓</div>
+            <div class="control-pad-btn control-pad-left" data-direction="left">←</div>
+            <div class="control-pad-btn control-pad-right" data-direction="right">→</div>
+        </div>
+        
+        <div id="controls">
+            <div class="control-btn" id="hideBtn">👁️</div>
+            <div class="control-btn" id="interactBtn">✋</div>
+            <div class="control-btn" id="sprintBtn">🏃</div>
+        </div>
+    </div>
+    
+    <script>
+        const canvas = document.getElementById('gameCanvas');
+        const ctx = canvas.getContext('2d');
+        
+        // Set canvas size
+        function resizeCanvas() {
+            canvas.width = window.innerWidth < 1400 ? window.innerWidth : 1400;
+            canvas.height = window.innerHeight < 700 ? window.innerHeight : 700;
+        }
+        
+        resizeCanvas();
+        window.addEventListener('resize', resizeCanvas);
+        
+        // Game world dimensions
+        const WORLD_WIDTH = 2400; // Extended world width
+        const WORLD_HEIGHT = 600;
+        const ROOM_WIDTH = 800; // Each room is 800px wide
+        const NUM_ROOMS = 3; // 3 rooms side by side
+        
+        // Camera
+        const camera = {
+            x: 0,
+            y: 0,
+            width: canvas.width,
+            height: canvas.height,
+            followSpeed: 0.1
+        };
+        
+        // Game state
+        let gameRunning = false;
+        let currentLevel = 1;
+        let battery = 70;
+        let sanity = 100;
+        let difficulty = 'easy';
+        let puzzleActive = false;
+        let currentPuzzle = null;
+        let timeLimit = 10000; // 10 seconds for easy difficulty
+        let puzzleTimer = null;
+        let powerUpActive = false;
+        let powerUpTimer = 0;
+        let grannyAggression = 1;
+        let consecutiveCorrect = 0;
+        let consecutiveWrong = 0;
+        let allPuzzlesSolved = false;
+        let doorOpen = false;
+        let currentRoom = 1;
+        
+        // Math problems database - All division problems
+        const mathProblems = {
+            easy: [
+                { question: "20 ÷ 4 = ?", answer: 5, options: [5, 4, 6, 3] },
+                { question: "15 ÷ 3 = ?", answer: 5, options: [5, 4, 6, 3] },
+                { question: "18 ÷ 2 = ?", answer: 9, options: [9, 8, 10, 7] },
+                { question: "24 ÷ 6 = ?", answer: 4, options: [4, 3, 5, 6] },
+                { question: "30 ÷ 5 = ?", answer: 6, options: [6, 5, 7, 4] },
+                { question: "21 ÷ 7 = ?", answer: 3, options: [3, 2, 4, 5] },
+                { question: "16 ÷ 4 = ?", answer: 4, options: [4, 3, 5, 6] },
+                { question: "27 ÷ 9 = ?", answer: 3, options: [3, 2, 4, 5] },
+                { question: "35 ÷ 7 = ?", answer: 5, options: [5, 4, 6, 7] },
+                { question: "40 ÷ 8 = ?", answer: 5, options: [5, 4, 6, 7] },
+                { question: "12 ÷ 3 = ?", answer: 4, options: [4, 3, 5, 6] },
+                { question: "14 ÷ 2 = ?", answer: 7, options: [7, 6, 8, 5] },
+                { question: "25 ÷ 5 = ?", answer: 5, options: [5, 4, 6, 7] },
+                { question: "28 ÷ 7 = ?", answer: 4, options: [4, 3, 5, 6] },
+                { question: "32 ÷ 8 = ?", answer: 4, options: [4, 3, 5, 6] },
+                { question: "36 ÷ 9 = ?", answer: 4, options: [4, 3, 5, 6] },
+                { question: "45 ÷ 9 = ?", answer: 5, options: [5, 4, 6, 7] },
+                { question: "50 ÷ 10 = ?", answer: 5, options: [5, 4, 6, 7] },
+                { question: "42 ÷ 6 = ?", answer: 7, options: [7, 6, 8, 5] },
+                { question: "33 ÷ 3 = ?", answer: 11, options: [11, 10, 12, 9] }
+            ],
+            normal: [
+                { question: "45 ÷ 9 = ?", answer: 5, options: [5, 4, 6, 3] },
+                { question: "56 ÷ 8 = ?", answer: 7, options: [7, 6, 8, 5] },
+                { question: "72 ÷ 9 = ?", answer: 8, options: [8, 7, 9, 6] },
+                { question: "84 ÷ 12 = ?", answer: 7, options: [7, 6, 8, 5] },
+                { question: "96 ÷ 8 = ?", answer: 12, options: [12, 10, 14, 8] },
+                { question: "63 ÷ 7 = ?", answer: 9, options: [9, 8, 10, 7] },
+                { question: "48 ÷ 6 = ?", answer: 8, options: [8, 7, 9, 6] },
+                { question: "54 ÷ 9 = ?", answer: 6, options: [6, 5, 7, 4] },
+                { question: "66 ÷ 11 = ?", answer: 6, options: [6, 5, 7, 4] },
+                { question: "78 ÷ 6 = ?", answer: 13, options: [13, 12, 14, 11] },
+                { question: "90 ÷ 10 = ?", answer: 9, options: [9, 8, 10, 7] },
+                { question: "81 ÷ 9 = ?", answer: 9, options: [9, 8, 10, 7] },
+                { question: "75 ÷ 5 = ?", answer: 15, options: [15, 14, 16, 13] },
+                { question: "64 ÷ 8 = ?", answer: 8, options: [8, 7, 9, 6] },
+                { question: "99 ÷ 11 = ?", answer: 9, options: [9, 8, 10, 7] },
+                { question: "108 ÷ 12 = ?", answer: 9, options: [9, 8, 10, 7] },
+                { question: "112 ÷ 14 = ?", answer: 8, options: [8, 7, 9, 6] },
+                { question: "126 ÷ 9 = ?", answer: 14, options: [14, 13, 15, 12] },
+                { question: "132 ÷ 11 = ?", answer: 12, options: [12, 11, 13, 10] },
+                { question: "140 ÷ 10 = ?", answer: 14, options: [14, 13, 15, 12] }
+            ],
+            hard: [
+                { question: "144 ÷ 12 = ?", answer: 12, options: [12, 10, 14, 8] },
+                { question: "156 ÷ 13 = ?", answer: 12, options: [12, 11, 13, 10] },
+                { question: "168 ÷ 14 = ?", answer: 12, options: [12, 11, 13, 10] },
+                { question: "192 ÷ 16 = ?", answer: 12, options: [12, 11, 13, 10] },
+                { question: "225 ÷ 15 = ?", answer: 15, options: [15, 14, 16, 13] },
+                { question: "272 ÷ 17 = ?", answer: 16, options: [16, 15, 17, 14] },
+                { question: "306 ÷ 18 = ?", answer: 17, options: [17, 16, 18, 15] },
+                { question: "342 ÷ 19 = ?", answer: 18, options: [18, 17, 19, 16] },
+                { question: "380 ÷ 20 = ?", answer: 19, options: [19, 18, 20, 17] },
+                { question: "420 ÷ 21 = ?", answer: 20, options: [20, 19, 21, 18] },
+                { question: "462 ÷ 22 = ?", answer: 21, options: [21, 20, 22, 19] },
+                { question: "506 ÷ 23 = ?", answer: 22, options: [22, 21, 23, 20] },
+                { question: "552 ÷ 24 = ?", answer: 23, options: [23, 22, 24, 21] },
+                { question: "600 ÷ 25 = ?", answer: 24, options: [24, 23, 25, 22] },
+                { question: "650 ÷ 26 = ?", answer: 25, options: [25, 24, 26, 23] },
+                { question: "702 ÷ 27 = ?", answer: 26, options: [26, 25, 27, 24] },
+                { question: "756 ÷ 28 = ?", answer: 27, options: [27, 26, 28, 25] },
+                { question: "812 ÷ 29 = ?", answer: 28, options: [28, 27, 29, 26] },
+                { question: "870 ÷ 30 = ?", answer: 29, options: [29, 28, 30, 27] },
+                { question: "930 ÷ 31 = ?", answer: 30, options: [30, 29, 31, 28] }
+            ]
+        };
+        
+        // Input handling
+        const keys = {};
+        const touch = { x: 0, y: 0, active: false };
+        
+        document.addEventListener('keydown', (e) => {
+            keys[e.key.toLowerCase()] = true;
+            
+            if (['ArrowUp', 'ArrowDown', 'ArrowLeft', 'ArrowRight'].includes(e.key)) {
+                e.preventDefault();
+            }
+        });
+        
+        document.addEventListener('keyup', (e) => {
+            keys[e.key.toLowerCase()] = false;
+        });
+        
+        // Touch controls
+        document.addEventListener('touchstart', (e) => {
+            touch.x = e.touches[0].clientX;
+            touch.y = e.touches[0].clientY;
+            touch.active = true;
+        });
+        
+        document.addEventListener('touchmove', (e) => {
+            if (touch.active) {
+                touch.x = e.touches[0].clientX;
+                touch.y = e.touches[0].clientY;
+            }
+        });
+        
+        document.addEventListener('touchend', () => {
+            touch.active = false;
+        });
+        
+        // Control pad buttons
+        document.querySelectorAll('.control-pad-btn').forEach(btn => {
+            btn.addEventListener('touchstart', (e) => {
+                e.preventDefault();
+                const direction = btn.getAttribute('data-direction');
+                keys[direction] = true;
+            });
+            
+            btn.addEventListener('touchend', (e) => {
+                e.preventDefault();
+                const direction = btn.getAttribute('data-direction');
+                keys[direction] = false;
+            });
+            
+            btn.addEventListener('mousedown', (e) => {
+                const direction = btn.getAttribute('data-direction');
+                keys[direction] = true;
+            });
+            
+            btn.addEventListener('mouseup', (e) => {
+                const direction = btn.getAttribute('data-direction');
+                keys[direction] = false;
+            });
+        });
+        
+        // Action buttons
+        document.getElementById('hideBtn').addEventListener('touchstart', (e) => {
+            e.preventDefault();
+            keys['h'] = true;
+        });
+        
+        document.getElementById('hideBtn').addEventListener('touchend', (e) => {
+            e.preventDefault();
+            keys['h'] = false;
+        });
+        
+        document.getElementById('interactBtn').addEventListener('touchstart', (e) => {
+            e.preventDefault();
+            keys[' '] = true;
+        });
+        
+        document.getElementById('interactBtn').addEventListener('touchend', (e) => {
+            e.preventDefault();
+            keys[' '] = false;
+        });
+        
+        document.getElementById('sprintBtn').addEventListener('touchstart', (e) => {
+            e.preventDefault();
+            keys['shift'] = true;
+        });
+        
+        document.getElementById('sprintBtn').addEventListener('touchend', (e) => {
+            e.preventDefault();
+            keys['shift'] = false;
+        });
+        
+        // Difficulty selection
+        document.querySelectorAll('.difficulty-btn').forEach(btn => {
+            btn.addEventListener('click', () => {
+                document.querySelectorAll('.difficulty-btn').forEach(b => b.classList.remove('active'));
+                btn.classList.add('active');
+                difficulty = btn.getAttribute('data-difficulty');
+                
+                // Adjust time limit based on difficulty
+                if (difficulty === 'easy') {
+                    timeLimit = 10000; // 10 seconds
+                } else if (difficulty === 'normal') {
+                    timeLimit = 7000; // 7 seconds
+                } else {
+                    timeLimit = 5000; // 5 seconds
+                }
+            });
+        });
+        
+        // Update camera to follow player
+        function updateCamera() {
+            const targetX = player.x - camera.width / 2;
+            const targetY = player.y - camera.height / 2;
+            
+            // Smooth camera following
+            camera.x += (targetX - camera.x) * camera.followSpeed;
+            camera.y += (targetY - camera.y) * camera.followSpeed;
+            
+            // Keep camera within world bounds
+            camera.x = Math.max(0, Math.min(WORLD_WIDTH - camera.width, camera.x));
+            camera.y = Math.max(0, Math.min(WORLD_HEIGHT - camera.height, camera.y));
+            
+            // Update current room based on camera position
+            currentRoom = Math.floor(camera.x / ROOM_WIDTH) + 1;
+            document.getElementById('roomIndicator').textContent = `Room ${currentRoom}`;
+            
+            // Update minimap
+            updateMinimap();
+        }
+        
+        // Update minimap
+        function updateMinimap() {
+            const minimap = document.getElementById('minimap');
+            minimap.innerHTML = '';
+            
+            // Draw room boundaries
+            for (let i = 0; i < NUM_ROOMS; i++) {
+                const roomDiv = document.createElement('div');
+                roomDiv.style.position = 'absolute';
+                roomDiv.style.left = (i * 200 / NUM_ROOMS) + 'px';
+                roomDiv.style.top = '0px';
+                roomDiv.style.width = (200 / NUM_ROOMS - 2) + 'px';
+                roomDiv.style.height = '100px';
+                roomDiv.style.border = '1px solid #333';
+                roomDiv.style.background = 'rgba(50, 50, 50, 0.5)';
+                minimap.appendChild(roomDiv);
+            }
+            
+            // Player position on minimap
+            const playerDot = document.createElement('div');
+            playerDot.className = 'minimap-dot minimap-player';
+            playerDot.style.left = (player.x / WORLD_WIDTH * 200) + 'px';
+            playerDot.style.top = (player.y / WORLD_HEIGHT * 100) + 'px';
+            minimap.appendChild(playerDot);
+            
+            // Granny position on minimap
+            const grannyDot = document.createElement('div');
+            grannyDot.className = 'minimap-dot minimap-granny';
+            grannyDot.style.left = (granny.x / WORLD_WIDTH * 200) + 'px';
+            grannyDot.style.top = (granny.y / WORLD_HEIGHT * 100) + 'px';
+            minimap.appendChild(grannyDot);
+            
+            // Math scrolls on minimap
+            mathScrolls.forEach(scroll => {
+                if (!scroll.solved) {
+                    const scrollDot = document.createElement('div');
+                    scrollDot.className = 'minimap-dot minimap-scroll';
+                    scrollDot.style.left = (scroll.x / WORLD_WIDTH * 200) + 'px';
+                    scrollDot.style.top = (scroll.y / WORLD_HEIGHT * 100) + 'px';
+                    minimap.appendChild(scrollDot);
+                }
+            });
+            
+            // Door on minimap
+            if (door && !door.open) {
+                const doorDot = document.createElement('div');
+                doorDot.className = 'minimap-dot minimap-door';
+                doorDot.style.left = (door.x / WORLD_WIDTH * 200) + 'px';
+                doorDot.style.top = (door.y / WORLD_HEIGHT * 100) + 'px';
+                minimap.appendChild(doorDot);
+            }
+        }
+        
+        // Player class
+        class Player {
+            constructor() {
+                this.x = WORLD_WIDTH / 2;
+                this.y = WORLD_HEIGHT / 2;
+                this.width = 30;
+                this.height = 40;
+                this.velocityX = 0;
+                this.velocityY = 0;
+                this.speed = 2;
+                this.sprintSpeed = 4;
+                this.facing = 1; // 1 for right, -1 for left
+                this.hiding = false;
+                this.hidingSpot = null;
+                this.canSprint = true;
+                this.sprintCooldown = 0;
+                this.heartbeat = 0;
+                this.animationFrame = 0;
+                this.state = 'idle'; // idle, walking, running, hiding
+            }
+            
+            update() {
+                // Handle sprint cooldown
+                if (this.sprintCooldown > 0) {
+                    this.sprintCooldown--;
+                }
+                
+                // Movement
+                const currentSpeed = (keys['shift'] && this.canSprint && this.sprintCooldown === 0) ? this.sprintSpeed : this.speed;
+                
+                if (keys['left'] || keys['arrowleft']) {
+                    this.velocityX = -currentSpeed;
+                    this.facing = -1;
+                    this.state = keys['shift'] ? 'running' : 'walking';
+                } else if (keys['right'] || keys['arrowright']) {
+                    this.velocityX = currentSpeed;
+                    this.facing = 1;
+                    this.state = keys['shift'] ? 'running' : 'walking';
+                } else {
+                    this.velocityX = 0;
+                    if (this.state !== 'hiding') this.state = 'idle';
+                }
+                
+                if (keys['up'] || keys['arrowup']) {
+                    this.velocityY = -currentSpeed;
+                    if (this.state !== 'hiding') this.state = keys['shift'] ? 'running' : 'walking';
+                } else if (keys['down'] || keys['arrowdown']) {
+                    this.velocityY = currentSpeed;
+                    if (this.state !== 'hiding') this.state = keys['shift'] ? 'running' : 'walking';
+                } else {
+                    this.velocityY = 0;
+                    if (this.velocityX === 0 && this.state !== 'hiding') this.state = 'idle';
+                }
+                
+                // Hide/Unhide
+                if (keys['h'] && !this.hiding) {
+                    this.tryHide();
+                } else if (!keys['h'] && this.hiding) {
+                    this.unhide();
+                }
+                
+                // Update position if not hiding
+                if (!this.hiding) {
+                    this.x += this.velocityX;
+                    this.y += this.velocityY;
+                    
+                    // Keep player in world bounds
+                    this.x = Math.max(this.width/2, Math.min(WORLD_WIDTH - this.width/2, this.x));
+                    this.y = Math.max(this.height/2, Math.min(WORLD_HEIGHT - this.height/2, this.y));
+                    
+                    // Sprint uses battery
+                    if (keys['shift'] && this.canSprint && this.sprintCooldown === 0) {
+                        battery -= 0.5;
+                        if (battery <= 0) {
+                            battery = 0;
+                            this.canSprint = false;
+                        }
+                        document.getElementById('batteryFill').style.width = battery + '%';
+                    }
+                }
+                
+                // Animation
+                this.animationFrame += 0.1;
+                
+                // Heartbeat when granny is near
+                const distanceToGranny = Math.sqrt(
+                    Math.pow(granny.x - this.x, 2) + 
+                    Math.pow(granny.y - this.y, 2)
+                );
+                
+                if (distanceToGranny < 200) {
+                    this.heartbeat = Math.min(1, this.heartbeat + 0.05);
+                } else {
+                    this.heartbeat = Math.max(0, this.heartbeat - 0.02);
+                }
+            }
+            
+            draw() {
+                ctx.save();
+                
+                // Apply heartbeat effect
+                if (this.heartbeat > 0) {
+                    const scale = 1 + this.heartbeat * 0.05;
+                    ctx.translate(this.x - camera.x, this.y - camera.y);
+                    ctx.scale(scale, scale);
+                    ctx.translate(-(this.x - camera.x), -(this.y - camera.y));
+                }
+                
+                // Draw player shadow
+                ctx.fillStyle = 'rgba(0, 0, 0, 0.5)';
+                ctx.ellipse(this.x - camera.x, this.y - camera.y + this.height/2 + 5, this.width/2, 5, 0, 0, Math.PI * 2);
+                ctx.fill();
+                
+                // Draw player
+                if (this.hiding) {
+                    // Draw hiding indicator
+                    ctx.fillStyle = 'rgba(0, 0, 0, 0.7)';
+                    ctx.fillRect(this.x - camera.x - this.width/2 - 5, this.y - camera.y - this.height/2 - 5, this.width + 10, this.height + 10);
+                }
+                
+                // Player body
+                ctx.fillStyle = '#333';
+                ctx.fillRect(this.x - camera.x - this.width/2, this.y - camera.y - this.height/2, this.width, this.height);
+                
+                // Player head
+                ctx.fillStyle = '#555';
+                ctx.beginPath();
+                ctx.arc(this.x - camera.x, this.y - camera.y - this.height/2 - 10, 10, 0, Math.PI * 2);
+                ctx.fill();
+                
+                // Eyes (glowing when power-up is active)
+                ctx.fillStyle = powerUpActive ? '#ff0' : '#000';
+                ctx.beginPath();
+                ctx.arc(this.x - camera.x - 3 * this.facing, this.y - camera.y - this.height/2 - 10, 2, 0, Math.PI * 2);
+                ctx.arc(this.x - camera.x + 3 * this.facing, this.y - camera.y - this.height/2 - 10, 2, 0, Math.PI * 2);
+                ctx.fill();
+                
+                // Draw flashlight beam
+                if (battery > 0) {
+                    ctx.save();
+                    ctx.translate(this.x - camera.x, this.y - camera.y - this.height/2 - 10);
+                    ctx.rotate(this.facing * 0.3);
+                    
+                    const gradient = ctx.createLinearGradient(0, 0, this.facing * 150, 0);
+                    gradient.addColorStop(0, 'rgba(255, 255, 200, 0.3)');
+                    gradient.addColorStop(1, 'rgba(255, 255, 200, 0)');
+                    
+                    ctx.fillStyle = gradient;
+                    ctx.beginPath();
+                    ctx.moveTo(0, 0);
+                    ctx.lineTo(this.facing * 150, -40);
+                    ctx.lineTo(this.facing * 150, 40);
+                    ctx.closePath();
+                    ctx.fill();
+                    
+                    ctx.restore();
+                }
+                
+                ctx.restore();
+            }
+            
+            tryHide() {
+                // Check if near hiding spot
+                for (let spot of hidingSpots) {
+                    const distance = Math.sqrt(
+                        Math.pow(spot.x - this.x, 2) + 
+                        Math.pow(spot.y - this.y, 2)
+                    );
+                    
+                    if (distance < 50 && !spot.occupied) {
+                        this.hiding = true;
+                        this.hidingSpot = spot;
+                        spot.occupied = true;
+                        this.state = 'hiding';
+                        return;
+                    }
+                }
+            }
+            
+            unhide() {
+                if (this.hidingSpot) {
+                    this.hidingSpot.occupied = false;
+                    this.hidingSpot = null;
+                }
+                this.hiding = false;
+            }
+            
+            scare() {
+                // Player gets scared
+                sanity -= 20;
+                document.getElementById('sanityFill').style.width = sanity + '%';
+                
+                // Add screen shake
+                gameScreenShake = 20;
+                
+                // Add jump scare effect
+                document.getElementById('gameContainer').classList.add('glitch');
+                setTimeout(() => {
+                    document.getElementById('gameContainer').classList.remove('glitch');
+                }, 300);
+                
+                if (sanity <= 0) {
+                    gameOver();
+                }
+            }
+        }
+        
+        // Granny class
+        class Granny {
+            constructor() {
+                this.x = WORLD_WIDTH / 2;
+                this.y = WORLD_HEIGHT / 2;
+                this.width = 40;
+                this.height = 60;
+                this.velocityX = 0;
+                this.velocityY = 0;
+                this.speed = 1 + grannyAggression * 0.3;
+                this.facing = 1;
+                this.state = 'patrol'; // patrol, search, chase, stunned, banished
+                this.targetX = this.x;
+                this.targetY = this.y;
+                this.patrolPoints = this.generatePatrolPoints();
+                this.currentPatrolIndex = 0;
+                this.detectionRadius = 100;
+                this.visionAngle = Math.PI / 3;
+                this.lastSeenPlayerX = null;
+                this.lastSeenPlayerY = null;
+                this.searchTimer = 0;
+                this.stunnedTimer = 0;
+                this.banishedTimer = 0;
+                this.animationFrame = 0;
+                this.teleportCooldown = 0;
+                this.whisperTimer = 0;
+                this.whisperText = "";
+            }
+            
+            generatePatrolPoints() {
+                const points = [];
+                for (let room = 0; room < NUM_ROOMS; room++) {
+                    const roomX = room * ROOM_WIDTH + ROOM_WIDTH / 2;
+                    points.push(
+                        { x: roomX - 200, y: 150 },
+                        { x: roomX + 200, y: 150 },
+                        { x: roomX + 200, y: WORLD_HEIGHT - 150 },
+                        { x: roomX - 200, y: WORLD_HEIGHT - 150 }
+                    );
+                }
+                return points;
+            }
+            
+            update() {
+                // Update timers
+                if (this.stunnedTimer > 0) {
+                    this.stunnedTimer--;
+                    if (this.stunnedTimer === 0) {
+                        this.state = 'search';
+                        this.searchTimer = 120; // 2 seconds at 60fps
+                    }
+                }
+                
+                if (this.banishedTimer > 0) {
+                    this.banishedTimer--;
+                    if (this.banishedTimer === 0) {
+                        this.respawn();
+                    }
+                }
+                
+                if (this.teleportCooldown > 0) {
+                    this.teleportCooldown--;
+                }
+                
+                if (this.whisperTimer > 0) {
+                    this.whisperTimer--;
+                    if (this.whisperTimer === 0) {
+                        this.whisperText = "";
+                    }
+                }
+                
+                if (this.searchTimer > 0) {
+                    this.searchTimer--;
+                }
+                
+                // Update based on state
+                switch(this.state) {
+                    case 'patrol':
+                        this.patrol();
+                        break;
+                    case 'search':
+                        this.search();
+                        break;
+                    case 'chase':
+                        this.chase();
+                        break;
+                    case 'stunned':
+                        // Stunned, don't move
+                        break;
+                    case 'banished':
+                        // Banished, don't move
+                        break;
+                }
+                
+                // Check for player detection
+                this.detectPlayer();
+                
+                // Update position
+                this.x += this.velocityX;
+                this.y += this.velocityY;
+                
+                // Keep granny in world bounds
+                this.x = Math.max(this.width/2, Math.min(WORLD_WIDTH - this.width/2, this.x));
+                this.y = Math.max(this.height/2, Math.min(WORLD_HEIGHT - this.height/2, this.y));
+                
+                // Animation
+                this.animationFrame += 0.1;
+                
+                // Random whispers
+                if (Math.random() < 0.005 && this.whisperTimer === 0) {
+                    this.whisper();
+                }
+                
+                // Random teleport in harder difficulties
+                if (difficulty !== 'easy' && Math.random() < 0.002 * grannyAggression && this.teleportCooldown === 0) {
+                    this.teleport();
+                }
+            }
+            
+            draw() {
+                // Only draw if granny is visible on screen
+                if (this.x < camera.x - 50 || this.x > camera.x + camera.width + 50 ||
+                    this.y < camera.y - 50 || this.y > camera.y + camera.height + 50) {
+                    return;
+                }
+                
+                ctx.save();
+                
+                // Draw granny shadow
+                ctx.fillStyle = 'rgba(0, 0, 0, 0.7)';
+                ctx.ellipse(this.x - camera.x, this.y - camera.y + this.height/2 + 5, this.width/2, 8, 0, 0, Math.PI * 2);
+                ctx.fill();
+                
+                // Draw granny
+                if (this.state === 'banished') {
+                    // Draw banished effect
+                    ctx.globalAlpha = 0.3;
+                }
+                
+                // Granny body
+                ctx.fillStyle = '#222';
+                ctx.fillRect(this.x - camera.x - this.width/2, this.y - camera.y - this.height/2, this.width, this.height);
+                
+                // Granny dress
+                ctx.fillStyle = '#444';
+                ctx.beginPath();
+                ctx.moveTo(this.x - camera.x - this.width/2, this.y - camera.y - this.height/2 + 20);
+                ctx.lineTo(this.x - camera.x - this.width/2 - 10, this.y - camera.y + this.height/2);
+                ctx.lineTo(this.x - camera.x + this.width/2 + 10, this.y - camera.y + this.height/2);
+                ctx.lineTo(this.x - camera.x + this.width/2, this.y - camera.y - this.height/2 + 20);
+                ctx.closePath();
+                ctx.fill();
+                
+                // Granny head
+                ctx.fillStyle = '#555';
+                ctx.beginPath();
+                ctx.arc(this.x - camera.x, this.y - camera.y - this.height/2 - 10, 12, 0, Math.PI * 2);
+                ctx.fill();
+                
+                // Granny hair
+                ctx.fillStyle = '#222';
+                ctx.beginPath();
+                ctx.arc(this.x - camera.x, this.y - camera.y - this.height/2 - 15, 15, Math.PI, 0);
+                ctx.fill();
+                
+                // Eyes (glowing)
+                ctx.fillStyle = '#ff0000';
+                ctx.beginPath();
+                ctx.arc(this.x - camera.x - 4 * this.facing, this.y - camera.y - this.height/2 - 10, 3, 0, Math.PI * 2);
+                ctx.arc(this.x - camera.x + 4 * this.facing, this.y - camera.y - this.height/2 - 10, 3, 0, Math.PI * 2);
+                ctx.fill();
+                
+                // Draw stunned effect
+                if (this.state === 'stunned') {
+                    ctx.strokeStyle = '#ffff00';
+                    ctx.lineWidth = 3;
+                    ctx.beginPath();
+                    ctx.arc(this.x - camera.x, this.y - camera.y - this.height/2, 30, 0, Math.PI * 2);
+                    ctx.stroke();
+                    
+                    // Stars
+                    ctx.fillStyle = '#ffff00';
+                    ctx.font = '20px Arial';
+                    ctx.fillText('✨', this.x - camera.x - 20, this.y - camera.y - this.height/2 - 20);
+                    ctx.fillText('✨', this.x - camera.x + 10, this.y - camera.y - this.height/2 - 20);
+                }
+                
+                // Draw whisper text
+                if (this.whisperText) {
+                    ctx.fillStyle = 'rgba(255, 0, 0, 0.7)';
+                    ctx.font = '16px Creepster';
+                    ctx.textAlign = 'center';
+                    ctx.fillText(this.whisperText, this.x - camera.x, this.y - camera.y - this.height/2 - 30);
+                }
+                
+                ctx.restore();
+            }
+            
+            patrol() {
+                // Move to current patrol point
+                const target = this.patrolPoints[this.currentPatrolIndex];
+                const dx = target.x - this.x;
+                const dy = target.y - this.y;
+                const distance = Math.sqrt(dx * dx + dy * dy);
+                
+                if (distance < 10) {
+                    // Reached patrol point, move to next
+                    this.currentPatrolIndex = (this.currentPatrolIndex + 1) % this.patrolPoints.length;
+                } else {
+                    // Move towards patrol point
+                    this.velocityX = (dx / distance) * this.speed;
+                    this.velocityY = (dy / distance) * this.speed;
+                    this.facing = dx > 0 ? 1 : -1;
+                }
+            }
+            
+            search() {
+                // Move around searching for player
+                if (this.searchTimer > 0) {
+                    // Move to last known position
+                    if (this.lastSeenPlayerX !== null && this.lastSeenPlayerY !== null) {
+                        const dx = this.lastSeenPlayerX - this.x;
+                        const dy = this.lastSeenPlayerY - this.y;
+                        const distance = Math.sqrt(dx * dx + dy * dy);
+                        
+                        if (distance > 10) {
+                            this.velocityX = (dx / distance) * this.speed * 0.7;
+                            this.velocityY = (dy / distance) * this.speed * 0.7;
+                            this.facing = dx > 0 ? 1 : -1;
+                        }
+                    }
+                } else {
+                    // Done searching, go back to patrol
+                    this.state = 'patrol';
+                    this.lastSeenPlayerX = null;
+                    this.lastSeenPlayerY = null;
+                }
+            }
+            
+            chase() {
+                // Chase the player
+                const dx = player.x - this.x;
+                const dy = player.y - this.y;
+                const distance = Math.sqrt(dx * dx + dy * dy);
+                
+                if (distance > 0) {
+                    this.velocityX = (dx / distance) * this.speed * 1.5;
+                    this.velocityY = (dy / distance) * this.speed * 1.5;
+                    this.facing = dx > 0 ? 1 : -1;
+                }
+                
+                // Check if caught player
+                if (distance < 30 && !player.hiding) {
+                    this.catchPlayer();
+                }
+            }
+            
+            detectPlayer() {
+                // Can't detect if stunned or banished
+                if (this.state === 'stunned' || this.state === 'banished') {
+                    return;
+                }
+                
+                // Can't detect if player is hiding
+                if (player.hiding) {
+                    return;
+                }
+                
+                const dx = player.x - this.x;
+                const dy = player.y - this.y;
+                const distance = Math.sqrt(dx * dx + dy * dy);
+                
+                // Check if player is in detection radius
+                if (distance < this.detectionRadius) {
+                    // Check if player is in vision cone
+                    const angle = Math.atan2(dy, dx);
+                    const facingAngle = this.facing === 1 ? 0 : Math.PI;
+                    let angleDiff = Math.abs(angle - facingAngle);
+                    
+                    // Normalize angle difference
+                    if (angleDiff > Math.PI) {
+                        angleDiff = 2 * Math.PI - angleDiff;
+                    }
+                    
+                    if (angleDiff < this.visionAngle / 2) {
+                        // Player detected!
+                        if (this.state !== 'chase') {
+                            this.state = 'chase';
+                            this.lastSeenPlayerX = player.x;
+                            this.lastSeenPlayerY = player.y;
+                        }
+                    }
+                }
+            }
+            
+            catchPlayer() {
+                // Game over
+                gameOver();
+            }
+            
+            stun() {
+                // Stun granny
+                this.state = 'stunned';
+                this.stunnedTimer = 180; // 3 seconds at 60fps
+                this.velocityX = 0;
+                this.velocityY = 0;
+            }
+            
+            banish() {
+                // Banish granny
+                this.state = 'banished';
+                this.banishedTimer = 600; // 10 seconds at 60fps
+                this.velocityX = 0;
+                this.velocityY = 0;
+            }
+            
+            respawn() {
+                // Respawn at random location
+                this.x = Math.random() * (WORLD_WIDTH - 100) + 50;
+                this.y = Math.random() * (WORLD_HEIGHT - 100) + 50;
+                this.state = 'patrol';
+                this.velocityX = 0;
+                this.velocityY = 0;
+            }
+            
+            teleport() {
+                // Teleport to player's general area
+                const offsetX = (Math.random() - 0.5) * 300;
+                const offsetY = (Math.random() - 0.5) * 300;
+                
+                this.x = Math.max(50, Math.min(WORLD_WIDTH - 50, player.x + offsetX));
+                this.y = Math.max(50, Math.min(WORLD_HEIGHT - 50, player.y + offsetY));
+                
+                this.teleportCooldown = 300; // 5 seconds at 60fps
+                
+                // Create teleport effect
+                for (let i = 0; i < 20; i++) {
+                    particles.push(new Particle(this.x, this.y, 'teleport'));
+                }
+                
+                // Whisper after teleport
+                this.whisper("Found you...");
+            }
+            
+            whisper(text) {
+                this.whisperText = text || this.getRandomWhisper();
+                this.whisperTimer = 120; // 2 seconds at 60fps
+            }
+            
+            getRandomWhisper() {
+                const whispers = [
+                    "I see you...",
+                    "Come here...",
+                    "Don't hide...",
+                    "I know you're there...",
+                    "Little mouse...",
+                    "Time to play...",
+                    "Can't escape...",
+                    "Forever here..."
+                ];
+                return whispers[Math.floor(Math.random() * whispers.length)];
+            }
+        }
+        
+        // Hiding spot class
+        class HidingSpot {
+            constructor(x, y, type) {
+                this.x = x;
+                this.y = y;
+                this.type = type; // 'bed', 'wardrobe', 'cabinet'
+                this.width = type === 'bed' ? 80 : 60;
+                this.height = type === 'bed' ? 100 : 80;
+                this.occupied = false;
+            }
+            
+            draw() {
+                // Only draw if hiding spot is visible on screen
+                if (this.x < camera.x - 100 || this.x > camera.x + camera.width + 100 ||
+                    this.y < camera.y - 100 || this.y > camera.y + camera.height + 100) {
+                    return;
+                }
+                
+                ctx.save();
+                
+                // Draw hiding spot
+                if (this.type === 'bed') {
+                    // Draw bed
+                    ctx.fillStyle = '#444';
+                    ctx.fillRect(this.x - camera.x - this.width/2, this.y - camera.y - this.height/2, this.width, this.height);
+                    
+                    // Draw pillow
+                    ctx.fillStyle = '#666';
+                    ctx.fillRect(this.x - camera.x - this.width/2 + 10, this.y - camera.y - this.height/2 + 10, this.width - 20, 20);
+                    
+                    // Draw blanket
+                    ctx.fillStyle = '#555';
+                    ctx.fillRect(this.x - camera.x - this.width/2 + 5, this.y - camera.y - this.height/2 + 30, this.width - 10, this.height - 35);
+                } else if (this.type === 'wardrobe') {
+                    // Draw wardrobe
+                    ctx.fillStyle = '#333';
+                    ctx.fillRect(this.x - camera.x - this.width/2, this.y - camera.y - this.height/2, this.width, this.height);
+                    
+                    // Draw doors
+                    ctx.strokeStyle = '#222';
+                    ctx.lineWidth = 2;
+                    ctx.beginPath();
+                    ctx.moveTo(this.x - camera.x, this.y - camera.y - this.height/2);
+                    ctx.lineTo(this.x - camera.x, this.y - camera.y + this.height/2);
+                    ctx.stroke();
+                    
+                    // Draw handles
+                    ctx.fillStyle = '#666';
+                    ctx.beginPath();
+                    ctx.arc(this.x - camera.x - this.width/4, this.y - camera.y, 3, 0, Math.PI * 2);
+                    ctx.arc(this.x - camera.x + this.width/4, this.y - camera.y, 3, 0, Math.PI * 2);
+                    ctx.fill();
+                } else if (this.type === 'cabinet') {
+                    // Draw cabinet
+                    ctx.fillStyle = '#444';
+                    ctx.fillRect(this.x - camera.x - this.width/2, this.y - camera.y - this.height/2, this.width, this.height);
+                    
+                    // Draw shelves
+                    ctx.strokeStyle = '#333';
+                    ctx.lineWidth = 1;
+                    ctx.beginPath();
+                    ctx.moveTo(this.x - camera.x - this.width/2, this.y - camera.y - this.height/4);
+                    ctx.lineTo(this.x - camera.x + this.width/2, this.y - camera.y - this.height/4);
+                    ctx.moveTo(this.x - camera.x - this.width/2, this.y - camera.y + this.height/4);
+                    ctx.lineTo(this.x - camera.x + this.width/2, this.y - camera.y + this.height/4);
+                    ctx.stroke();
+                }
+                
+                // Draw highlight if player can hide here
+                const distance = Math.sqrt(
+                    Math.pow(player.x - this.x, 2) + 
+                    Math.pow(player.y - this.y, 2)
+                );
+                
+                if (distance < 50 && !this.occupied) {
+                    ctx.strokeStyle = 'rgba(0, 255, 0, 0.5)';
+                    ctx.lineWidth = 2;
+                    ctx.strokeRect(this.x - camera.x - this.width/2 - 5, this.y - camera.y - this.height/2 - 5, this.width + 10, this.height + 10);
+                }
+                
+                ctx.restore();
+            }
+        }
+        
+        // Math scroll class
+        class MathScroll {
+            constructor(x, y) {
+                this.x = x;
+                this.y = y;
+                this.width = 40;
+                this.height = 40;
+                this.solved = false;
+                this.animationFrame = 0;
+                this.glowIntensity = 0;
+            }
+            
+            update() {
+                this.animationFrame += 0.05;
+                
+                // Pulsing glow effect
+                this.glowIntensity = Math.sin(this.animationFrame) * 0.3 + 0.7;
+                
+                // Check if player is near
+                const distance = Math.sqrt(
+                    Math.pow(player.x - this.x, 2) + 
+                    Math.pow(player.y - this.y, 2)
+                );
+                
+                if (distance < 50 && !this.solved && !puzzleActive) {
+                    // Show interaction prompt
+                    if (keys[' ']) {
+                        this.activate();
+                    }
+                }
+            }
+            
+            draw() {
+                if (this.solved) return;
+                
+                // Only draw if scroll is visible on screen
+                if (this.x < camera.x - 50 || this.x > camera.x + camera.width + 50 ||
+                    this.y < camera.y - 50 || this.y > camera.y + camera.height + 50) {
+                    return;
+                }
+                
+                ctx.save();
+                
+                // Draw glow effect
+                const gradient = ctx.createRadialGradient(this.x - camera.x, this.y - camera.y, 0, this.x - camera.x, this.y - camera.y, 30);
+                gradient.addColorStop(0, `rgba(138, 0, 0, ${this.glowIntensity})`);
+                gradient.addColorStop(1, 'rgba(138, 0, 0, 0)');
+                ctx.fillStyle = gradient;
+                ctx.fillRect(this.x - camera.x - 30, this.y - camera.y - 30, 60, 60);
+                
+                // Draw scroll
+                ctx.fillStyle = '#f5f0e1';
+                ctx.fillRect(this.x - camera.x - this.width/2, this.y - camera.y - this.height/2, this.width, this.height);
+                
+                // Draw scroll border
+                ctx.strokeStyle = '#8b4513';
+                ctx.lineWidth = 2;
+                ctx.strokeRect(this.x - camera.x - this.width/2, this.y - camera.y - this.height/2, this.width, this.height);
+                
+                // Draw division symbol
+                ctx.fillStyle = '#8b0000';
+                ctx.font = 'bold 20px Creepster';
+                ctx.textAlign = 'center';
+                ctx.textBaseline = 'middle';
+                ctx.fillText('÷', this.x - camera.x, this.y - camera.y);
+                
+                // Draw interaction prompt
+                const distance = Math.sqrt(
+                    Math.pow(player.x - this.x, 2) + 
+                    Math.pow(player.y - this.y, 2)
+                );
+                
+                if (distance < 50) {
+                    ctx.fillStyle = 'rgba(255, 255, 255, 0.8)';
+                    ctx.font = '14px Merriweather';
+                    ctx.fillText('Press SPACE', this.x - camera.x, this.y - camera.y + 30);
+                }
+                
+                ctx.restore();
+            }
+            
+            activate() {
+                if (this.solved || puzzleActive) return;
+                
+                puzzleActive = true;
+                const problems = mathProblems[difficulty];
+                const problem = problems[Math.floor(Math.random() * problems.length)];
+                currentPuzzle = { problem, scroll: this };
+                
+                document.getElementById('questionText').textContent = problem.question;
+                const answerButtons = document.getElementById('answerButtons');
+                answerButtons.innerHTML = '';
+                
+                // Shuffle options
+                const shuffledOptions = [...problem.options].sort(() => Math.random() - 0.5);
+                
+                shuffledOptions.forEach(option => {
+                    const btn = document.createElement('button');
+                    btn.className = 'answer-btn';
+                    btn.textContent = option;
+                    btn.onclick = () => checkAnswer(option);
+                    answerButtons.appendChild(btn);
+                });
+                
+                document.getElementById('mathPuzzle').style.display = 'block';
+                
+                // Start timer
+                puzzleTimer = setTimeout(() => {
+                    // Time's up - wrong answer
+                    checkAnswer(null);
+                }, timeLimit);
+            }
+        }
+        
+        // Door class
+        class Door {
+            constructor(x, y) {
+                this.x = x;
+                this.y = y;
+                this.width = 60;
+                this.height = 100;
+                this.open = false;
+                this.opening = false;
+                this.openAmount = 0;
+                this.animationFrame = 0;
+                this.glowIntensity = 0;
+            }
+            
+            update() {
+                this.animationFrame += 0.05;
+                
+                // Pulsing glow effect when all puzzles are solved
+                if (allPuzzlesSolved && !this.open) {
+                    this.glowIntensity = Math.sin(this.animationFrame) * 0.3 + 0.7;
+                }
+                
+                // Handle door opening animation
+                if (this.opening && this.openAmount < 1) {
+                    this.openAmount += 0.05;
+                    if (this.openAmount >= 1) {
+                        this.openAmount = 1;
+                        this.open = true;
+                        this.opening = false;
+                    }
+                }
+                
+                // Check if player is near and all puzzles are solved
+                const distance = Math.sqrt(
+                    Math.pow(player.x - this.x, 2) + 
+                    Math.pow(player.y - this.y, 2)
+                );
+                
+                if (distance < 60 && allPuzzlesSolved && !this.open) {
+                    // Show interaction prompt
+                    document.getElementById('doorInteraction').style.display = 'block';
+                    
+                    if (keys[' ']) {
+                        this.opening = true;
+                    }
+                } else {
+                    document.getElementById('doorInteraction').style.display = 'none';
+                }
+                
+                // Check if player has entered the door
+                if (this.open && distance < 40) {
+                    // Player has entered the door
+                    levelComplete();
+                }
+            }
+            
+            draw() {
+                // Only draw if door is visible on screen
+                if (this.x < camera.x - 100 || this.x > camera.x + camera.width + 100 ||
+                    this.y < camera.y - 100 || this.y > camera.y + camera.height + 100) {
+                    return;
+                }
+                
+                ctx.save();
+                
+                // Draw glow effect when all puzzles are solved
+                if (allPuzzlesSolved && !this.open) {
+                    const gradient = ctx.createRadialGradient(this.x - camera.x, this.y - camera.y, 0, this.x - camera.x, this.y - camera.y, 50);
+                    gradient.addColorStop(0, `rgba(76, 175, 80, ${this.glowIntensity})`);
+                    gradient.addColorStop(1, 'rgba(76, 175, 80, 0)');
+                    ctx.fillStyle = gradient;
+                    ctx.fillRect(this.x - camera.x - 50, this.y - camera.y - 50, 100, 100);
+                }
+                
+                // Draw door frame
+                ctx.fillStyle = '#444';
+                ctx.fillRect(this.x - camera.x - this.width/2 - 5, this.y - camera.y - this.height/2 - 5, this.width + 10, this.height + 10);
+                
+                // Draw door
+                ctx.fillStyle = '#333';
+                ctx.save();
+                ctx.translate(this.x - camera.x, this.y - camera.y);
+                
+                if (this.openAmount > 0) {
+                    // Apply opening transformation
+                    ctx.scale(1 - this.openAmount, 1);
+                    ctx.translate(-this.width/2 * this.openAmount, 0);
+                }
+                
+                ctx.fillRect(-this.width/2, -this.height/2, this.width, this.height);
+                
+                // Draw door handle
+                ctx.fillStyle = '#666';
+                ctx.beginPath();
+                ctx.arc(this.width/2 - 10, 0, 3, 0, Math.PI * 2);
+                ctx.fill();
+                
+                ctx.restore();
+                
+                // Draw lock indicator
+                if (!allPuzzlesSolved) {
+                    ctx.fillStyle = '#8b0000';
+                    ctx.font = 'bold 20px Creepster';
+                    ctx.textAlign = 'center';
+                    ctx.textBaseline = 'middle';
+                    ctx.fillText('🔒', this.x - camera.x, this.y - camera.y);
+                } else if (!this.open) {
+                    ctx.fillStyle = '#4CAF50';
+                    ctx.font = 'bold 20px Creepster';
+                    ctx.textAlign = 'center';
+                    ctx.textBaseline = 'middle';
+                    ctx.fillText('🔓', this.x - camera.x, this.y - camera.y);
+                }
+                
+                ctx.restore();
+            }
+        }
+        
+        // Particle class
+        class Particle {
+            constructor(x, y, type) {
+                this.x = x;
+                this.y = y;
+                this.type = type;
+                this.life = 1;
+                this.decay = 0.02;
+                
+                switch(type) {
+                    case 'dust':
+                        this.vx = (Math.random() - 0.5) * 0.5;
+                        this.vy = -Math.random() * 0.5 - 0.2;
+                        this.size = Math.random() * 3 + 1;
+                        this.color = `rgba(139, 69, 19, ${Math.random() * 0.3 + 0.1})`;
+                        break;
+                    case 'teleport':
+                        this.vx = (Math.random() - 0.5) * 5;
+                        this.vy = (Math.random() - 0.5) * 5;
+                        this.size = Math.random() * 5 + 2;
+                        this.color = `rgba(138, 0, 0, ${Math.random() * 0.5 + 0.5})`;
+                        this.decay = 0.05;
+                        break;
+                    case 'powerup':
+                        this.vx = (Math.random() - 0.5) * 3;
+                        this.vy = -Math.random() * 3 - 1;
+                        this.size = Math.random() * 4 + 2;
+                        this.color = `rgba(255, 255, 0, ${Math.random() * 0.7 + 0.3})`;
+                        this.decay = 0.03;
+                        break;
+                }
+            }
+            
+            update() {
+                this.x += this.vx;
+                this.y += this.vy;
+                this.life -= this.decay;
+                
+                if (this.type === 'dust') {
+                    this.vx *= 0.98;
+                    this.vy += 0.02;
+                } else if (this.type === 'teleport') {
+                    this.vx *= 0.95;
+                    this.vy *= 0.95;
+                } else if (this.type === 'powerup') {
+                    this.vy += 0.1;
+                }
+            }
+            
+            draw() {
+                // Only draw if particle is visible on screen
+                if (this.x < camera.x - 50 || this.x > camera.x + camera.width + 50 ||
+                    this.y < camera.y - 50 || this.y > camera.y + camera.height + 50) {
+                    return;
+                }
+                
+                ctx.save();
+                ctx.globalAlpha = this.life;
+                ctx.fillStyle = this.color;
+                
+                if (this.type === 'teleport') {
+                    // Special effect for teleport particles
+                    ctx.shadowColor = this.color;
+                    ctx.shadowBlur = 10;
+                }
+                
+                ctx.beginPath();
+                ctx.arc(this.x - camera.x, this.y - camera.y, this.size, 0, Math.PI * 2);
+                ctx.fill();
+                
+                ctx.restore();
+            }
+        }
+        
+        // Game objects
+        let player;
+        let granny;
+        let hidingSpots = [];
+        let mathScrolls = [];
+        let door;
+        let particles = [];
+        let gameScreenShake = 0;
+        
+        // Initialize level
+        function initLevel() {
+            // Create player
+            player = new Player();
+            
+            // Create granny
+            granny = new Granny();
+            
+            // Create hiding spots across all rooms
+            hidingSpots = [];
+            for (let room = 0; room < NUM_ROOMS; room++) {
+                const roomX = room * ROOM_WIDTH + ROOM_WIDTH / 2;
+                hidingSpots.push(new HidingSpot(roomX - 250, 150, 'bed'));
+                hidingSpots.push(new HidingSpot(roomX + 250, 150, 'wardrobe'));
+                hidingSpots.push(new HidingSpot(roomX - 250, WORLD_HEIGHT - 150, 'cabinet'));
+                hidingSpots.push(new HidingSpot(roomX + 250, WORLD_HEIGHT - 150, 'bed'));
+            }
+            
+            // Create math scrolls - increase number with level
+            const scrollCount = Math.min(12, 8 + currentLevel * 2); // More scrolls in expanded world
+            mathScrolls = [];
+            
+            // Position scrolls across all rooms
+            for (let i = 0; i < scrollCount; i++) {
+                const room = Math.floor(i / 4); // 4 scrolls per room
+                const roomX = room * ROOM_WIDTH + ROOM_WIDTH / 2;
+                const positionInRoom = i % 4;
+                
+                let x, y;
+                switch(positionInRoom) {
+                    case 0:
+                        x = roomX - 200;
+                        y = 250;
+                        break;
+                    case 1:
+                        x = roomX + 200;
+                        y = 250;
+                        break;
+                    case 2:
+                        x = roomX;
+                        y = WORLD_HEIGHT / 2;
+                        break;
+                    case 3:
+                        x = roomX;
+                        y = WORLD_HEIGHT - 250;
+                        break;
+                }
+                
+                mathScrolls.push(new MathScroll(x, y));
+            }
+            
+            // Create door at the end of the last room
+            door = new Door(WORLD_WIDTH - 100, WORLD_HEIGHT / 2);
+            
+            // Reset particles
+            particles = [];
+            
+            // Reset game state
+            battery = 70;
+            sanity = 100;
+            grannyAggression = 1 + (currentLevel - 1) * 0.2;
+            consecutiveCorrect = 0;
+            consecutiveWrong = 0;
+            powerUpActive = false;
+            powerUpTimer = 0;
+            allPuzzlesSolved = false;
+            doorOpen = false;
+            
+            // Update UI
+            document.getElementById('batteryFill').style.width = battery + '%';
+            document.getElementById('sanityFill').style.width = sanity + '%';
+            document.getElementById('level').textContent = `Level ${currentLevel}`;
+        }
+        
+        // Show math puzzle
+        function showMathPuzzle(scroll) {
+            puzzleActive = true;
+            const problems = mathProblems[difficulty];
+            const problem = problems[Math.floor(Math.random() * problems.length)];
+            currentPuzzle = { problem, scroll };
+            
+            document.getElementById('questionText').textContent = problem.question;
+            const answerButtons = document.getElementById('answerButtons');
+            answerButtons.innerHTML = '';
+            
+            // Shuffle options
+            const shuffledOptions = [...problem.options].sort(() => Math.random() - 0.5);
+            
+            shuffledOptions.forEach(option => {
+                const btn = document.createElement('button');
+                btn.className = 'answer-btn';
+                btn.textContent = option;
+                btn.onclick = () => checkAnswer(option);
+                answerButtons.appendChild(btn);
+            });
+            
+            document.getElementById('mathPuzzle').style.display = 'block';
+            
+            // Start timer
+            puzzleTimer = setTimeout(() => {
+                // Time's up - wrong answer
+                checkAnswer(null);
+            }, timeLimit);
+        }
+        
+        // Check answer
+        function checkAnswer(answer) {
+            clearTimeout(puzzleTimer);
+            document.getElementById('mathPuzzle').style.display = 'none';
+            
+            if (answer === currentPuzzle.problem.answer) {
+                // Correct answer
+                currentPuzzle.scroll.solved = true;
+                consecutiveCorrect++;
+                consecutiveWrong = 0;
+                
+                // Create power-up effect
+                for (let i = 0; i < 20; i++) {
+                    particles.push(new Particle(currentPuzzle.scroll.x, currentPuzzle.scroll.y, 'powerup'));
+                }
+                
+                // Grant power-up based on consecutive correct answers
+                if (consecutiveCorrect >= 3) {
+                    // Banish granny
+                    granny.banish();
+                    powerUpActive = true;
+                    powerUpTimer = 600; // 10 seconds
+                    consecutiveCorrect = 0;
+                } else {
+                    // Stun granny
+                    granny.stun();
+                }
+                
+                // Restore some sanity
+                sanity = Math.min(100, sanity + 10);
+                document.getElementById('sanityFill').style.width = sanity + '%';
+                
+                // Reduce granny aggression
+                grannyAggression = Math.max(1, grannyAggression - 0.2);
+                granny.speed = 1 + grannyAggression * 0.3;
+                
+                // Check if all puzzles are solved
+                checkAllPuzzlesSolved();
+            } else {
+                // Wrong answer or time out
+                consecutiveWrong++;
+                consecutiveCorrect = 0;
+                
+                // Increase granny aggression
+                grannyAggression = Math.min(3, grannyAggression + 0.3);
+                granny.speed = 1 + grannyAggression * 0.3;
+                granny.detectionRadius = 100 + grannyAggression * 20;
+                
+                // Lose sanity
+                sanity -= 10;
+                document.getElementById('sanityFill').style.width = sanity + '%';
+                
+                // Screen shake
+                gameScreenShake = 15;
+                
+                // Jump scare
+                document.getElementById('gameContainer').classList.add('glitch');
+                setTimeout(() => {
+                    document.getElementById('gameContainer').classList.remove('glitch');
+                }, 300);
+                
+                if (sanity <= 0) {
+                    gameOver();
+                }
+            }
+            
+            puzzleActive = false;
+            currentPuzzle = null;
+        }
+        
+        // Check if all puzzles are solved
+        function checkAllPuzzlesSolved() {
+            const allSolved = mathScrolls.every(scroll => scroll.solved);
+            
+            if (allSolved && !allPuzzlesSolved) {
+                allPuzzlesSolved = true;
+                
+                // Create celebration effect
+                for (let i = 0; i < 50; i++) {
+                    particles.push(new Particle(door.x, door.y, 'powerup'));
+                }
+            }
+        }
+        
+        // Game over
+        function gameOver() {
+            gameRunning = false;
+            
+            const messages = [
+                "Granny got you... Your mind couldn't handle the pressure.",
+                "You became one of the whispers in the dark...",
+                "Your division skills weren't enough to save you...",
+                "The house has claimed another victim..."
+            ];
+            
+            document.getElementById('deathMessage').textContent = messages[Math.floor(Math.random() * messages.length)];
+            document.getElementById('gameOverScreen').style.display = 'flex';
+        }
+        
+        // Level complete
+        function levelComplete() {
+            gameRunning = false;
+            document.getElementById('levelCompleteScreen').style.display = 'flex';
+        }
+        
+        // Next level
+        function nextLevel() {
+            document.getElementById('levelCompleteScreen').style.display = 'none';
+            currentLevel++;
+            gameRunning = true;
+            initLevel();
+            gameLoop();
+        }
+        
+        // Draw background
+        function drawBackground() {
+            // Clear canvas
+            ctx.fillStyle = '#000';
+            ctx.fillRect(0, 0, canvas.width, canvas.height);
+            
+            // Draw floor across entire world
+            ctx.fillStyle = '#222';
+            ctx.fillRect(0, WORLD_HEIGHT - 50 - camera.y, WORLD_WIDTH, 50);
+            
+            // Draw floorboards
+            ctx.strokeStyle = '#111';
+            ctx.lineWidth = 1;
+            for (let i = 0; i < WORLD_WIDTH; i += 40) {
+                ctx.beginPath();
+                ctx.moveTo(i - camera.x, WORLD_HEIGHT - 50 - camera.y);
+                ctx.lineTo(i - camera.x, WORLD_HEIGHT - camera.y);
+                ctx.stroke();
+            }
+            
+            // Draw walls
+            ctx.fillStyle = '#1a1a1a';
+            ctx.fillRect(0, -camera.y, WORLD_WIDTH, 50);
+            ctx.fillRect(0, -camera.y, 50, WORLD_HEIGHT);
+            ctx.fillRect(WORLD_WIDTH - 50, -camera.y, 50, WORLD_HEIGHT);
+            
+            // Draw room dividers
+            ctx.strokeStyle = '#333';
+            ctx.lineWidth = 3;
+            for (let i = 1; i < NUM_ROOMS; i++) {
+                const x = i * ROOM_WIDTH;
+                ctx.beginPath();
+                ctx.moveTo(x - camera.x, 50 - camera.y);
+                ctx.lineTo(x - camera.x, WORLD_HEIGHT - 50 - camera.y);
+                ctx.stroke();
+            }
+            
+            // Draw wallpaper pattern
+            ctx.strokeStyle = '#111';
+            ctx.lineWidth = 1;
+            for (let i = 50; i < WORLD_WIDTH; i += 30) {
+                for (let j = 50; j < WORLD_HEIGHT - 50; j += 30) {
+                    ctx.strokeRect(i - camera.x, j - camera.y, 30, 30);
+                }
+            }
+            
+            // Draw windows with moonlight in each room
+            for (let room = 0; room < NUM_ROOMS; room++) {
+                const roomX = room * ROOM_WIDTH + ROOM_WIDTH / 2;
+                
+                ctx.fillStyle = 'rgba(100, 100, 150, 0.2)';
+                ctx.fillRect(roomX - 140 - camera.x, 80 - camera.y, 80, 80);
+                ctx.fillRect(roomX + 60 - camera.x, 80 - camera.y, 80, 80);
+                
+                // Window frames
+                ctx.strokeStyle = '#333';
+                ctx.lineWidth = 3;
+                ctx.strokeRect(roomX - 140 - camera.x, 80 - camera.y, 80, 80);
+                ctx.strokeRect(roomX + 60 - camera.x, 80 - camera.y, 80, 80);
+                ctx.beginPath();
+                ctx.moveTo(roomX - 100 - camera.x, 80 - camera.y);
+                ctx.lineTo(roomX - 100 - camera.x, 160 - camera.y);
+                ctx.moveTo(roomX - 140 - camera.x, 120 - camera.y);
+                ctx.lineTo(roomX - 60 - camera.x, 120 - camera.y);
+                ctx.moveTo(roomX + 100 - camera.x, 80 - camera.y);
+                ctx.lineTo(roomX + 100 - camera.x, 160 - camera.y);
+                ctx.moveTo(roomX + 60 - camera.x, 120 - camera.y);
+                ctx.lineTo(roomX + 140 - camera.x, 120 - camera.y);
+                ctx.stroke();
+                
+                // Draw moonlight beams
+                const gradient1 = ctx.createLinearGradient(roomX - 140 - camera.x, 80 - camera.y, roomX - 100 - camera.x, 400 - camera.y);
+                gradient1.addColorStop(0, 'rgba(200, 200, 255, 0.1)');
+                gradient1.addColorStop(1, 'rgba(200, 200, 255, 0)');
+                ctx.fillStyle = gradient1;
+                ctx.beginPath();
+                ctx.moveTo(roomX - 140 - camera.x, 80 - camera.y);
+                ctx.lineTo(roomX - 60 - camera.x, 80 - camera.y);
+                ctx.lineTo(roomX - 100 - camera.x, 400 - camera.y);
+                ctx.closePath();
+                ctx.fill();
+                
+                const gradient2 = ctx.createLinearGradient(roomX + 60 - camera.x, 80 - camera.y, roomX + 100 - camera.x, 400 - camera.y);
+                gradient2.addColorStop(0, 'rgba(200, 200, 255, 0.1)');
+                gradient2.addColorStop(1, 'rgba(200, 200, 255, 0)');
+                ctx.fillStyle = gradient2;
+                ctx.beginPath();
+                ctx.moveTo(roomX + 60 - camera.x, 80 - camera.y);
+                ctx.lineTo(roomX + 140 - camera.x, 80 - camera.y);
+                ctx.lineTo(roomX + 100 - camera.x, 400 - camera.y);
+                ctx.closePath();
+                ctx.fill();
+            }
+            
+            // Add dust particles
+            if (Math.random() < 0.1) {
+                particles.push(new Particle(
+                    Math.random() * WORLD_WIDTH,
+                    Math.random() * WORLD_HEIGHT,
+                    'dust'
+                ));
+            }
+        }
+        
+        // Apply screen shake
+        function applyScreenShake() {
+            if (gameScreenShake > 0) {
+                const shakeX = (Math.random() - 0.5) * gameScreenShake;
+                const shakeY = (Math.random() - 0.5) * gameScreenShake;
+                ctx.translate(shakeX, shakeY);
+                gameScreenShake *= 0.9;
+            }
+        }
+        
+        // Draw vignette
+        function drawVignette() {
+            const gradient = ctx.createRadialGradient(
+                canvas.width / 2, canvas.height / 2, canvas.width / 3,
+                canvas.width / 2, canvas.height / 2, canvas.width / 2
+            );
+            gradient.addColorStop(0, 'rgba(0, 0, 0, 0)');
+            gradient.addColorStop(1, 'rgba(0, 0, 0, 0.7)');
+            
+            ctx.fillStyle = gradient;
+            ctx.fillRect(0, 0, canvas.width, canvas.height);
+        }
+        
+        // Draw sanity effects
+        function drawSanityEffects() {
+            if (sanity < 50) {
+                // Visual distortions when sanity is low
+                const distortion = (50 - sanity) / 50;
+                
+                // Color overlay
+                ctx.fillStyle = `rgba(139, 0, 0, ${distortion * 0.1})`;
+                ctx.fillRect(0, 0, canvas.width, canvas.height);
+                
+                // Random glitches
+                if (Math.random() < distortion * 0.1) {
+                    ctx.fillStyle = `rgba(255, 255, 255, ${distortion * 0.5})`;
+                    const glitchHeight = Math.random() * 50;
+                    const glitchY = Math.random() * canvas.height;
+                    ctx.fillRect(0, glitchY, canvas.width, glitchHeight);
+                }
+                
+                // Tunnel vision
+                if (sanity < 25) {
+                    const tunnelVision = (25 - sanity) / 25;
+                    const gradient = ctx.createRadialGradient(
+                        canvas.width / 2, canvas.height / 2, canvas.width / 2 * (1 - tunnelVision),
+                        canvas.width / 2, canvas.height / 2, canvas.width / 2
+                    );
+                    gradient.addColorStop(0, 'rgba(0, 0, 0, 0)');
+                    gradient.addColorStop(1, `rgba(0, 0, 0, ${tunnelVision})`);
+                    
+                    ctx.fillStyle = gradient;
+                    ctx.fillRect(0, 0, canvas.width, canvas.height);
+                }
+            }
+        }
+        
+        // Game loop
+        function gameLoop() {
+            if (!gameRunning) return;
+            
+            // Update camera
+            updateCamera();
+            
+            // Clear canvas
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+            
+            // Apply screen shake
+            ctx.save();
+            applyScreenShake();
+            
+            // Draw background
+            drawBackground();
+            
+            // Update and draw game objects
+            player.update();
+            granny.update();
+            door.update();
+            
+            // Draw hiding spots
+            hidingSpots.forEach(spot => {
+                spot.draw();
+            });
+            
+            // Draw math scrolls
+            mathScrolls.forEach(scroll => {
+                scroll.update();
+                scroll.draw();
+            });
+            
+            // Draw door
+            door.draw();
+            
+            // Draw particles
+            particles = particles.filter(particle => {
+                particle.update();
+                particle.draw();
+                return particle.life > 0;
+            });
+            
+            // Draw characters
+            player.draw();
+            granny.draw();
+            
+            // Draw UI effects
+            drawVignette();
+            drawSanityEffects();
+            
+            ctx.restore();
+            
+            // Update power-up timer
+            if (powerUpActive) {
+                powerUpTimer--;
+                if (powerUpTimer <= 0) {
+                    powerUpActive = false;
+                }
+            }
+            
+            // Continue game loop
+            requestAnimationFrame(gameLoop);
+        }
+        
+        // Start game
+        function startGame() {
+            document.getElementById('startScreen').style.display = 'none';
+            gameRunning = true;
+            currentLevel = 1;
+            initLevel();
+            gameLoop();
+        }
+        
+        // Restart game
+        function restartGame() {
+            document.getElementById('gameOverScreen').style.display = 'none';
+            gameRunning = true;
+            currentLevel = 1;
+            initLevel();
+            gameLoop();
+        }
+        
+        // Back to menu
+        function backToMenu() {
+            document.getElementById('gameOverScreen').style.display = 'none';
+            document.getElementById('startScreen').style.display = 'flex';
+            gameRunning = false;
+        }
+        
+        // Initialize background for start screen
+        drawBackground();
+    </script>
+</body>
+</html>
