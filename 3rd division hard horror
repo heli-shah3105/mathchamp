@@ -530,9 +530,9 @@
             <p>You're trapped in Granny's haunted mansion. Explore the endless halls, solve division problems to gain powers and fight back, or fail and face her wrath. Your mind is your only weapon...</p>
             
             <div class="difficulty-selector">
-                <button class="difficulty-btn active" data-difficulty="easy">Easy</button>
-                <button class="difficulty-btn" data-difficulty="normal">Normal</button>
-                <button class="difficulty-btn" data-difficulty="hard">Hard</button>
+                <button class="difficulty-btn active" data-difficulty="level1">Level 1</button>
+                <button class="difficulty-btn" data-difficulty="level2">Level 2</button>
+                <button class="difficulty-btn" data-difficulty="level3">Level 3</button>
             </div>
             
             <button class="menu-btn" onclick="startGame()">BEGIN NIGHTMARE</button>
@@ -606,10 +606,10 @@
         let currentLevel = 1;
         let battery = 70;
         let sanity = 100;
-        let difficulty = 'easy';
+        let difficulty = 'level1';
         let puzzleActive = false;
         let currentPuzzle = null;
-        let timeLimit = 10000; // 10 seconds for easy difficulty
+        let timeLimit = 10000; // 10 seconds for level1
         let puzzleTimer = null;
         let powerUpActive = false;
         let powerUpTimer = 0;
@@ -620,73 +620,73 @@
         let doorOpen = false;
         let currentRoom = 1;
         
-        // Math problems database - All division problems
+        // Math problems database - Different types of division problems for each level
         const mathProblems = {
-            easy: [
-                { question: "20 ÷ 4 = ?", answer: 5, options: [5, 4, 6, 3] },
-                { question: "15 ÷ 3 = ?", answer: 5, options: [5, 4, 6, 3] },
-                { question: "18 ÷ 2 = ?", answer: 9, options: [9, 8, 10, 7] },
-                { question: "24 ÷ 6 = ?", answer: 4, options: [4, 3, 5, 6] },
-                { question: "30 ÷ 5 = ?", answer: 6, options: [6, 5, 7, 4] },
-                { question: "21 ÷ 7 = ?", answer: 3, options: [3, 2, 4, 5] },
-                { question: "16 ÷ 4 = ?", answer: 4, options: [4, 3, 5, 6] },
-                { question: "27 ÷ 9 = ?", answer: 3, options: [3, 2, 4, 5] },
-                { question: "35 ÷ 7 = ?", answer: 5, options: [5, 4, 6, 7] },
-                { question: "40 ÷ 8 = ?", answer: 5, options: [5, 4, 6, 7] },
-                { question: "12 ÷ 3 = ?", answer: 4, options: [4, 3, 5, 6] },
-                { question: "14 ÷ 2 = ?", answer: 7, options: [7, 6, 8, 5] },
-                { question: "25 ÷ 5 = ?", answer: 5, options: [5, 4, 6, 7] },
-                { question: "28 ÷ 7 = ?", answer: 4, options: [4, 3, 5, 6] },
-                { question: "32 ÷ 8 = ?", answer: 4, options: [4, 3, 5, 6] },
-                { question: "36 ÷ 9 = ?", answer: 4, options: [4, 3, 5, 6] },
-                { question: "45 ÷ 9 = ?", answer: 5, options: [5, 4, 6, 7] },
-                { question: "50 ÷ 10 = ?", answer: 5, options: [5, 4, 6, 7] },
-                { question: "42 ÷ 6 = ?", answer: 7, options: [7, 6, 8, 5] },
-                { question: "33 ÷ 3 = ?", answer: 11, options: [11, 10, 12, 9] }
+            level1: [
+                { question: "88 ÷ 4 = ?", answer: 22, options: [22, 24, 18, 20] },
+                { question: "96 ÷ 8 = ?", answer: 12, options: [12, 14, 10, 8] },
+                { question: "75 ÷ 5 = ?", answer: 15, options: [15, 13, 17, 19] },
+                { question: "84 ÷ 7 = ?", answer: 12, options: [12, 14, 10, 8] },
+                { question: "92 ÷ 4 = ?", answer: 23, options: [23, 21, 25, 19] },
+                { question: "66 ÷ 6 = ?", answer: 11, options: [11, 9, 13, 7] },
+                { question: "78 ÷ 6 = ?", answer: 13, options: [13, 11, 15, 9] },
+                { question: "56 ÷ 4 = ?", answer: 14, options: [14, 12, 16, 10] },
+                { question: "99 ÷ 9 = ?", answer: 11, options: [11, 9, 13, 7] },
+                { question: "81 ÷ 9 = ?", answer: 9, options: [9, 7, 11, 5] },
+                { question: "64 ÷ 8 = ?", answer: 8, options: [8, 6, 10, 4] },
+                { question: "72 ÷ 6 = ?", answer: 12, options: [12, 10, 14, 8] },
+                { question: "48 ÷ 4 = ?", answer: 12, options: [12, 10, 14, 8] },
+                { question: "54 ÷ 6 = ?", answer: 9, options: [9, 7, 11, 5] },
+                { question: "63 ÷ 7 = ?", answer: 9, options: [9, 7, 11, 5] },
+                { question: "36 ÷ 4 = ?", answer: 9, options: [9, 7, 11, 5] },
+                { question: "42 ÷ 6 = ?", answer: 7, options: [7, 5, 9, 3] },
+                { question: "49 ÷ 7 = ?", answer: 7, options: [7, 5, 9, 3] },
+                { question: "32 ÷ 4 = ?", answer: 8, options: [8, 6, 10, 4] },
+                { question: "27 ÷ 3 = ?", answer: 9, options: [9, 7, 11, 5] }
             ],
-            normal: [
-                { question: "45 ÷ 9 = ?", answer: 5, options: [5, 4, 6, 3] },
-                { question: "56 ÷ 8 = ?", answer: 7, options: [7, 6, 8, 5] },
-                { question: "72 ÷ 9 = ?", answer: 8, options: [8, 7, 9, 6] },
-                { question: "84 ÷ 12 = ?", answer: 7, options: [7, 6, 8, 5] },
-                { question: "96 ÷ 8 = ?", answer: 12, options: [12, 10, 14, 8] },
-                { question: "63 ÷ 7 = ?", answer: 9, options: [9, 8, 10, 7] },
-                { question: "48 ÷ 6 = ?", answer: 8, options: [8, 7, 9, 6] },
-                { question: "54 ÷ 9 = ?", answer: 6, options: [6, 5, 7, 4] },
-                { question: "66 ÷ 11 = ?", answer: 6, options: [6, 5, 7, 4] },
-                { question: "78 ÷ 6 = ?", answer: 13, options: [13, 12, 14, 11] },
-                { question: "90 ÷ 10 = ?", answer: 9, options: [9, 8, 10, 7] },
-                { question: "81 ÷ 9 = ?", answer: 9, options: [9, 8, 10, 7] },
-                { question: "75 ÷ 5 = ?", answer: 15, options: [15, 14, 16, 13] },
-                { question: "64 ÷ 8 = ?", answer: 8, options: [8, 7, 9, 6] },
-                { question: "99 ÷ 11 = ?", answer: 9, options: [9, 8, 10, 7] },
-                { question: "108 ÷ 12 = ?", answer: 9, options: [9, 8, 10, 7] },
-                { question: "112 ÷ 14 = ?", answer: 8, options: [8, 7, 9, 6] },
-                { question: "126 ÷ 9 = ?", answer: 14, options: [14, 13, 15, 12] },
-                { question: "132 ÷ 11 = ?", answer: 12, options: [12, 11, 13, 10] },
-                { question: "140 ÷ 10 = ?", answer: 14, options: [14, 13, 15, 12] }
+            level2: [
+                { question: "A teacher has 96 pencils and wants to distribute them equally among 8 students. How many pencils will each student get?", answer: 12, options: [12, 10, 14, 8] },
+                { question: "A bakery made 84 cupcakes and needs to pack them in boxes of 7. How many boxes are needed?", answer: 12, options: [12, 10, 14, 8] },
+                { question: "Sarah has 75 marbles and wants to share them equally with 5 friends. How many marbles will each friend receive?", answer: 15, options: [15, 13, 17, 19] },
+                { question: "A farmer harvested 92 apples and wants to put them in baskets of 4. How many baskets does he need?", answer: 23, options: [23, 21, 25, 19] },
+                { question: "A library has 78 books to be placed on 6 shelves equally. How many books will be on each shelf?", answer: 13, options: [13, 11, 15, 9] },
+                { question: "A candy store has 66 lollipops to be packed in bags of 6. How many bags are needed?", answer: 11, options: [11, 9, 13, 7] },
+                { question: "A school has 56 students and wants to arrange them in rows of 4. How many rows will there be?", answer: 14, options: [14, 12, 16, 10] },
+                { question: "A toy store has 99 teddy bears to be displayed in 9 windows equally. How many teddy bears will be in each window?", answer: 11, options: [11, 9, 13, 7] },
+                { question: "A gardener has 81 flowers to plant in 9 rows. How many flowers will be in each row?", answer: 9, options: [9, 7, 11, 5] },
+                { question: "A pizza place has 64 slices of pizza to be distributed among 8 tables equally. How many slices will each table get?", answer: 8, options: [8, 6, 10, 4] },
+                { question: "A pet store has 72 fish to be put in 6 aquariums equally. How many fish will be in each aquarium?", answer: 12, options: [12, 10, 14, 8] },
+                { question: "A classroom has 48 chairs to be arranged in 4 rows. How many chairs will be in each row?", answer: 12, options: [12, 10, 14, 8] },
+                { question: "A camp has 54 campers to be divided into 6 groups. How many campers will be in each group?", answer: 9, options: [9, 7, 11, 5] },
+                { question: "A factory produces 63 toys per hour and needs to package them in boxes of 7. How many boxes are needed per hour?", answer: 9, options: [9, 7, 11, 5] },
+                { question: "A supermarket has 36 cartons of milk to be displayed on 4 shelves equally. How many cartons will be on each shelf?", answer: 9, options: [9, 7, 11, 5] },
+                { question: "A bus has 42 passengers and needs to drop them off at 6 stops equally. How many passengers will get off at each stop?", answer: 7, options: [7, 5, 9, 3] },
+                { question: "A bakery has 49 donuts to be packed in boxes of 7. How many boxes are needed?", answer: 7, options: [7, 5, 9, 3] },
+                { question: "A store has 32 boxes to be stacked in 4 piles. How many boxes will be in each pile?", answer: 8, options: [8, 6, 10, 4] },
+                { question: "A theater has 27 rows of seats with 3 seats in each row. How many seats are there in total?", answer: 9, options: [9, 7, 11, 5] },
+                { question: "A restaurant has 45 tables and wants to arrange them in 5 sections equally. How many tables will be in each section?", answer: 9, options: [9, 7, 11, 5] }
             ],
-            hard: [
-                { question: "144 ÷ 12 = ?", answer: 12, options: [12, 10, 14, 8] },
-                { question: "156 ÷ 13 = ?", answer: 12, options: [12, 11, 13, 10] },
-                { question: "168 ÷ 14 = ?", answer: 12, options: [12, 11, 13, 10] },
-                { question: "192 ÷ 16 = ?", answer: 12, options: [12, 11, 13, 10] },
-                { question: "225 ÷ 15 = ?", answer: 15, options: [15, 14, 16, 13] },
-                { question: "272 ÷ 17 = ?", answer: 16, options: [16, 15, 17, 14] },
-                { question: "306 ÷ 18 = ?", answer: 17, options: [17, 16, 18, 15] },
-                { question: "342 ÷ 19 = ?", answer: 18, options: [18, 17, 19, 16] },
-                { question: "380 ÷ 20 = ?", answer: 19, options: [19, 18, 20, 17] },
-                { question: "420 ÷ 21 = ?", answer: 20, options: [20, 19, 21, 18] },
-                { question: "462 ÷ 22 = ?", answer: 21, options: [21, 20, 22, 19] },
-                { question: "506 ÷ 23 = ?", answer: 22, options: [22, 21, 23, 20] },
-                { question: "552 ÷ 24 = ?", answer: 23, options: [23, 22, 24, 21] },
-                { question: "600 ÷ 25 = ?", answer: 24, options: [24, 23, 25, 22] },
-                { question: "650 ÷ 26 = ?", answer: 25, options: [25, 24, 26, 23] },
-                { question: "702 ÷ 27 = ?", answer: 26, options: [26, 25, 27, 24] },
-                { question: "756 ÷ 28 = ?", answer: 27, options: [27, 26, 28, 25] },
-                { question: "812 ÷ 29 = ?", answer: 28, options: [28, 27, 29, 26] },
-                { question: "870 ÷ 30 = ?", answer: 29, options: [29, 28, 30, 27] },
-                { question: "930 ÷ 31 = ?", answer: 30, options: [30, 29, 31, 28] }
+            level3: [
+                { question: "528 ÷ 8 = ?", answer: 66, options: [66, 56, 76, 46] },
+                { question: "735 ÷ 7 = ?", answer: 105, options: [105, 95, 115, 125] },
+                { question: "912 ÷ 12 = ?", answer: 76, options: [76, 66, 86, 56] },
+                { question: "648 ÷ 9 = ?", answer: 72, options: [72, 62, 82, 52] },
+                { question: "825 ÷ 15 = ?", answer: 55, options: [55, 45, 65, 35] },
+                { question: "984 ÷ 12 = ?", answer: 82, options: [82, 72, 92, 62] },
+                { question: "726 ÷ 6 = ?", answer: 121, options: [121, 111, 131, 101] },
+                { question: "855 ÷ 9 = ?", answer: 95, options: [95, 85, 105, 75] },
+                { question: "672 ÷ 8 = ?", answer: 84, options: [84, 74, 94, 64] },
+                { question: "936 ÷ 12 = ?", answer: 78, options: [78, 68, 88, 58] },
+                { question: "765 ÷ 5 = ?", answer: 153, options: [153, 143, 163, 133] },
+                { question: "894 ÷ 6 = ?", answer: 149, options: [149, 139, 159, 129] },
+                { question: "918 ÷ 9 = ?", answer: 102, options: [102, 92, 112, 82] },
+                { question: "744 ÷ 8 = ?", answer: 93, options: [93, 83, 103, 73] },
+                { question: "867 ÷ 3 = ?", answer: 289, options: [289, 279, 299, 269] },
+                { question: "975 ÷ 5 = ?", answer: 195, options: [195, 185, 205, 175] },
+                { question: "636 ÷ 6 = ?", answer: 106, options: [106, 96, 116, 86] },
+                { question: "852 ÷ 12 = ?", answer: 71, options: [71, 61, 81, 51] },
+                { question: "798 ÷ 7 = ?", answer: 114, options: [114, 104, 124, 94] },
+                { question: "945 ÷ 9 = ?", answer: 105, options: [105, 95, 115, 125] }
             ]
         };
         
@@ -788,9 +788,9 @@
                 difficulty = btn.getAttribute('data-difficulty');
                 
                 // Adjust time limit based on difficulty
-                if (difficulty === 'easy') {
+                if (difficulty === 'level1') {
                     timeLimit = 10000; // 10 seconds
-                } else if (difficulty === 'normal') {
+                } else if (difficulty === 'level2') {
                     timeLimit = 7000; // 7 seconds
                 } else {
                     timeLimit = 5000; // 5 seconds
@@ -1193,7 +1193,7 @@
                 }
                 
                 // Random teleport in harder difficulties
-                if (difficulty !== 'easy' && Math.random() < 0.002 * grannyAggression && this.teleportCooldown === 0) {
+                if (difficulty !== 'level1' && Math.random() < 0.002 * grannyAggression && this.teleportCooldown === 0) {
                     this.teleport();
                 }
             }
