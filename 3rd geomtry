@@ -1,0 +1,902 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Poppy's Shape Adventure</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Comic Sans MS', cursive, sans-serif;
+        }
+        
+        body {
+            background: linear-gradient(135deg, #ffafbd, #ffc3a0);
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            overflow: hidden;
+            padding: 20px;
+        }
+        
+        #game-container {
+            width: 100%;
+            max-width: 800px;
+            height: 600px;
+            background-color: rgba(255, 255, 255, 0.95);
+            border-radius: 20px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+            position: relative;
+            overflow: hidden;
+        }
+        
+        #game-screen {
+            width: 100%;
+            height: 100%;
+            position: relative;
+        }
+        
+        .screen {
+            width: 100%;
+            height: 100%;
+            position: absolute;
+            top: 0;
+            left: 0;
+            display: none;
+            flex-direction: column;
+            align-items: center;
+            justify-content: flex-start;
+            padding: 20px;
+            overflow-y: auto;
+        }
+        
+        .active {
+            display: flex;
+        }
+        
+        h1 {
+            color: #ff6b8b;
+            font-size: 42px;
+            margin: 10px 0;
+            text-shadow: 3px 3px 0 #ffd166;
+            text-align: center;
+        }
+        
+        h2 {
+            color: #06d6a0;
+            font-size: 32px;
+            margin-bottom: 15px;
+            text-align: center;
+        }
+        
+        h3 {
+            color: #118ab2;
+            font-size: 24px;
+            margin: 10px 0;
+        }
+        
+        p {
+            color: #118ab2;
+            font-size: 18px;
+            margin-bottom: 15px;
+            text-align: center;
+            max-width: 90%;
+        }
+        
+        .btn {
+            background-color: #ffd166;
+            color: #073b4c;
+            border: none;
+            border-radius: 50px;
+            padding: 12px 25px;
+            font-size: 20px;
+            font-weight: bold;
+            cursor: pointer;
+            margin: 8px;
+            box-shadow: 0 5px 0 #f0a500;
+            transition: all 0.2s;
+        }
+        
+        .btn:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 8px 0 #f0a500;
+        }
+        
+        .btn:active {
+            transform: translateY(2px);
+            box-shadow: 0 3px 0 #f0a500;
+        }
+        
+        .level-btn {
+            background-color: #06d6a0;
+            box-shadow: 0 5px 0 #04a17c;
+        }
+        
+        .level-btn:hover {
+            box-shadow: 0 8px 0 #04a17c;
+        }
+        
+        .level-btn:active {
+            box-shadow: 0 3px 0 #04a17c;
+        }
+        
+        #level-selection {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: center;
+            gap: 15px;
+            margin: 20px 0;
+        }
+        
+        .shape-container {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: center;
+            gap: 20px;
+            margin: 15px 0;
+        }
+        
+        .shape {
+            width: 110px;
+            height: 110px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            transition: all 0.3s;
+            position: relative;
+        }
+        
+        .shape:hover {
+            transform: scale(1.1);
+        }
+        
+        .shape-name {
+            position: absolute;
+            bottom: -25px;
+            font-size: 16px;
+            font-weight: bold;
+            color: #073b4c;
+            background-color: rgba(255, 255, 255, 0.8);
+            padding: 3px 8px;
+            border-radius: 10px;
+            opacity: 0;
+            transition: opacity 0.3s;
+        }
+        
+        .shape:hover .shape-name {
+            opacity: 1;
+        }
+        
+        .question-container {
+            background-color: #ffd166;
+            padding: 15px;
+            border-radius: 15px;
+            margin: 15px 0;
+            width: 90%;
+            text-align: center;
+        }
+        
+        .options-container {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: center;
+            gap: 12px;
+            margin: 15px 0;
+        }
+        
+        .option {
+            background-color: #118ab2;
+            color: white;
+            padding: 12px 20px;
+            border-radius: 50px;
+            cursor: pointer;
+            font-size: 16px;
+            transition: all 0.2s;
+        }
+        
+        .option:hover {
+            background-color: #0d6e8c;
+            transform: scale(1.05);
+        }
+        
+        .feedback {
+            font-size: 22px;
+            font-weight: bold;
+            margin: 12px 0;
+            height: 30px;
+        }
+        
+        .correct {
+            color: #06d6a0;
+        }
+        
+        .incorrect {
+            color: #ef476f;
+        }
+        
+        .score {
+            position: absolute;
+            top: 15px;
+            right: 15px;
+            font-size: 22px;
+            font-weight: bold;
+            color: #073b4c;
+            background-color: rgba(255, 255, 255, 0.8);
+            padding: 8px 15px;
+            border-radius: 50px;
+        }
+        
+        .progress-bar {
+            width: 80%;
+            height: 18px;
+            background-color: #e0e0e0;
+            border-radius: 10px;
+            margin: 15px 0;
+            overflow: hidden;
+        }
+        
+        .progress {
+            height: 100%;
+            background-color: #06d6a0;
+            width: 0%;
+            transition: width 0.5s;
+        }
+        
+        .formula-container {
+            background-color: #ffd166;
+            padding: 15px;
+            border-radius: 15px;
+            margin: 15px 0;
+            width: 90%;
+        }
+        
+        .formula {
+            font-size: 20px;
+            margin: 8px 0;
+            text-align: center;
+        }
+        
+        .shape-demo {
+            width: 180px;
+            height: 180px;
+            margin: 15px auto;
+            position: relative;
+        }
+        
+        .dimension {
+            position: absolute;
+            background-color: #073b4c;
+            color: white;
+            padding: 4px 8px;
+            border-radius: 5px;
+            font-size: 14px;
+        }
+        
+        .poppy-character {
+            width: 80px;
+            height: 80px;
+            position: absolute;
+            bottom: 15px;
+            left: 15px;
+            background-color: #ff6b8b;
+            border-radius: 50% 50% 50% 10%;
+            animation: bounce 2s infinite;
+        }
+        
+        @keyframes bounce {
+            0%, 100% { transform: translateY(0); }
+            50% { transform: translateY(-15px); }
+        }
+        
+        .confetti {
+            position: absolute;
+            width: 12px;
+            height: 12px;
+            background-color: #ff6b8b;
+            opacity: 0;
+        }
+        
+        @keyframes confetti-fall {
+            0% { transform: translateY(-100px) rotate(0deg); opacity: 1; }
+            100% { transform: translateY(600px) rotate(360deg); opacity: 0; }
+        }
+        
+        .instruction {
+            color: #073b4c;
+            font-size: 16px;
+            margin: 5px 0;
+            font-style: italic;
+        }
+        
+        .question-counter {
+            color: #073b4c;
+            font-size: 18px;
+            margin-bottom: 10px;
+            font-weight: bold;
+        }
+        
+        .next-question-btn {
+            background-color: #118ab2;
+            color: white;
+        }
+        
+        .next-question-btn:hover {
+            background-color: #0d6e8c;
+        }
+    </style>
+</head>
+<body>
+    <div id="game-container">
+        <div id="game-screen">
+            <!-- Start Screen -->
+            <div id="start-screen" class="screen active">
+                <h1>Poppy's Shape Adventure!</h1>
+                <p>Join Poppy on a colorful journey to learn all about shapes and geometry!</p>
+                <div class="poppy-character"></div>
+                <button id="start-btn" class="btn">Start Learning!</button>
+            </div>
+            
+            <!-- Level Selection Screen -->
+            <div id="level-select-screen" class="screen">
+                <h1>Choose Your Level!</h1>
+                <div id="level-selection">
+                    <button class="btn level-btn" data-level="1">Level 1: Quadrilaterals</button>
+                    <button class="btn level-btn" data-level="2">Level 2: Triangles</button>
+                    <button class="btn level-btn" data-level="3">Level 3: Lines</button>
+                    <button class="btn level-btn" data-level="4">Level 4: Area & Perimeter</button>
+                </div>
+                <button id="back-to-start" class="btn">Back</button>
+            </div>
+            
+            <!-- Level 1: Quadrilaterals -->
+            <div id="level-1" class="screen">
+                <h2>Level 1: Quadrilaterals</h2>
+                <p>Click on each shape to learn its name!</p>
+                
+                <div class="shape-container">
+                    <div class="shape" data-shape="square">
+                        <svg width="100" height="100">
+                            <rect x="10" y="10" width="80" height="80" fill="#ff6b8b" stroke="#073b4c" stroke-width="3" />
+                        </svg>
+                        <div class="shape-name">Square</div>
+                    </div>
+                    
+                    <div class="shape" data-shape="rectangle">
+                        <svg width="120" height="80">
+                            <rect x="10" y="10" width="100" height="60" fill="#06d6a0" stroke="#073b4c" stroke-width="3" />
+                        </svg>
+                        <div class="shape-name">Rectangle</div>
+                    </div>
+                    
+                    <div class="shape" data-shape="trapezoid">
+                        <svg width="120" height="80">
+                            <polygon points="20,10 100,10 80,70 40,70" fill="#118ab2" stroke="#073b4c" stroke-width="3" />
+                        </svg>
+                        <div class="shape-name">Trapezoid</div>
+                    </div>
+                    
+                    <div class="shape" data-shape="parallelogram">
+                        <svg width="120" height="80">
+                            <polygon points="30,10 110,10 90,70 10,70" fill="#ffd166" stroke="#073b4c" stroke-width="3" />
+                        </svg>
+                        <div class="shape-name">Parallelogram</div>
+                    </div>
+                    
+                    <div class="shape" data-shape="rhombus">
+                        <svg width="100" height="100">
+                            <polygon points="50,10 90,50 50,90 10,50" fill="#ef476f" stroke="#073b4c" stroke-width="3" />
+                        </svg>
+                        <div class="shape-name">Rhombus</div>
+                    </div>
+                </div>
+                
+                <div class="question-container">
+                    <div class="question-counter">Question <span id="level-1-question-num">1</span>/5</div>
+                    <p id="level-1-question-text">Which shape has four equal sides and four right angles?</p>
+                    <div class="options-container" id="level-1-options">
+                        <!-- Options will be populated by JavaScript -->
+                    </div>
+                    <div class="feedback" id="level-1-feedback"></div>
+                </div>
+                
+                <div class="progress-bar">
+                    <div class="progress" id="level-1-progress"></div>
+                </div>
+                
+                <button class="btn next-question-btn" id="level-1-next">Next Question</button>
+                <button class="btn" id="next-level-1">Next Level</button>
+                <button class="btn" id="back-to-levels-1">Back to Levels</button>
+            </div>
+            
+            <!-- Level 2: Triangles -->
+            <div id="level-2" class="screen">
+                <h2>Level 2: Triangles</h2>
+                <p>Learn about the three types of triangles!</p>
+                
+                <div class="shape-container">
+                    <div class="shape" data-shape="equilateral">
+                        <svg width="100" height="100">
+                            <polygon points="50,10 90,90 10,90" fill="#ff6b8b" stroke="#073b4c" stroke-width="3" />
+                        </svg>
+                        <div class="shape-name">Equilateral</div>
+                    </div>
+                    
+                    <div class="shape" data-shape="isosceles">
+                        <svg width="100" height="100">
+                            <polygon points="50,10 80,90 20,90" fill="#06d6a0" stroke="#073b4c" stroke-width="3" />
+                        </svg>
+                        <div class="shape-name">Isosceles</div>
+                    </div>
+                    
+                    <div class="shape" data-shape="scalene">
+                        <svg width="100" height="100">
+                            <polygon points="50,10 85,85 15,75" fill="#118ab2" stroke="#073b4c" stroke-width="3" />
+                        </svg>
+                        <div class="shape-name">Scalene</div>
+                    </div>
+                </div>
+                
+                <div class="question-container">
+                    <div class="question-counter">Question <span id="level-2-question-num">1</span>/5</div>
+                    <p id="level-2-question-text">Which triangle has all sides of different lengths?</p>
+                    <div class="options-container" id="level-2-options">
+                        <!-- Options will be populated by JavaScript -->
+                    </div>
+                    <div class="feedback" id="level-2-feedback"></div>
+                </div>
+                
+                <div class="progress-bar">
+                    <div class="progress" id="level-2-progress"></div>
+                </div>
+                
+                <button class="btn next-question-btn" id="level-2-next">Next Question</button>
+                <button class="btn" id="next-level-2">Next Level</button>
+                <button class="btn" id="back-to-levels-2">Back to Levels</button>
+            </div>
+            
+            <!-- Level 3: Lines -->
+            <div id="level-3" class="screen">
+                <h2>Level 3: Lines</h2>
+                <p>Discover different types of lines!</p>
+                
+                <div class="shape-container">
+                    <div class="shape" data-shape="parallel">
+                        <svg width="120" height="80">
+                            <line x1="10" y1="20" x2="110" y2="20" stroke="#ff6b8b" stroke-width="4" />
+                            <line x1="10" y1="60" x2="110" y2="60" stroke="#ff6b8b" stroke-width="4" />
+                        </svg>
+                        <div class="shape-name">Parallel Lines</div>
+                    </div>
+                    
+                    <div class="shape" data-shape="perpendicular">
+                        <svg width="80" height="80">
+                            <line x1="40" y1="10" x2="40" y2="70" stroke="#06d6a0" stroke-width="4" />
+                            <line x1="10" y1="40" x2="70" y2="40" stroke="#06d6a0" stroke-width="4" />
+                        </svg>
+                        <div class="shape-name">Perpendicular Lines</div>
+                    </div>
+                    
+                    <div class="shape" data-shape="intersecting">
+                        <svg width="80" height="80">
+                            <line x1="20" y1="20" x2="60" y2="60" stroke="#118ab2" stroke-width="4" />
+                            <line x1="60" y1="20" x2="20" y2="60" stroke="#118ab2" stroke-width="4" />
+                        </svg>
+                        <div class="shape-name">Intersecting Lines</div>
+                    </div>
+                </div>
+                
+                <div class="question-container">
+                    <div class="question-counter">Question <span id="level-3-question-num">1</span>/5</div>
+                    <p id="level-3-question-text">Which lines cross each other at a 90-degree angle?</p>
+                    <div class="options-container" id="level-3-options">
+                        <!-- Options will be populated by JavaScript -->
+                    </div>
+                    <div class="feedback" id="level-3-feedback"></div>
+                </div>
+                
+                <div class="progress-bar">
+                    <div class="progress" id="level-3-progress"></div>
+                </div>
+                
+                <button class="btn next-question-btn" id="level-3-next">Next Question</button>
+                <button class="btn" id="next-level-3">Next Level</button>
+                <button class="btn" id="back-to-levels-3">Back to Levels</button>
+            </div>
+            
+            <!-- Level 4: Area & Perimeter -->
+            <div id="level-4" class="screen">
+                <h2>Level 4: Area & Perimeter</h2>
+                <p>Learn how to calculate area and perimeter!</p>
+                
+                <div class="formula-container">
+                    <h3>Square</h3>
+                    <div class="shape-demo">
+                        <svg width="200" height="200">
+                            <rect x="50" y="50" width="100" height="100" fill="#ff6b8b" stroke="#073b4c" stroke-width="3" />
+                            <text x="100" y="45" text-anchor="middle" fill="#073b4c" font-size="18">s</text>
+                            <text x="160" y="100" text-anchor="middle" fill="#073b4c" font-size="18">s</text>
+                        </svg>
+                    </div>
+                    <div class="formula">Perimeter = 4 × s</div>
+                    <div class="formula">Area = s × s</div>
+                </div>
+                
+                <div class="formula-container">
+                    <h3>Rectangle</h3>
+                    <div class="shape-demo">
+                        <svg width="200" height="150">
+                            <rect x="50" y="25" width="120" height="80" fill="#06d6a0" stroke="#073b4c" stroke-width="3" />
+                            <text x="110" y="15" text-anchor="middle" fill="#073b4c" font-size="18">l</text>
+                            <text x="180" y="65" text-anchor="middle" fill="#073b4c" font-size="18">w</text>
+                        </svg>
+                    </div>
+                    <div class="formula">Perimeter = 2 × (l + w)</div>
+                    <div class="formula">Area = l × w</div>
+                </div>
+                
+                <div class="question-container">
+                    <div class="question-counter">Question <span id="level-4-question-num">1</span>/5</div>
+                    <p id="level-4-question-text">If a rectangle has length 5 and width 3, what is its area?</p>
+                    <div class="options-container" id="level-4-options">
+                        <!-- Options will be populated by JavaScript -->
+                    </div>
+                    <div class="feedback" id="level-4-feedback"></div>
+                </div>
+                
+                <div class="progress-bar">
+                    <div class="progress" id="level-4-progress"></div>
+                </div>
+                
+                <button class="btn next-question-btn" id="level-4-next">Next Question</button>
+                <button class="btn" id="back-to-levels-4">Back to Levels</button>
+                <button class="btn" id="play-again">Play Again!</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Game state
+        const gameState = {
+            currentScreen: 'start-screen',
+            score: 0,
+            levelProgress: {
+                1: 0,
+                2: 0,
+                3: 0,
+                4: 0
+            },
+            currentQuestions: {
+                1: 0,
+                2: 0,
+                3: 0,
+                4: 0
+            }
+        };
+
+        // Questions for each level
+        const questions = {
+            1: [
+                {
+                    question: "Which shape has four equal sides and four right angles?",
+                    options: ["Square", "Rectangle", "Rhombus", "Trapezoid"],
+                    correct: 0
+                },
+                {
+                    question: "Which shape has two pairs of parallel sides but not all sides equal?",
+                    options: ["Square", "Rectangle", "Rhombus", "Trapezoid"],
+                    correct: 1
+                },
+                {
+                    question: "Which quadrilateral has only one pair of parallel sides?",
+                    options: ["Square", "Rectangle", "Parallelogram", "Trapezoid"],
+                    correct: 3
+                },
+                {
+                    question: "Which shape has all sides equal but angles that are not 90 degrees?",
+                    options: ["Square", "Rectangle", "Rhombus", "Trapezoid"],
+                    correct: 2
+                },
+                {
+                    question: "Which shape has opposite sides that are parallel and equal in length?",
+                    options: ["Square", "Rectangle", "Parallelogram", "All of the above"],
+                    correct: 3
+                }
+            ],
+            2: [
+                {
+                    question: "Which triangle has all sides of different lengths?",
+                    options: ["Equilateral", "Isosceles", "Scalene"],
+                    correct: 2
+                },
+                {
+                    question: "Which triangle has all sides equal?",
+                    options: ["Equilateral", "Isosceles", "Scalene"],
+                    correct: 0
+                },
+                {
+                    question: "Which triangle has two equal sides?",
+                    options: ["Equilateral", "Isosceles", "Scalene"],
+                    correct: 1
+                },
+                {
+                    question: "If a triangle has angles 60°, 60°, and 60°, what type is it?",
+                    options: ["Equilateral", "Isosceles", "Scalene"],
+                    correct: 0
+                },
+                {
+                    question: "Which triangle can have a right angle (90°)?",
+                    options: ["Equilateral", "Isosceles", "Any triangle"],
+                    correct: 2
+                }
+            ],
+            3: [
+                {
+                    question: "Which lines cross each other at a 90-degree angle?",
+                    options: ["Parallel Lines", "Perpendicular Lines", "Intersecting Lines"],
+                    correct: 1
+                },
+                {
+                    question: "Which lines never meet no matter how far they extend?",
+                    options: ["Parallel Lines", "Perpendicular Lines", "Intersecting Lines"],
+                    correct: 0
+                },
+                {
+                    question: "Which lines cross each other at any angle?",
+                    options: ["Parallel Lines", "Perpendicular Lines", "Intersecting Lines"],
+                    correct: 2
+                },
+                {
+                    question: "Railroad tracks are an example of which type of lines?",
+                    options: ["Parallel Lines", "Perpendicular Lines", "Intersecting Lines"],
+                    correct: 0
+                },
+                {
+                    question: "The corners of a book are an example of which type of lines?",
+                    options: ["Parallel Lines", "Perpendicular Lines", "Intersecting Lines"],
+                    correct: 1
+                }
+            ],
+            4: [
+                {
+                    question: "If a rectangle has length 5 and width 3, what is its area?",
+                    options: ["15", "16", "8", "10"],
+                    correct: 0
+                },
+                {
+                    question: "If a square has side length 4, what is its perimeter?",
+                    options: ["8", "12", "16", "20"],
+                    correct: 2
+                },
+                {
+                    question: "What is the area of a square with side length 6?",
+                    options: ["12", "24", "36", "30"],
+                    correct: 2
+                },
+                {
+                    question: "If a rectangle has length 7 and width 2, what is its perimeter?",
+                    options: ["14", "18", "16", "20"],
+                    correct: 1
+                },
+                {
+                    question: "What is the formula for the area of a rectangle?",
+                    options: ["length + width", "length × width", "2 × (length + width)", "4 × side"],
+                    correct: 1
+                }
+            ]
+        };
+
+        // DOM Elements
+        const screens = document.querySelectorAll('.screen');
+        const startBtn = document.getElementById('start-btn');
+        const backToStartBtn = document.getElementById('back-to-start');
+        const levelBtns = document.querySelectorAll('.level-btn');
+        const nextLevelBtns = document.querySelectorAll('[id^="next-level-"]');
+        const backToLevelsBtns = document.querySelectorAll('[id^="back-to-levels-"]');
+        const playAgainBtn = document.getElementById('play-again');
+        const nextQuestionBtns = document.querySelectorAll('[id^="level-"][id$="-next"]');
+        const shapes = document.querySelectorAll('.shape');
+        const progressBars = document.querySelectorAll('.progress');
+
+        // Switch screen function
+        function switchScreen(screenId) {
+            screens.forEach(screen => {
+                screen.classList.remove('active');
+            });
+            document.getElementById(screenId).classList.add('active');
+            gameState.currentScreen = screenId;
+            
+            // Update progress bars
+            updateProgressBars();
+            
+            // Load questions for the current level if applicable
+            const levelMatch = screenId.match(/level-(\d)/);
+            if (levelMatch) {
+                const level = parseInt(levelMatch[1]);
+                loadQuestion(level);
+            }
+        }
+
+        // Load a question for a specific level
+        function loadQuestion(level) {
+            const questionNum = gameState.currentQuestions[level];
+            const questionData = questions[level][questionNum];
+            
+            // Update question counter
+            document.getElementById(`level-${level}-question-num`).textContent = questionNum + 1;
+            
+            // Update question text
+            document.getElementById(`level-${level}-question-text`).textContent = questionData.question;
+            
+            // Update options
+            const optionsContainer = document.getElementById(`level-${level}-options`);
+            optionsContainer.innerHTML = '';
+            
+            questionData.options.forEach((option, index) => {
+                const optionElement = document.createElement('div');
+                optionElement.className = 'option';
+                optionElement.textContent = option;
+                optionElement.dataset.index = index;
+                optionElement.addEventListener('click', () => checkAnswer(level, index));
+                optionsContainer.appendChild(optionElement);
+            });
+            
+            // Reset feedback
+            document.getElementById(`level-${level}-feedback`).textContent = '';
+            document.getElementById(`level-${level}-feedback`).className = 'feedback';
+            
+            // Reset option colors
+            optionsContainer.querySelectorAll('.option').forEach(opt => {
+                opt.style.backgroundColor = '';
+            });
+        }
+
+        // Check if an answer is correct
+        function checkAnswer(level, selectedIndex) {
+            const questionNum = gameState.currentQuestions[level];
+            const questionData = questions[level][questionNum];
+            const feedback = document.getElementById(`level-${level}-feedback`);
+            const options = document.getElementById(`level-${level}-options`).querySelectorAll('.option');
+            
+            // Reset all options to default color
+            options.forEach(opt => {
+                opt.style.backgroundColor = '';
+            });
+            
+            if (selectedIndex === questionData.correct) {
+                feedback.textContent = "Correct! Great job!";
+                feedback.className = "feedback correct";
+                options[selectedIndex].style.backgroundColor = '#06d6a0';
+                
+                // Add to progress
+                if (gameState.levelProgress[level] < 100) {
+                    gameState.levelProgress[level] += 20;
+                    updateProgressBars();
+                    
+                    if (gameState.levelProgress[level] >= 100) {
+                        createConfetti();
+                    }
+                }
+            } else {
+                feedback.textContent = "Not quite, try again!";
+                feedback.className = "feedback incorrect";
+                options[selectedIndex].style.backgroundColor = '#ef476f';
+                
+                // Highlight correct answer
+                options[questionData.correct].style.backgroundColor = '#06d6a0';
+            }
+        }
+
+        // Go to next question
+        function nextQuestion(level) {
+            if (gameState.currentQuestions[level] < questions[level].length - 1) {
+                gameState.currentQuestions[level]++;
+                loadQuestion(level);
+            }
+        }
+
+        // Update progress bars based on game state
+        function updateProgressBars() {
+            progressBars.forEach(bar => {
+                const level = bar.id.split('-')[1];
+                bar.style.width = `${gameState.levelProgress[level]}%`;
+            });
+        }
+
+        // Create confetti animation
+        function createConfetti() {
+            const container = document.getElementById('game-container');
+            for (let i = 0; i < 50; i++) {
+                const confetti = document.createElement('div');
+                confetti.className = 'confetti';
+                confetti.style.left = `${Math.random() * 100}%`;
+                confetti.style.backgroundColor = `hsl(${Math.random() * 360}, 100%, 50%)`;
+                confetti.style.animation = `confetti-fall ${1 + Math.random() * 2}s linear forwards`;
+                container.appendChild(confetti);
+                
+                setTimeout(() => {
+                    confetti.remove();
+                }, 3000);
+            }
+        }
+
+        // Handle shape clicks
+        shapes.forEach(shape => {
+            shape.addEventListener('click', () => {
+                const shapeName = shape.getAttribute('data-shape');
+                shape.style.transform = 'scale(1.2)';
+                shape.style.filter = 'brightness(1.3)';
+                
+                setTimeout(() => {
+                    shape.style.transform = '';
+                    shape.style.filter = '';
+                }, 300);
+                
+                // Add to progress
+                const level = gameState.currentScreen.split('-')[1];
+                if (gameState.levelProgress[level] < 100) {
+                    gameState.levelProgress[level] += 10;
+                    updateProgressBars();
+                    
+                    if (gameState.levelProgress[level] >= 100) {
+                        createConfetti();
+                    }
+                }
+            });
+        });
+
+        // Event listeners for navigation
+        startBtn.addEventListener('click', () => switchScreen('level-select-screen'));
+        backToStartBtn.addEventListener('click', () => switchScreen('start-screen'));
+        
+        levelBtns.forEach(btn => {
+            btn.addEventListener('click', () => {
+                const level = btn.getAttribute('data-level');
+                switchScreen(`level-${level}`);
+            });
+        });
+        
+        nextLevelBtns.forEach(btn => {
+            btn.addEventListener('click', () => {
+                const currentLevel = parseInt(btn.id.split('-')[2]);
+                if (currentLevel < 4) {
+                    switchScreen(`level-${currentLevel + 1}`);
+                } else {
+                    switchScreen('level-select-screen');
+                }
+            });
+        });
+        
+        backToLevelsBtns.forEach(btn => {
+            btn.addEventListener('click', () => switchScreen('level-select-screen'));
+        });
+        
+        playAgainBtn.addEventListener('click', () => {
+            // Reset progress and questions
+            for (let level in gameState.levelProgress) {
+                gameState.levelProgress[level] = 0;
+                gameState.currentQuestions[level] = 0;
+            }
+            updateProgressBars();
+            switchScreen('start-screen');
+        });
+        
+        // Next question buttons
+        nextQuestionBtns.forEach(btn => {
+            btn.addEventListener('click', () => {
+                const level = parseInt(btn.id.split('-')[1]);
+                nextQuestion(level);
+            });
+        });
+
+        // Initialize progress bars and load first questions
+        updateProgressBars();
+        for (let level = 1; level <= 4; level++) {
+            loadQuestion(level);
+        }
+    </script>
+</body>
+</html>
