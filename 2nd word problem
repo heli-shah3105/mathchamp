@@ -1,0 +1,469 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Math Monster Mayhem!</title>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Fredoka:wght@400;600;700&display=swap');
+
+        body {
+            margin: 0;
+            padding: 0;
+            font-family: 'Fredoka', sans-serif;
+            background-color: #0077be;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            overflow: hidden;
+            position: relative;
+        }
+
+        /* Animated Background Bubbles */
+        .bubble {
+            position: absolute;
+            border-radius: 50%;
+            background: rgba(255, 255, 255, 0.3);
+            animation: rise 15s infinite ease-in;
+        }
+        .bubble1 { width: 40px; height: 40px; left: 10%; animation-delay: 0s; }
+        .bubble2 { width: 20px; height: 20px; left: 30%; animation-delay: 2s; }
+        .bubble3 { width: 60px; height: 60px; left: 60%; animation-delay: 4s; }
+        .bubble4 { width: 30px; height: 30px; left: 80%; animation-delay: 1s; }
+        .bubble5 { width: 50px; height: 50px; left: 50%; animation-delay: 3s; }
+        @keyframes rise {
+            0% { bottom: -100px; opacity: 0; }
+            10% { opacity: 1; }
+            90% { opacity: 1; }
+            100% { bottom: 110vh; opacity: 0; }
+        }
+
+        #game-container {
+            width: 90%;
+            max-width: 800px;
+            height: 600px;
+            background: linear-gradient(to bottom, #4ecdc4, #1a535c);
+            border-radius: 25px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.3);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            padding: 20px;
+            position: relative;
+            overflow: hidden;
+            border: 5px solid #f7fff7;
+        }
+
+        header {
+            text-align: center;
+            color: #f7fff7;
+            width: 100%;
+        }
+
+        h1 {
+            margin: 0;
+            font-size: 3em;
+            text-shadow: 3px 3px 0 #ff6b6b;
+            animation: float 3s ease-in-out infinite;
+        }
+
+        @keyframes float {
+            0%, 100% { transform: translateY(0px); }
+            50% { transform: translateY(-10px); }
+        }
+
+        #level-info, #score-info {
+            font-size: 1.5em;
+            font-weight: 600;
+            color: #ffe66d;
+        }
+
+        #monster-area {
+            flex-grow: 1;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            width: 100%;
+            position: relative;
+        }
+
+        .monster {
+            font-size: 8em;
+            animation: bob 2s ease-in-out infinite;
+            transition: all 0.5s ease;
+        }
+
+        @keyframes bob {
+            0%, 100% { transform: translateY(0px) scale(1); }
+            50% { transform: translateY(-20px) scale(1.05); }
+        }
+
+        .monster.happy {
+            animation: spin 0.5s ease;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg) scale(1); }
+            50% { transform: rotate(180deg) scale(1.2); }
+            100% { transform: rotate(360deg) scale(1); }
+        }
+
+        .monster.sad {
+            animation: shake 0.5s ease;
+            filter: grayscale(100%);
+        }
+
+        @keyframes shake {
+            0%, 100% { transform: translateX(0); }
+            25% { transform: translateX(-10px); }
+            75% { transform: translateX(10px); }
+        }
+
+        #problem-box {
+            background: #f7fff7;
+            border-radius: 15px;
+            padding: 20px 30px;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.2);
+            margin-bottom: 20px;
+            min-height: 80px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            width: 90%;
+            max-width: 600px;
+        }
+
+        #problem-text {
+            font-size: 1.8em;
+            color: #1a535c;
+            text-align: center;
+            font-weight: 600;
+        }
+
+        #input-area {
+            display: flex;
+            gap: 15px;
+            align-items: center;
+        }
+
+        #answer-input {
+            font-size: 2em;
+            width: 100px;
+            text-align: center;
+            border: 3px solid #ffe66d;
+            border-radius: 10px;
+            padding: 5px;
+            font-family: 'Fredoka', sans-serif;
+            background: #f7fff7;
+        }
+
+        .btn {
+            font-size: 1.5em;
+            font-family: 'Fredoka', sans-serif;
+            font-weight: 600;
+            padding: 10px 25px;
+            border: none;
+            border-radius: 50px;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.2);
+        }
+
+        .btn:hover:not(:disabled) {
+            transform: translateY(-3px);
+            box-shadow: 0 6px 15px rgba(0,0,0,0.3);
+        }
+        
+        .btn:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+
+        #submit-btn {
+            background: #4ecdc4;
+            color: #f7fff7;
+        }
+
+        #next-btn {
+            background: #95e77e;
+            color: #1a535c;
+            display: none; /* Hidden by default */
+        }
+
+        #feedback {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            font-size: 4em;
+            font-weight: 700;
+            color: #ffe66d;
+            text-shadow: 3px 3px 0 #ff6b6b;
+            z-index: 10;
+            pointer-events: none;
+            opacity: 0;
+        }
+
+        #feedback.show {
+            animation: feedback-pop 1.5s ease;
+        }
+
+        @keyframes feedback-pop {
+            0% { opacity: 0; transform: translate(-50%, -50%) scale(0.5); }
+            50% { opacity: 1; transform: translate(-50%, -50%) scale(1.2); }
+            100% { opacity: 0; transform: translate(-50%, -50%) scale(1); }
+        }
+        
+        #game-over-screen {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(26, 83, 92, 0.95);
+            display: none;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            color: #f7fff7;
+            border-radius: 20px;
+        }
+
+        #game-over-screen h2 {
+            font-size: 4em;
+            margin-bottom: 20px;
+        }
+
+        #final-score {
+            font-size: 2em;
+            margin-bottom: 30px;
+        }
+
+        #restart-btn {
+            background: #ff6b6b;
+            color: #f7fff7;
+            font-size: 1.8em;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="bubble bubble1"></div>
+    <div class="bubble bubble2"></div>
+    <div class="bubble bubble3"></div>
+    <div class="bubble bubble4"></div>
+    <div class="bubble bubble5"></div>
+
+    <main id="game-container">
+        <header>
+            <h1>Math Monster Mayhem!</h1>
+            <p id="level-info">Press Start to begin!</p>
+            <p id="score-info">Pearls: 0</p>
+        </header>
+
+        <section id="monster-area">
+            <div class="monster" id="monster">🐠</div>
+        </section>
+
+        <section id="problem-box">
+            <p id="problem-text">Are you ready for an adventure?</p>
+        </section>
+
+        <section id="input-area">
+            <input type="number" id="answer-input" disabled style="display:none;">
+            <button id="submit-btn" class="btn">Start Game</button>
+            <button id="next-btn" class="btn">Next!</button>
+        </section>
+
+        <div id="feedback"></div>
+
+        <div id="game-over-screen">
+            <h2>🎉 You Did It! 🎉</h2>
+            <p id="final-score">Final Pearls: 0</p>
+            <button id="restart-btn" class="btn">Play Again</button>
+        </div>
+    </main>
+
+    <script>
+        const gameData = {
+            level1: {
+                title: "The Sunny Shallows",
+                monster: "🐠",
+                problems: [
+                    { text: "Gilly the Gatherer saw 3 red fish. 2 blue fish joined them. How many fish in all?", answer: 5 },
+                    { text: "Captain Calc found 4 pearls. A crab gave him 3 more. How many pearls now?", answer: 7 },
+                    { text: "A starfish had 5 arms. It found 2 more arms! How many arms does it have?", answer: 7 },
+                    { text: "There are 6 clams on the beach. 4 more wash up. How many clams are there?", answer: 10 },
+                    { text: "I have 8 shiny rocks. My friend gave me 2 more. How many rocks do I have?", answer: 10 }
+                ]
+            },
+            level2: {
+                title: "The Kooky Kelp Forest",
+                monster: "🐢",
+                problems: [
+                    { text: "Shelly the Subtractor had 8 stickers. 3 floated away. How many are left?", answer: 5 },
+                    { text: "There were 10 little fish. A whale ate 4. How many fish are left?", answer: 6 },
+                    { text: "A treasure chest had 7 gold coins. A pirate took 5. How many are left?", answer: 2 },
+                    { text: "I saw 9 jellyfish. 6 swam away. How many are still here?", answer: 3 },
+                    { text: "There were 12 sea horses. 8 hid in the coral. How many are left?", answer: 4 }
+                ]
+            },
+            level3: {
+                title: "The Deep-Sea Puzzle Grotto",
+                monster: "🐙",
+                problems: [
+                    { text: "Puzzles the Octopus had 7 shells. He gave 2 away, then found 3 more. How many now?", answer: 8 },
+                    { text: "5 urchins were on a rock. 2 more joined, then a wave washed 4 away. How many left?", answer: 3 },
+                    { text: "I had 10 pearls. I lost 4, then my friend gave me 3. How many do I have?", answer: 9 },
+                    { text: "There were 6 fish. 3 more came, then 2 swam away. How many fish are left?", answer: 7 },
+                    { text: "A crab had 9 legs. It lost 2, then grew 4 new ones! How many legs now?", answer: 11 }
+                ]
+            }
+        };
+
+        // DOM Elements
+        const monsterEl = document.getElementById('monster');
+        const problemTextEl = document.getElementById('problem-text');
+        const answerInputEl = document.getElementById('answer-input');
+        const submitBtnEl = document.getElementById('submit-btn');
+        const nextBtnEl = document.getElementById('next-btn');
+        const levelInfoEl = document.getElementById('level-info');
+        const scoreInfoEl = document.getElementById('score-info');
+        const feedbackEl = document.getElementById('feedback');
+        const gameOverScreenEl = document.getElementById('game-over-screen');
+        const finalScoreEl = document.getElementById('final-score');
+        const restartBtnEl = document.getElementById('restart-btn');
+
+        // Game State
+        let currentLevel = 1;
+        let currentProblemIndex = 0;
+        let score = 0;
+        let problems = [];
+        let gameStarted = false;
+
+        function startGame() {
+            gameStarted = true;
+            currentLevel = 1;
+            currentProblemIndex = 0;
+            score = 0;
+            scoreInfoEl.textContent = `Pearls: ${score}`;
+            gameOverScreenEl.style.display = 'none';
+            
+            // Show the input field for the game
+            answerInputEl.style.display = 'inline-block';
+            
+            loadLevel(currentLevel);
+        }
+
+        function loadLevel(level) {
+            if (level > 3) {
+                showGameOver();
+                return;
+            }
+            const levelKey = `level${level}`;
+            const levelData = gameData[levelKey];
+            problems = levelData.problems;
+            currentProblemIndex = 0;
+            
+            levelInfoEl.textContent = `Level: ${level} - ${levelData.title}`;
+            monsterEl.textContent = levelData.monster;
+            monsterEl.className = 'monster'; // Reset animations
+
+            showProblem();
+        }
+
+        function showProblem() {
+            if (currentProblemIndex >= problems.length) {
+                currentLevel++;
+                loadLevel(currentLevel);
+                return;
+            }
+
+            const problem = problems[currentProblemIndex];
+            problemTextEl.textContent = problem.text;
+            answerInputEl.value = '';
+            answerInputEl.disabled = false;
+            answerInputEl.focus();
+            
+            submitBtnEl.style.display = 'inline-block';
+            submitBtnEl.textContent = 'Submit';
+            submitBtnEl.disabled = false;
+            nextBtnEl.style.display = 'none';
+        }
+
+        function checkAnswer() {
+            const problem = problems[currentProblemIndex];
+            const userAnswer = parseInt(answerInputEl.value, 10);
+            
+            answerInputEl.disabled = true;
+            submitBtnEl.disabled = true;
+
+            if (userAnswer === problem.answer) {
+                handleCorrectAnswer();
+            } else {
+                handleIncorrectAnswer();
+            }
+        }
+
+        function handleCorrectAnswer() {
+            score += 10;
+            scoreInfoEl.textContent = `Pearls: ${score}`;
+            monsterEl.classList.add('happy');
+            showFeedback('Correct! 🎉');
+            
+            submitBtnEl.style.display = 'none';
+            nextBtnEl.style.display = 'inline-block';
+        }
+
+        function handleIncorrectAnswer() {
+            monsterEl.classList.add('sad');
+            showFeedback('Try Again! 🤔');
+            answerInputEl.disabled = false;
+            submitBtnEl.disabled = false;
+        }
+
+        function showFeedback(message) {
+            feedbackEl.textContent = message;
+            feedbackEl.classList.add('show');
+            setTimeout(() => {
+                feedbackEl.classList.remove('show');
+                monsterEl.classList.remove('happy', 'sad');
+            }, 1500);
+        }
+
+        function nextProblem() {
+            currentProblemIndex++;
+            showProblem();
+        }
+
+        function showGameOver() {
+            finalScoreEl.textContent = `Final Pearls: ${score}`;
+            gameOverScreenEl.style.display = 'flex';
+            gameStarted = false;
+            answerInputEl.style.display = 'none';
+            submitBtnEl.textContent = 'Start Game';
+            submitBtnEl.style.display = 'inline-block';
+        }
+
+        // Event Listeners
+        submitBtnEl.addEventListener('click', () => {
+            if (!gameStarted) {
+                startGame();
+            } else {
+                checkAnswer();
+            }
+        });
+
+        nextBtnEl.addEventListener('click', nextProblem);
+        restartBtnEl.addEventListener('click', startGame);
+
+        answerInputEl.addEventListener('keyup', (event) => {
+            if (event.key === 'Enter' && !submitBtnEl.disabled && gameStarted) {
+                checkAnswer();
+            }
+        });
+
+    </script>
+</body>
+</html>
