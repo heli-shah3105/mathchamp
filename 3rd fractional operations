@@ -1,0 +1,1065 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Poppy's Fraction Operations Adventure 🌈</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        html {
+            scroll-behavior: smooth;
+        }
+
+        body {
+            font-family: 'Comic Sans MS', cursive, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            overflow-x: hidden;
+            position: relative;
+        }
+
+        /* Scroll to top button */
+        .scroll-top {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+            color: white;
+            width: 50px;
+            height: 50px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            font-size: 24px;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.3);
+            transition: all 0.3s;
+            z-index: 1000;
+            opacity: 0;
+            pointer-events: none;
+        }
+
+        .scroll-top.visible {
+            opacity: 1;
+            pointer-events: all;
+        }
+
+        .scroll-top:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 8px 25px rgba(0,0,0,0.4);
+        }
+
+        /* Animated background bubbles */
+        .bubble {
+            position: fixed;
+            border-radius: 50%;
+            background: rgba(255, 255, 255, 0.1);
+            animation: float 15s infinite ease-in-out;
+            pointer-events: none;
+        }
+
+        @keyframes float {
+            0%, 100% { transform: translateY(0) rotate(0deg); }
+            33% { transform: translateY(-100px) rotate(120deg); }
+            66% { transform: translateY(100px) rotate(240deg); }
+        }
+
+        .main-wrapper {
+            padding: 20px;
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: flex-start;
+        }
+
+        .game-container {
+            background: white;
+            border-radius: 30px;
+            padding: 30px;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+            max-width: 900px;
+            width: 100%;
+            position: relative;
+            animation: slideIn 0.5s ease-out;
+            margin: 20px 0;
+        }
+
+        @keyframes slideIn {
+            from {
+                transform: translateY(-50px);
+                opacity: 0;
+            }
+            to {
+                transform: translateY(0);
+                opacity: 1;
+            }
+        }
+
+        header {
+            text-align: center;
+            margin-bottom: 20px;
+        }
+
+        h1 {
+            color: #764ba2;
+            font-size: clamp(1.8em, 5vw, 2.5em);
+            text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.1);
+            animation: bounce 2s infinite;
+        }
+
+        @keyframes bounce {
+            0%, 100% { transform: translateY(0); }
+            50% { transform: translateY(-10px); }
+        }
+
+        .level-indicator {
+            display: flex;
+            justify-content: center;
+            gap: 15px;
+            margin: 20px 0;
+            flex-wrap: wrap;
+        }
+
+        .level-badge {
+            padding: 10px 20px;
+            border-radius: 20px;
+            font-weight: bold;
+            transition: all 0.3s;
+            cursor: pointer;
+            font-size: 0.9em;
+        }
+
+        .level-badge.active {
+            background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+            color: white;
+            transform: scale(1.1);
+            box-shadow: 0 5px 15px rgba(245, 87, 108, 0.4);
+        }
+
+        .level-badge.completed {
+            background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);
+            color: white;
+        }
+
+        .level-badge.locked {
+            background: #e0e0e0;
+            color: #999;
+        }
+
+        .game-area {
+            min-height: 400px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 20px;
+            padding: 20px 0;
+        }
+
+        .instruction {
+            background: linear-gradient(135deg, #fa709a 0%, #fee140 100%);
+            padding: 15px 25px;
+            border-radius: 20px;
+            color: white;
+            font-size: 1.2em;
+            text-align: center;
+            animation: pulse 2s infinite;
+            box-shadow: 0 5px 15px rgba(250, 112, 154, 0.3);
+            max-width: 90%;
+        }
+
+        @keyframes pulse {
+            0%, 100% { transform: scale(1); }
+            50% { transform: scale(1.05); }
+        }
+
+        .fraction-display {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+            font-size: clamp(2em, 6vw, 3em);
+            color: #764ba2;
+            margin: 20px 0;
+        }
+
+        .fraction-line {
+            width: 60px;
+            height: 4px;
+            background: #764ba2;
+            position: relative;
+        }
+
+        .options-container {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
+            gap: 15px;
+            width: 100%;
+            max-width: 600px;
+        }
+
+        .option-card {
+            background: white;
+            border: 3px solid #764ba2;
+            border-radius: 15px;
+            padding: 20px;
+            cursor: pointer;
+            transition: all 0.3s;
+            text-align: center;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .option-card:hover {
+            transform: translateY(-5px) scale(1.05);
+            box-shadow: 0 10px 25px rgba(118, 75, 162, 0.3);
+            background: linear-gradient(135deg, #ffecd2 0%, #fcb69f 100%);
+        }
+
+        .option-card.correct {
+            animation: correctAnswer 0.6s ease-out;
+            background: linear-gradient(135deg, #84fab0 0%, #8fd3f4 100%);
+        }
+
+        .option-card.incorrect {
+            animation: shake 0.5s ease-out;
+            background: linear-gradient(135deg, #fccb90 0%, #ff9a9e 100%);
+        }
+
+        @keyframes correctAnswer {
+            0% { transform: scale(1); }
+            50% { transform: scale(1.2) rotate(10deg); }
+            100% { transform: scale(1); }
+        }
+
+        @keyframes shake {
+            0%, 100% { transform: translateX(0); }
+            25% { transform: translateX(-10px); }
+            75% { transform: translateX(10px); }
+        }
+
+        .pizza-container {
+            display: flex;
+            justify-content: center;
+            margin: 20px 0;
+        }
+
+        .pizza {
+            width: min(200px, 40vw);
+            height: min(200px, 40vw);
+            border-radius: 50%;
+            background: #ffd93d;
+            position: relative;
+            box-shadow: 0 5px 20px rgba(255, 217, 61, 0.5);
+            border: 5px solid #8b4513;
+            overflow: hidden;
+        }
+
+        .pizza-slice {
+            position: absolute;
+            width: 50%;
+            height: 50%;
+            transform-origin: right bottom;
+            transition: all 0.3s;
+            background: #ffd93d;
+            clip-path: polygon(100% 50%, 0 0, 0 100%);
+            right: 50%;
+            bottom: 50%;
+        }
+
+        .pizza-slice.eaten {
+            opacity: 0.3;
+            transform: scale(0.8);
+            background: #ccc;
+        }
+
+        .pizza-slice::before {
+            content: '🍕';
+            font-size: clamp(20px, 4vw, 30px);
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+        }
+
+        .score-board {
+            display: flex;
+            justify-content: space-around;
+            margin: 20px 0;
+            padding: 15px;
+            background: linear-gradient(135deg, #a8edea 0%, #fed6e3 100%);
+            border-radius: 20px;
+            flex-wrap: wrap;
+            gap: 10px;
+        }
+
+        .score-item {
+            text-align: center;
+            min-width: 80px;
+        }
+
+        .score-label {
+            font-size: 0.9em;
+            color: #666;
+        }
+
+        .score-value {
+            font-size: clamp(1.5em, 4vw, 2em);
+            font-weight: bold;
+            color: #764ba2;
+        }
+
+        .character {
+            font-size: clamp(60px, 15vw, 80px);
+            animation: dance 2s infinite;
+            margin: 20px 0;
+        }
+
+        @keyframes dance {
+            0%, 100% { transform: rotate(-5deg); }
+            50% { transform: rotate(5deg); }
+        }
+
+        .start-screen, .end-screen {
+            text-align: center;
+            padding: 40px 20px;
+        }
+
+        .btn {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border: none;
+            padding: 15px 40px;
+            font-size: 1.2em;
+            border-radius: 30px;
+            cursor: pointer;
+            transition: all 0.3s;
+            font-weight: bold;
+            box-shadow: 0 5px 15px rgba(118, 75, 162, 0.3);
+            margin: 10px;
+        }
+
+        .btn:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 8px 25px rgba(118, 75, 162, 0.4);
+        }
+
+        .btn:active {
+            transform: translateY(0);
+        }
+
+        .stars {
+            font-size: clamp(1.5em, 4vw, 2em);
+            color: #ffd700;
+            margin: 20px 0;
+        }
+
+        .confetti {
+            position: fixed;
+            width: 10px;
+            height: 10px;
+            background: #f0f;
+            animation: confettiFall 3s linear infinite;
+            pointer-events: none;
+            z-index: 999;
+        }
+
+        @keyframes confettiFall {
+            to {
+                transform: translateY(100vh) rotate(360deg);
+                opacity: 0;
+            }
+        }
+
+        .progress-bar {
+            width: 100%;
+            height: 30px;
+            background: #e0e0e0;
+            border-radius: 15px;
+            overflow: hidden;
+            margin: 20px 0;
+        }
+
+        .progress-fill {
+            height: 100%;
+            background: linear-gradient(90deg, #84fab0 0%, #8fd3f4 100%);
+            transition: width 0.5s ease-out;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-weight: bold;
+        }
+
+        .hidden {
+            display: none;
+        }
+
+        /* Hint box styles */
+        .hint-box {
+            background: linear-gradient(135deg, #ffecd2 0%, #fcb69f 100%);
+            border-radius: 15px;
+            padding: 15px;
+            margin: 15px 0;
+            color: #764ba2;
+            font-weight: bold;
+            text-align: center;
+            box-shadow: 0 5px 15px rgba(252, 182, 159, 0.3);
+            animation: slideInHint 0.5s ease-out;
+            max-width: 90%;
+        }
+
+        @keyframes slideInHint {
+            from {
+                transform: translateY(-20px);
+                opacity: 0;
+            }
+            to {
+                transform: translateY(0);
+                opacity: 1;
+            }
+        }
+
+        /* Visual representation for Level 3 */
+        .fraction-visual {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: center;
+            gap: 10px;
+            margin: 20px 0;
+            max-width: 400px;
+        }
+
+        .fraction-piece {
+            width: 40px;
+            height: 40px;
+            border-radius: 8px;
+            border: 2px solid #764ba2;
+            transition: all 0.3s;
+        }
+
+        .fraction-piece.filled {
+            background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+            animation: pulse 1.5s infinite;
+        }
+
+        .fraction-piece.empty {
+            background: #f0f0f0;
+        }
+
+        /* Chocolate bar pieces */
+        .chocolate-container {
+            display: grid;
+            grid-template-columns: repeat(3, minmax(50px, 60px));
+            gap: 5px;
+            margin: 20px 0;
+        }
+
+        .chocolate-piece {
+            width: min(60px, 10vw);
+            height: min(40px, 6vw);
+            border-radius: 5px;
+            border: 2px solid #654321;
+            transition: all 0.3s;
+        }
+
+        .chocolate-piece.eaten {
+            background: #8b4513;
+        }
+
+        .chocolate-piece.not-eaten {
+            background: #d2691e;
+        }
+
+        /* Fraction operation display */
+        .operation-display {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+            font-size: clamp(1.5em, 5vw, 2.5em);
+            color: #764ba2;
+            margin: 20px 0;
+            flex-wrap: wrap;
+        }
+
+        .operation-symbol {
+            font-weight: bold;
+            margin: 0 10px;
+        }
+
+        /* Responsive adjustments */
+        @media (max-width: 768px) {
+            .game-container {
+                padding: 20px;
+                margin: 10px;
+            }
+            
+            .options-container {
+                grid-template-columns: repeat(2, 1fr);
+            }
+        }
+
+        @media (max-width: 480px) {
+            .options-container {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Scroll to top button -->
+    <div class="scroll-top" id="scrollTop" onclick="scrollToTop()">↑</div>
+
+    <!-- Animated background bubbles -->
+    <div class="bubble" style="width: 80px; height: 80px; left: 10%; top: 20%; animation-delay: 0s;"></div>
+    <div class="bubble" style="width: 60px; height: 60px; left: 80%; top: 60%; animation-delay: 2s;"></div>
+    <div class="bubble" style="width: 100px; height: 100px; left: 50%; top: 80%; animation-delay: 4s;"></div>
+    <div class="bubble" style="width: 40px; height: 40px; left: 20%; top: 70%; animation-delay: 6s;"></div>
+    <div class="bubble" style="width: 70px; height: 70px; left: 70%; top: 30%; animation-delay: 8s;"></div>
+
+    <div class="main-wrapper">
+        <main class="game-container">
+            <header>
+                <h1>🌈 Poppy's Fraction Operations Adventure 🎈</h1>
+            </header>
+
+            <!-- Start Screen -->
+            <section id="startScreen" class="start-screen">
+                <div class="character">🦄</div>
+                <h2 style="color: #764ba2; margin: 20px 0;">Welcome to Fraction Operations Land!</h2>
+                <p style="font-size: 1.2em; color: #666; margin: 20px 0;">
+                    Join Poppy the Unicorn on a magical journey to learn fraction operations!<br>
+                    Solve fun puzzles and collect stars! ⭐
+                </p>
+                <button class="btn" onclick="startGame()">Let's Play! 🎮</button>
+            </section>
+
+            <!-- Game Screen -->
+            <section id="gameScreen" class="hidden">
+                <div class="level-indicator">
+                    <div class="level-badge active" id="level1">Addition 🌟</div>
+                    <div class="level-badge locked" id="level2">Subtraction 🌟🌟</div>
+                    <div class="level-badge locked" id="level3">Multiplication 🌟🌟🌟</div>
+                    <div class="level-badge locked" id="level4">Division 🌟🌟🌟🌟</div>
+                </div>
+
+                <div class="progress-bar">
+                    <div class="progress-fill" id="progressBar">0%</div>
+                </div>
+
+                <div class="score-board">
+                    <div class="score-item">
+                        <div class="score-label">Score</div>
+                        <div class="score-value" id="score">0</div>
+                    </div>
+                    <div class="score-item">
+                        <div class="score-label">Stars</div>
+                        <div class="score-value" id="stars">0</div>
+                    </div>
+                    <div class="score-item">
+                        <div class="score-label">Level</div>
+                        <div class="score-value" id="currentLevel">1</div>
+                    </div>
+                </div>
+
+                <div class="game-area" id="gameArea">
+                    <!-- Game content will be dynamically inserted here -->
+                </div>
+            </section>
+
+            <!-- End Screen -->
+            <section id="endScreen" class="end-screen hidden">
+                <div class="character">🎉</div>
+                <h2 style="color: #764ba2; margin: 20px 0;">Congratulations! 🎊</h2>
+                <div class="stars" id="finalStars">⭐⭐⭐⭐</div>
+                <p style="font-size: 1.2em; color: #666; margin: 20px 0;">
+                    You've completed all levels!<br>
+                    You're a Fraction Operations Master! 🏆
+                </p>
+                <div style="font-size: 1.5em; color: #764ba2; margin: 20px 0;">
+                    Final Score: <span id="finalScore">0</span>
+                </div>
+                <button class="btn" onclick="resetGame()">Play Again 🔄</button>
+            </section>
+        </main>
+    </div>
+
+    <script>
+        let currentLevel = 1;
+        let score = 0;
+        let stars = 0;
+        let questionsAnswered = 0;
+        let totalQuestions = 0;
+        let currentQuestion = null;
+        let hintShown = false;
+
+        const levelData = {
+            1: {
+                name: "Fraction Addition",
+                totalQuestions: 6,
+                questions: [
+                    { 
+                        operation: "1/4 + 1/4",
+                        options: ["1/2", "1/4", "2/4", "1"],
+                        correct: "1/2",
+                        hint: "When adding fractions with the same denominator, just add the numerators: 1 + 1 = 2, so 2/4 which simplifies to 1/2."
+                    },
+                    { 
+                        operation: "1/3 + 1/3",
+                        options: ["2/3", "1/3", "2/6", "1"],
+                        correct: "2/3",
+                        hint: "Add the numerators: 1 + 1 = 2, keep the denominator 3, so 2/3."
+                    },
+                    { 
+                        operation: "1/2 + 1/4",
+                        options: ["3/4", "1/2", "2/6", "2/4"],
+                        correct: "3/4",
+                        hint: "First make denominators the same: 1/2 = 2/4, then add: 2/4 + 1/4 = 3/4."
+                    },
+                    { 
+                        operation: "2/5 + 1/5",
+                        options: ["3/5", "2/5", "3/10", "1/5"],
+                        correct: "3/5",
+                        hint: "Same denominator, just add numerators: 2 + 1 = 3, so 3/5."
+                    },
+                    { 
+                        operation: "1/8 + 3/8",
+                        options: ["1/2", "4/8", "3/8", "1/4"],
+                        correct: "1/2",
+                        hint: "1/8 + 3/8 = 4/8, which simplifies to 1/2."
+                    },
+                    { 
+                        operation: "1/6 + 1/3",
+                        options: ["1/2", "2/9", "1/3", "2/6"],
+                        correct: "1/2",
+                        hint: "Make denominators the same: 1/3 = 2/6, then add: 1/6 + 2/6 = 3/6 = 1/2."
+                    }
+                ]
+            },
+            2: {
+                name: "Fraction Subtraction",
+                totalQuestions: 6,
+                questions: [
+                    { 
+                        operation: "3/4 - 1/4",
+                        options: ["1/2", "2/4", "1/4", "1"],
+                        correct: "1/2",
+                        hint: "Same denominator, subtract numerators: 3 - 1 = 2, so 2/4 = 1/2."
+                    },
+                    { 
+                        operation: "5/6 - 1/6",
+                        options: ["2/3", "4/6", "1/2", "1/3"],
+                        correct: "2/3",
+                        hint: "5/6 - 1/6 = 4/6, which simplifies to 2/3."
+                    },
+                    { 
+                        operation: "3/4 - 1/2",
+                        options: ["1/4", "2/4", "1/2", "2/2"],
+                        correct: "1/4",
+                        hint: "Make denominators the same: 1/2 = 2/4, then subtract: 3/4 - 2/4 = 1/4."
+                    },
+                    { 
+                        operation: "7/8 - 3/8",
+                        options: ["1/2", "4/8", "3/8", "1/4"],
+                        correct: "1/2",
+                        hint: "7/8 - 3/8 = 4/8, which simplifies to 1/2."
+                    },
+                    { 
+                        operation: "5/6 - 1/3",
+                        options: ["1/2", "3/6", "4/6", "1/3"],
+                        correct: "1/2",
+                        hint: "Make denominators the same: 1/3 = 2/6, then subtract: 5/6 - 2/6 = 3/6 = 1/2."
+                    },
+                    { 
+                        operation: "4/5 - 2/5",
+                        options: ["2/5", "1/5", "2/10", "3/5"],
+                        correct: "2/5",
+                        hint: "Same denominator, subtract numerators: 4 - 2 = 2, so 2/5."
+                    }
+                ]
+            },
+            3: {
+                name: "Fraction Multiplication",
+                totalQuestions: 6,
+                questions: [
+                    { 
+                        operation: "1/2 × 1/2",
+                        options: ["1/4", "1/2", "2/4", "1"],
+                        correct: "1/4",
+                        hint: "Multiply numerators: 1×1=1, multiply denominators: 2×2=4, so 1/4."
+                    },
+                    { 
+                        operation: "2/3 × 1/4",
+                        options: ["1/6", "2/12", "3/7", "1/4"],
+                        correct: "1/6",
+                        hint: "Multiply numerators: 2×1=2, multiply denominators: 3×4=12, so 2/12 = 1/6."
+                    },
+                    { 
+                        operation: "3/4 × 2/3",
+                        options: ["1/2", "6/12", "5/7", "3/4"],
+                        correct: "1/2",
+                        hint: "Multiply numerators: 3×2=6, multiply denominators: 4×3=12, so 6/12 = 1/2."
+                    },
+                    { 
+                        operation: "1/5 × 2/3",
+                        options: ["2/15", "3/8", "1/5", "2/5"],
+                        correct: "2/15",
+                        hint: "Multiply numerators: 1×2=2, multiply denominators: 5×3=15, so 2/15."
+                    },
+                    { 
+                        operation: "3/5 × 2/7",
+                        options: ["6/35", "5/12", "3/7", "2/5"],
+                        correct: "6/35",
+                        hint: "Multiply numerators: 3×2=6, multiply denominators: 5×7=35, so 6/35."
+                    },
+                    { 
+                        operation: "4/9 × 3/8",
+                        options: ["1/6", "12/72", "7/17", "4/9"],
+                        correct: "1/6",
+                        hint: "Multiply numerators: 4×3=12, multiply denominators: 9×8=72, so 12/72 = 1/6."
+                    }
+                ]
+            },
+            4: {
+                name: "Fraction Division",
+                totalQuestions: 6,
+                questions: [
+                    { 
+                        operation: "1/2 ÷ 1/4",
+                        options: ["2", "1/2", "1/8", "3/4"],
+                        correct: "2",
+                        hint: "Dividing by a fraction is the same as multiplying by its reciprocal: 1/2 × 4/1 = 4/2 = 2."
+                    },
+                    { 
+                        operation: "3/4 ÷ 1/2",
+                        options: ["1 1/2", "3/8", "2/3", "1/4"],
+                        correct: "1 1/2",
+                        hint: "3/4 ÷ 1/2 = 3/4 × 2/1 = 6/4 = 3/2 = 1 1/2."
+                    },
+                    { 
+                        operation: "2/3 ÷ 1/3",
+                        options: ["2", "1/3", "2/9", "3/2"],
+                        correct: "2",
+                        hint: "2/3 ÷ 1/3 = 2/3 × 3/1 = 6/3 = 2."
+                    },
+                    { 
+                        operation: "5/6 ÷ 2/3",
+                        options: ["1 1/4", "10/18", "7/9", "5/4"],
+                        correct: "1 1/4",
+                        hint: "5/6 ÷ 2/3 = 5/6 × 3/2 = 15/12 = 5/4 = 1 1/4."
+                    },
+                    { 
+                        operation: "3/8 ÷ 1/4",
+                        options: ["1 1/2", "3/32", "4/7", "1/2"],
+                        correct: "1 1/2",
+                        hint: "3/8 ÷ 1/4 = 3/8 × 4/1 = 12/8 = 3/2 = 1 1/2."
+                    },
+                    { 
+                        operation: "4/5 ÷ 2/5",
+                        options: ["2", "8/25", "6/5", "1/2"],
+                        correct: "2",
+                        hint: "4/5 ÷ 2/5 = 4/5 × 5/2 = 20/10 = 2."
+                    }
+                ]
+            }
+        };
+
+        // Scroll functionality
+        window.addEventListener('scroll', () => {
+            const scrollTop = document.getElementById('scrollTop');
+            if (window.pageYOffset > 100) {
+                scrollTop.classList.add('visible');
+            } else {
+                scrollTop.classList.remove('visible');
+            }
+        });
+
+        function scrollToTop() {
+            window.scrollTo({
+                top: 0,
+                behavior: 'smooth'
+            });
+        }
+
+        function startGame() {
+            document.getElementById('startScreen').classList.add('hidden');
+            document.getElementById('gameScreen').classList.remove('hidden');
+            currentLevel = 1;
+            score = 0;
+            stars = 0;
+            questionsAnswered = 0;
+            hintShown = false;
+            updateScore();
+            loadLevel(1);
+            scrollToTop();
+        }
+
+        function loadLevel(level) {
+            currentLevel = level;
+            document.getElementById('currentLevel').textContent = level;
+            
+            // Update level badges
+            document.querySelectorAll('.level-badge').forEach((badge, index) => {
+                badge.classList.remove('active', 'completed', 'locked');
+                if (index + 1 < level) {
+                    badge.classList.add('completed');
+                } else if (index + 1 === level) {
+                    badge.classList.add('active');
+                } else {
+                    badge.classList.add('locked');
+                }
+            });
+
+            questionsAnswered = 0;
+            totalQuestions = levelData[level].totalQuestions;
+            updateProgress();
+            generateQuestion();
+        }
+
+        function generateQuestion() {
+            const level = levelData[currentLevel];
+            const randomIndex = Math.floor(Math.random() * level.questions.length);
+            currentQuestion = level.questions[randomIndex];
+            hintShown = false;
+            
+            const gameArea = document.getElementById('gameArea');
+            
+            // Parse the operation to display it nicely
+            const operationParts = currentQuestion.operation.split(' ');
+            const symbol = operationParts[1];
+            let symbolDisplay = '';
+            
+            switch(symbol) {
+                case '+': symbolDisplay = '+'; break;
+                case '-': symbolDisplay = '−'; break;
+                case '×': symbolDisplay = '×'; break;
+                case '÷': symbolDisplay = '÷'; break;
+            }
+            
+            gameArea.innerHTML = `
+                <div class="instruction">${getLevelInstruction(currentLevel)}</div>
+                <div class="operation-display">
+                    <div class="fraction-display">
+                        <span>${operationParts[0].split('/')[0]}</span>
+                        <div class="fraction-line"></div>
+                        <span>${operationParts[0].split('/')[1]}</span>
+                    </div>
+                    <div class="operation-symbol">${symbolDisplay}</div>
+                    <div class="fraction-display">
+                        <span>${operationParts[2].split('/')[0]}</span>
+                        <div class="fraction-line"></div>
+                        <span>${operationParts[2].split('/')[1]}</span>
+                    </div>
+                    <div class="operation-symbol">=</div>
+                    <div class="fraction-display">
+                        <span>?</span>
+                    </div>
+                </div>
+                <div id="hintContainer"></div>
+                <div class="options-container">
+                    ${currentQuestion.options.map(option => `
+                        <div class="option-card" onclick="checkAnswer('${option}')">
+                            <div class="fraction-display" style="font-size: 1.5em;">
+                                ${option.includes('/') ? `
+                                    <span>${option.split('/')[0]}</span>
+                                    <div class="fraction-line"></div>
+                                    <span>${option.split('/')[1]}</span>
+                                ` : `<span>${option}</span>`}
+                            </div>
+                        </div>
+                    `).join('')}
+                </div>
+            `;
+        }
+
+        function getLevelInstruction(level) {
+            switch(level) {
+                case 1: return "➕ Add the fractions together!";
+                case 2: return "➖ Subtract the fractions!";
+                case 3: return "✖️ Multiply the fractions!";
+                case 4: return "➗ Divide the fractions!";
+                default: return "Solve the fraction operation!";
+            }
+        }
+
+        function checkAnswer(answer) {
+            const cards = document.querySelectorAll('.option-card');
+            cards.forEach(card => {
+                card.style.pointerEvents = 'none';
+            });
+            
+            const clickedCard = event.currentTarget;
+            
+            if (answer === currentQuestion.correct) {
+                clickedCard.classList.add('correct');
+                score += 10;
+                stars += 1;
+                createConfetti();
+                playSuccessSound();
+                
+                questionsAnswered++;
+                updateScore();
+                updateProgress();
+                
+                setTimeout(() => {
+                    if (questionsAnswered >= totalQuestions) {
+                        if (currentLevel < 4) {
+                            loadLevel(currentLevel + 1);
+                        } else {
+                            endGame();
+                        }
+                    } else {
+                        generateQuestion();
+                    }
+                }, 1500);
+            } else {
+                clickedCard.classList.add('incorrect');
+                
+                // Show hint if not already shown
+                if (!hintShown) {
+                    showHint();
+                    hintShown = true;
+                    
+                    // Re-enable clicking after showing hint
+                    setTimeout(() => {
+                        cards.forEach(card => {
+                            card.style.pointerEvents = 'auto';
+                        });
+                        clickedCard.classList.remove('incorrect');
+                    }, 2500);
+                } else {
+                    // Show correct answer after hint has been shown
+                    setTimeout(() => {
+                        cards.forEach(card => {
+                            const cardContent = card.querySelector('.fraction-display');
+                            let cardText;
+                            
+                            if (cardContent.children.length > 1) {
+                                // It's a fraction
+                                cardText = `${cardContent.children[0].textContent}/${cardContent.children[2].textContent}`;
+                            } else {
+                                // It's a whole number
+                                cardText = cardContent.children[0].textContent;
+                            }
+                            
+                            if (cardText === currentQuestion.correct) {
+                                card.classList.add('correct');
+                            }
+                        });
+                        
+                        questionsAnswered++;
+                        updateScore();
+                        updateProgress();
+                        
+                        setTimeout(() => {
+                            if (questionsAnswered >= totalQuestions) {
+                                if (currentLevel < 4) {
+                                    loadLevel(currentLevel + 1);
+                                } else {
+                                    endGame();
+                                }
+                            } else {
+                                generateQuestion();
+                            }
+                        }, 1500);
+                    }, 1000);
+                }
+            }
+        }
+
+        function showHint() {
+            const hintContainer = document.getElementById('hintContainer');
+            hintContainer.innerHTML = `
+                <div class="hint-box">
+                    💡 Hint: ${currentQuestion.hint}
+                </div>
+            `;
+        }
+
+        function updateScore() {
+            document.getElementById('score').textContent = score;
+            document.getElementById('stars').textContent = stars;
+        }
+
+        function updateProgress() {
+            const percentage = Math.round((questionsAnswered / totalQuestions) * 100);
+            const progressBar = document.getElementById('progressBar');
+            progressBar.style.width = percentage + '%';
+            progressBar.textContent = percentage + '%';
+        }
+
+        function createConfetti() {
+            const colors = ['#f0f', '#0ff', '#ff0', '#0f0', '#f00', '#00f'];
+            for (let i = 0; i < 20; i++) {
+                setTimeout(() => {
+                    const confetti = document.createElement('div');
+                    confetti.className = 'confetti';
+                    confetti.style.left = Math.random() * 100 + '%';
+                    confetti.style.background = colors[Math.floor(Math.random() * colors.length)];
+                    confetti.style.animationDelay = Math.random() * 0.5 + 's';
+                    document.body.appendChild(confetti);
+                    
+                    setTimeout(() => confetti.remove(), 3000);
+                }, i * 50);
+            }
+        }
+
+        function playSuccessSound() {
+            // Create a simple success sound using Web Audio API
+            if (window.AudioContext || window.webkitAudioContext) {
+                const audioContext = new (window.AudioContext || window.webkitAudioContext)();
+                const oscillator = audioContext.createOscillator();
+                const gainNode = audioContext.createGain();
+                
+                oscillator.connect(gainNode);
+                gainNode.connect(audioContext.destination);
+                
+                oscillator.frequency.value = 523.25; // C5 note
+                oscillator.type = 'sine';
+                
+                gainNode.gain.setValueAtTime(0.3, audioContext.currentTime);
+                gainNode.gain.exponentialRampToValueAtTime(0.01, audioContext.currentTime + 0.5);
+                
+                oscillator.start(audioContext.currentTime);
+                oscillator.stop(audioContext.currentTime + 0.5);
+            }
+        }
+
+        function endGame() {
+            document.getElementById('gameScreen').classList.add('hidden');
+            document.getElementById('endScreen').classList.remove('hidden');
+            document.getElementById('finalScore').textContent = score;
+            
+            // Calculate star rating
+            let starRating = '⭐';
+            if (score >= 200) starRating = '⭐⭐⭐⭐';
+            else if (score >= 150) starRating = '⭐⭐⭐';
+            else if (score >= 100) starRating = '⭐⭐';
+            document.getElementById('finalStars').textContent = starRating;
+            
+            // Create celebration confetti
+            for (let i = 0; i < 50; i++) {
+                setTimeout(() => createConfetti(), i * 100);
+            }
+            scrollToTop();
+        }
+
+        function resetGame() {
+            document.getElementById('endScreen').classList.add('hidden');
+            document.getElementById('startScreen').classList.remove('hidden');
+            scrollToTop();
+        }
+
+        // Add some initial animations
+        window.addEventListener('load', () => {
+            document.querySelector('.game-container').style.animation = 'slideIn 0.5s ease-out';
+        });
+    </script>
+</body>
+</html>
