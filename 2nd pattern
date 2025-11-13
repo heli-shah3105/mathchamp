@@ -1,0 +1,1533 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Pattern Connect 4 - Challenge Edition</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+            overflow: auto;
+        }
+
+        .floating-shapes {
+            position: fixed;
+            width: 100%;
+            height: 100%;
+            top: 0;
+            left: 0;
+            pointer-events: none;
+            z-index: 0;
+        }
+
+        .shape {
+            position: absolute;
+            opacity: 0.1;
+            animation: float 20s infinite ease-in-out;
+        }
+
+        .shape:nth-child(1) {
+            width: 80px;
+            height: 80px;
+            background: #fff;
+            border-radius: 50%;
+            top: 20%;
+            left: 10%;
+            animation-delay: 0s;
+        }
+
+        .shape:nth-child(2) {
+            width: 60px;
+            height: 60px;
+            background: #fff;
+            transform: rotate(45deg);
+            top: 60%;
+            right: 10%;
+            animation-delay: 2s;
+        }
+
+        .shape:nth-child(3) {
+            width: 100px;
+            height: 100px;
+            background: #fff;
+            border-radius: 30%;
+            bottom: 20%;
+            left: 30%;
+            animation-delay: 4s;
+        }
+
+        @keyframes float {
+            0%, 100% {
+                transform: translateY(0) rotate(0deg);
+            }
+            33% {
+                transform: translateY(-30px) rotate(120deg);
+            }
+            66% {
+                transform: translateY(30px) rotate(240deg);
+            }
+        }
+
+        .game-container {
+            background: rgba(255, 255, 255, 0.95);
+            border-radius: 30px;
+            padding: 30px;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+            z-index: 1;
+            position: relative;
+            animation: slideIn 0.5s ease-out;
+            max-width: 900px;
+            width: 100%;
+            margin: 20px 0;
+        }
+
+        @keyframes slideIn {
+            from {
+                opacity: 0;
+                transform: translateY(-30px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        header {
+            text-align: center;
+            margin-bottom: 30px;
+        }
+
+        h1 {
+            font-size: 3em;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            margin-bottom: 10px;
+            text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.1);
+            animation: pulse 2s infinite;
+        }
+
+        @keyframes pulse {
+            0%, 100% {
+                transform: scale(1);
+            }
+            50% {
+                transform: scale(1.05);
+            }
+        }
+
+        .game-info {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+            padding: 15px;
+            background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+            border-radius: 15px;
+            color: white;
+            flex-wrap: wrap;
+            gap: 15px;
+        }
+
+        .score-board {
+            display: flex;
+            gap: 30px;
+            font-size: 1.2em;
+            font-weight: bold;
+        }
+
+        .score-item {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .score-indicator {
+            width: 30px;
+            height: 30px;
+            border-radius: 50%;
+            border: 3px solid white;
+        }
+
+        .player-indicator {
+            background: #ff6b6b;
+        }
+
+        .ai-indicator {
+            background: #4ecdc4;
+        }
+
+        .current-turn {
+            font-size: 1.3em;
+            font-weight: bold;
+            animation: blink 1s infinite;
+        }
+
+        @keyframes blink {
+            0%, 100% {
+                opacity: 1;
+            }
+            50% {
+                opacity: 0.7;
+            }
+        }
+
+        .move-counter {
+            font-size: 1.1em;
+            font-weight: bold;
+            padding: 8px 15px;
+            background: rgba(255, 255, 255, 0.2);
+            border-radius: 10px;
+        }
+
+        .board-wrapper {
+            position: relative;
+            display: inline-block;
+            margin: 0 auto;
+            display: flex;
+            justify-content: center;
+        }
+
+        .board {
+            background: linear-gradient(135deg, #4a90e2 0%, #357abd 100%);
+            border-radius: 20px;
+            padding: 15px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+            display: grid;
+            grid-template-columns: repeat(7, 70px);
+            grid-template-rows: repeat(6, 70px);
+            gap: 10px;
+            position: relative;
+        }
+
+        .cell {
+            background: white;
+            border-radius: 50%;
+            position: relative;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            box-shadow: inset 0 2px 10px rgba(0, 0, 0, 0.1);
+        }
+
+        .cell:hover {
+            transform: scale(1.05);
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
+        }
+
+        .cell.disabled {
+            cursor: not-allowed;
+        }
+
+        .disc {
+            width: 100%;
+            height: 100%;
+            border-radius: 50%;
+            position: absolute;
+            top: 0;
+            left: 0;
+            animation: dropIn 0.5s ease-in-out;
+            box-shadow: 0 3px 10px rgba(0, 0, 0, 0.3);
+        }
+
+        @keyframes dropIn {
+            from {
+                transform: translateY(-400px);
+                opacity: 0;
+            }
+            50% {
+                opacity: 1;
+            }
+            to {
+                transform: translateY(0);
+                opacity: 1;
+            }
+        }
+
+        .disc.player {
+            background: radial-gradient(circle at 30% 30%, #ff8787, #ff6b6b);
+            animation: dropIn 0.5s ease-in-out, pulseDisc 2s infinite;
+        }
+
+        .disc.ai {
+            background: radial-gradient(circle at 30% 30%, #6ee7df, #4ecdc4);
+            animation: dropIn 0.5s ease-in-out, pulseDisc 2s infinite;
+        }
+
+        @keyframes pulseDisc {
+            0%, 100% {
+                box-shadow: 0 3px 10px rgba(0, 0, 0, 0.3);
+            }
+            50% {
+                box-shadow: 0 5px 20px rgba(0, 0, 0, 0.4);
+            }
+        }
+
+        .disc.winning {
+            animation: dropIn 0.5s ease-in-out, celebrate 0.5s ease-in-out infinite alternate;
+        }
+
+        @keyframes celebrate {
+            from {
+                transform: scale(1) rotate(0deg);
+            }
+            to {
+                transform: scale(1.1) rotate(5deg);
+            }
+        }
+
+        .controls {
+            margin-top: 30px;
+            text-align: center;
+        }
+
+        .btn {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border: none;
+            padding: 15px 40px;
+            font-size: 1.2em;
+            border-radius: 50px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
+            margin: 0 10px;
+        }
+
+        .btn:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 8px 25px rgba(0, 0, 0, 0.3);
+        }
+
+        .btn:active {
+            transform: translateY(0);
+        }
+
+        .message {
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            background: white;
+            padding: 30px 50px;
+            border-radius: 20px;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+            z-index: 1000;
+            display: none;
+            animation: popIn 0.5s ease-out;
+            max-width: 500px;
+            width: 90%;
+        }
+
+        @keyframes popIn {
+            from {
+                opacity: 0;
+                transform: translate(-50%, -50%) scale(0.5);
+            }
+            to {
+                opacity: 1;
+                transform: translate(-50%, -50%) scale(1);
+            }
+        }
+
+        .message.show {
+            display: block;
+        }
+
+        .message h2 {
+            font-size: 2em;
+            margin-bottom: 15px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .message p {
+            font-size: 1.2em;
+            margin-bottom: 20px;
+            color: #555;
+        }
+
+        .overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.5);
+            z-index: 999;
+            display: none;
+        }
+
+        .overlay.show {
+            display: block;
+        }
+
+        .difficulty-selector {
+            margin-bottom: 20px;
+            text-align: center;
+        }
+
+        .difficulty-selector label {
+            font-weight: bold;
+            margin-right: 10px;
+            color: #555;
+        }
+
+        .difficulty-selector select {
+            padding: 8px 15px;
+            border-radius: 10px;
+            border: 2px solid #667eea;
+            font-size: 1em;
+            cursor: pointer;
+            background: white;
+            transition: all 0.3s ease;
+        }
+
+        .difficulty-selector select:hover {
+            border-color: #764ba2;
+        }
+
+        .pattern-challenge {
+            background: white;
+            border-radius: 20px;
+            padding: 30px;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+            z-index: 1001;
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            display: none;
+            max-width: 600px;
+            width: 90%;
+        }
+
+        .pattern-challenge.show {
+            display: block;
+            animation: popIn 0.5s ease-out;
+        }
+
+        .pattern-challenge h3 {
+            font-size: 1.8em;
+            margin-bottom: 20px;
+            color: #667eea;
+            text-align: center;
+        }
+
+        .pattern-question {
+            font-size: 1.2em;
+            margin-bottom: 20px;
+            text-align: center;
+            color: #333;
+            padding: 15px;
+            background: #f8f9fa;
+            border-radius: 10px;
+        }
+
+        .pattern-display {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            margin-bottom: 20px;
+            flex-wrap: wrap;
+            gap: 15px;
+        }
+
+        .pattern-item {
+            width: 60px;
+            height: 60px;
+            border-radius: 10px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            font-size: 1.5em;
+            font-weight: bold;
+            transition: all 0.3s ease;
+        }
+
+        .pattern-item.number {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+        }
+
+        .pattern-item.shape {
+            background: #f8f9fa;
+            border: 2px solid #667eea;
+        }
+
+        .pattern-item.question {
+            background: #fff3cd;
+            border: 2px dashed #856404;
+            color: #856404;
+        }
+
+        .pattern-options {
+            display: flex;
+            justify-content: center;
+            flex-wrap: wrap;
+            gap: 15px;
+            margin-bottom: 20px;
+        }
+
+        .pattern-option {
+            width: 60px;
+            height: 60px;
+            border-radius: 10px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            font-size: 1.5em;
+            font-weight: bold;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            background: #f8f9fa;
+            border: 2px solid #ddd;
+        }
+
+        .pattern-option:hover {
+            transform: scale(1.1);
+            border-color: #667eea;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
+        }
+
+        .pattern-option.selected {
+            border-color: #667eea;
+            background: rgba(102, 126, 234, 0.1);
+            transform: scale(1.05);
+        }
+
+        .pattern-buttons {
+            display: flex;
+            gap: 10px;
+            justify-content: center;
+        }
+
+        .pattern-hint {
+            margin-top: 15px;
+            padding: 15px;
+            background: #fff3cd;
+            border-radius: 10px;
+            color: #856404;
+            display: none;
+            font-size: 1.1em;
+        }
+
+        .pattern-hint.show {
+            display: block;
+        }
+
+        .pattern-attempts {
+            text-align: center;
+            margin-bottom: 15px;
+            font-weight: bold;
+            color: #666;
+            font-size: 1.1em;
+        }
+
+        .instructions {
+            background: rgba(255, 255, 255, 0.9);
+            border-radius: 15px;
+            padding: 20px;
+            margin-top: 30px;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+        }
+
+        .instructions h3 {
+            color: #667eea;
+            margin-bottom: 15px;
+            text-align: center;
+        }
+
+        .instructions ul {
+            list-style: none;
+            padding: 0;
+        }
+
+        .instructions li {
+            padding: 8px 0;
+            border-bottom: 1px solid #eee;
+            color: #555;
+        }
+
+        .instructions li:last-child {
+            border-bottom: none;
+        }
+
+        .instructions li:before {
+            content: "🧩 ";
+            margin-right: 8px;
+        }
+
+        .difficulty-info {
+            background: rgba(102, 126, 234, 0.1);
+            border-radius: 10px;
+            padding: 15px;
+            margin-top: 20px;
+            text-align: center;
+            color: #667eea;
+            font-weight: bold;
+        }
+
+        .shape-circle {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            background: #667eea;
+        }
+
+        .shape-square {
+            width: 40px;
+            height: 40px;
+            background: #764ba2;
+        }
+
+        .shape-triangle {
+            width: 0;
+            height: 0;
+            border-left: 20px solid transparent;
+            border-right: 20px solid transparent;
+            border-bottom: 35px solid #f093fb;
+        }
+
+        .shape-diamond {
+            width: 40px;
+            height: 40px;
+            background: #f5576c;
+            transform: rotate(45deg);
+        }
+
+        .shape-star {
+            position: relative;
+            display: inline-block;
+            width: 0;
+            height: 0;
+            border-left: 20px solid transparent;
+            border-right: 20px solid transparent;
+            border-bottom: 15px solid #ffce54;
+            transform: rotate(35deg);
+        }
+
+        .shape-star:before {
+            content: '';
+            position: absolute;
+            left: -20px;
+            top: -10px;
+            width: 0;
+            height: 0;
+            border-left: 20px solid transparent;
+            border-right: 20px solid transparent;
+            border-bottom: 15px solid #ffce54;
+            transform: rotate(-70deg);
+        }
+
+        .shape-star:after {
+            content: '';
+            position: absolute;
+            left: -20px;
+            top: 3px;
+            width: 0;
+            height: 0;
+            border-left: 20px solid transparent;
+            border-right: 20px solid transparent;
+            border-bottom: 15px solid #ffce54;
+            transform: rotate(70deg);
+        }
+
+        @media (max-width: 768px) {
+            .board {
+                grid-template-columns: repeat(7, 45px);
+                grid-template-rows: repeat(6, 45px);
+                gap: 5px;
+                padding: 10px;
+            }
+
+            h1 {
+                font-size: 2em;
+            }
+
+            .game-info {
+                flex-direction: column;
+                gap: 15px;
+            }
+
+            .pattern-item {
+                width: 50px;
+                height: 50px;
+            }
+
+            .pattern-option {
+                width: 50px;
+                height: 50px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="floating-shapes">
+        <div class="shape"></div>
+        <div class="shape"></div>
+        <div class="shape"></div>
+    </div>
+
+    <main class="game-container">
+        <header>
+            <h1>🧩 Pattern Connect 4 🎮</h1>
+        </header>
+
+        <section class="difficulty-selector">
+            <label for="difficulty">AI Difficulty:</label>
+            <select id="difficulty">
+                <option value="easy">Easy</option>
+                <option value="medium" selected>Medium</option>
+                <option value="hard">Hard</option>
+            </select>
+        </section>
+
+        <section class="game-info">
+            <div class="score-board">
+                <div class="score-item">
+                    <div class="score-indicator player-indicator"></div>
+                    <span>You: <span id="playerScore">0</span></span>
+                </div>
+                <div class="score-item">
+                    <div class="score-indicator ai-indicator"></div>
+                    <span>AI: <span id="aiScore">0</span></span>
+                </div>
+            </div>
+            <div class="move-counter">
+                Moves: <span id="moveCount">0</span>
+            </div>
+            <div class="current-turn" id="currentTurn">Your Turn</div>
+        </section>
+
+        <section class="board-wrapper">
+            <div class="board" id="board"></div>
+        </section>
+
+        <section class="controls">
+            <button class="btn" onclick="resetGame()">🔄 New Game</button>
+            <button class="btn" onclick="resetScores()">📊 Reset Scores</button>
+        </section>
+
+        <section class="instructions">
+            <h3>How to Play</h3>
+            <ul>
+                <li>Click on any column to drop your disc (red)</li>
+                <li>Connect 4 discs in a row to win</li>
+                <li>Every 5 moves, solve a pattern challenge to continue</li>
+                <li>Identify the next item in the sequence</li>
+                <li>Get hints if you're stuck on pattern problems</li>
+            </ul>
+            <div class="difficulty-info">
+                🧩 Test your pattern recognition skills!
+            </div>
+        </section>
+    </main>
+
+    <div class="overlay" id="overlay"></div>
+    <div class="message" id="message">
+        <h2 id="messageTitle">Game Over!</h2>
+        <p id="messageText">Winner!</p>
+        <button class="btn" onclick="closeMessage()">Play Again</button>
+    </div>
+
+    <div class="pattern-challenge" id="patternChallenge">
+        <h3>🧩 Pattern Challenge!</h3>
+        <div class="pattern-attempts" id="patternAttempts">Attempts remaining: 3</div>
+        <div class="pattern-question" id="patternQuestion">What comes next in this pattern?</div>
+        <div class="pattern-display" id="patternDisplay"></div>
+        <div class="pattern-options" id="patternOptions"></div>
+        <div class="pattern-buttons">
+            <button class="btn" onclick="checkPatternAnswer()">Submit Answer</button>
+            <button class="btn" onclick="getHint()">Get Hint</button>
+        </div>
+        <div class="pattern-hint" id="patternHint"></div>
+    </div>
+
+    <script>
+        const ROWS = 6;
+        const COLS = 7;
+        const PLAYER = 1;
+        const AI = 2;
+        
+        let board = [];
+        let currentPlayer = PLAYER;
+        let gameActive = true;
+        let playerScore = 0;
+        let aiScore = 0;
+        let difficulty = 'medium';
+        let moveCount = 0;
+        let patternChallengeActive = false;
+        let pendingMove = null;
+        let currentPatternProblem = null;
+        let patternAttempts = 3;
+        let selectedOption = null;
+
+        // Initialize the game
+        function initGame() {
+            board = Array(ROWS).fill().map(() => Array(COLS).fill(0));
+            currentPlayer = PLAYER;
+            gameActive = true;
+            moveCount = 0;
+            patternChallengeActive = false;
+            pendingMove = null;
+            currentPatternProblem = null;
+            patternAttempts = 3;
+            selectedOption = null;
+            createBoard();
+            updateTurnDisplay();
+            updateMoveCount();
+            loadScores();
+        }
+
+        // Create the board UI
+        function createBoard() {
+            const boardElement = document.getElementById('board');
+            boardElement.innerHTML = '';
+            
+            for (let row = 0; row < ROWS; row++) {
+                for (let col = 0; col < COLS; col++) {
+                    const cell = document.createElement('div');
+                    cell.className = 'cell';
+                    cell.dataset.row = row;
+                    cell.dataset.col = col;
+                    cell.onclick = () => handleCellClick(col);
+                    boardElement.appendChild(cell);
+                }
+            }
+        }
+
+        // Handle cell click
+        function handleCellClick(col) {
+            if (!gameActive || currentPlayer !== PLAYER || patternChallengeActive) return;
+            
+            const row = getAvailableRow(col);
+            if (row === -1) return;
+            
+            // Check if we need a pattern challenge
+            if ((moveCount + 1) % 5 === 0) {
+                pendingMove = { row, col };
+                showPatternChallenge();
+                return;
+            }
+            
+            makeMove(row, col, PLAYER);
+            
+            if (gameActive) {
+                currentPlayer = AI;
+                updateTurnDisplay();
+                setTimeout(() => makeAIMove(), 500);
+            }
+        }
+
+        // Show pattern challenge
+        function showPatternChallenge() {
+            patternChallengeActive = true;
+            patternAttempts = 3;
+            selectedOption = null;
+            currentPatternProblem = generatePatternProblem();
+            
+            document.getElementById('patternQuestion').textContent = currentPatternProblem.question;
+            document.getElementById('patternAttempts').textContent = `Attempts remaining: ${patternAttempts}`;
+            document.getElementById('patternHint').classList.remove('show');
+            
+            // Display pattern
+            const patternDisplay = document.getElementById('patternDisplay');
+            patternDisplay.innerHTML = '';
+            
+            currentPatternProblem.pattern.forEach((item, index) => {
+                const itemElement = document.createElement('div');
+                itemElement.className = `pattern-item ${item.type}`;
+                
+                if (item.type === 'number') {
+                    itemElement.textContent = item.value;
+                } else if (item.type === 'shape') {
+                    const shapeElement = document.createElement('div');
+                    shapeElement.className = `shape-${item.value}`;
+                    itemElement.appendChild(shapeElement);
+                } else if (item.type === 'question') {
+                    itemElement.textContent = '?';
+                }
+                
+                patternDisplay.appendChild(itemElement);
+            });
+            
+            // Display options
+            const optionsContainer = document.getElementById('patternOptions');
+            optionsContainer.innerHTML = '';
+            
+            currentPatternProblem.options.forEach((option, index) => {
+                const optionElement = document.createElement('div');
+                optionElement.className = 'pattern-option';
+                optionElement.dataset.index = index;
+                
+                if (option.type === 'number') {
+                    optionElement.textContent = option.value;
+                } else if (option.type === 'shape') {
+                    const shapeElement = document.createElement('div');
+                    shapeElement.className = `shape-${option.value}`;
+                    optionElement.appendChild(shapeElement);
+                }
+                
+                optionElement.onclick = () => selectOption(index);
+                optionsContainer.appendChild(optionElement);
+            });
+            
+            document.getElementById('patternChallenge').classList.add('show');
+            document.getElementById('overlay').classList.add('show');
+        }
+
+        // Select option
+        function selectOption(index) {
+            // Remove previous selection
+            document.querySelectorAll('.pattern-option').forEach(opt => {
+                opt.classList.remove('selected');
+            });
+            
+            // Add selection to clicked option
+            document.querySelector(`.pattern-option[data-index="${index}"]`).classList.add('selected');
+            selectedOption = index;
+        }
+
+        // Generate pattern problem
+        function generatePatternProblem() {
+            const patternTypes = ['number', 'shape'];
+            const patternType = patternTypes[Math.floor(Math.random() * patternTypes.length)];
+            
+            if (patternType === 'number') {
+                return generateNumberPattern();
+            } else {
+                return generateShapePattern();
+            }
+        }
+
+        // Generate number pattern
+        function generateNumberPattern() {
+            const patterns = [
+                // Arithmetic progression
+                {
+                    pattern: [
+                        { type: 'number', value: 2 },
+                        { type: 'number', value: 4 },
+                        { type: 'number', value: 6 },
+                        { type: 'number', value: 8 },
+                        { type: 'question' }
+                    ],
+                    answer: { type: 'number', value: 10 },
+                    hint: 'Add 2 to each number to get the next one',
+                    question: 'What number comes next in this sequence?'
+                },
+                {
+                    pattern: [
+                        { type: 'number', value: 5 },
+                        { type: 'number', value: 10 },
+                        { type: 'number', value: 15 },
+                        { type: 'number', value: 20 },
+                        { type: 'question' }
+                    ],
+                    answer: { type: 'number', value: 25 },
+                    hint: 'Add 5 to each number to get the next one',
+                    question: 'What number comes next in this sequence?'
+                },
+                // Geometric progression
+                {
+                    pattern: [
+                        { type: 'number', value: 2 },
+                        { type: 'number', value: 4 },
+                        { type: 'number', value: 8 },
+                        { type: 'number', value: 16 },
+                        { type: 'question' }
+                    ],
+                    answer: { type: 'number', value: 32 },
+                    hint: 'Multiply each number by 2 to get the next one',
+                    question: 'What number comes next in this sequence?'
+                },
+                // Fibonacci
+                {
+                    pattern: [
+                        { type: 'number', value: 1 },
+                        { type: 'number', value: 1 },
+                        { type: 'number', value: 2 },
+                        { type: 'number', value: 3 },
+                        { type: 'number', value: 5 },
+                        { type: 'question' }
+                    ],
+                    answer: { type: 'number', value: 8 },
+                    hint: 'Each number is the sum of the two previous numbers',
+                    question: 'What number comes next in this Fibonacci sequence?'
+                },
+                // Squares
+                {
+                    pattern: [
+                        { type: 'number', value: 1 },
+                        { type: 'number', value: 4 },
+                        { type: 'number', value: 9 },
+                        { type: 'number', value: 16 },
+                        { type: 'question' }
+                    ],
+                    answer: { type: 'number', value: 25 },
+                    hint: 'These are square numbers: 1², 2², 3², 4²...',
+                    question: 'What number comes next in this sequence?'
+                },
+                // Alternating pattern
+                {
+                    pattern: [
+                        { type: 'number', value: 3 },
+                        { type: 'number', value: 6 },
+                        { type: 'number', value: 5 },
+                        { type: 'number', value: 10 },
+                        { type: 'number', value: 7 },
+                        { type: 'question' }
+                    ],
+                    answer: { type: 'number', value: 14 },
+                    hint: 'Two alternating patterns: +3, -1, +5, -3, +7...',
+                    question: 'What number comes next in this sequence?'
+                }
+            ];
+            
+            const selectedPattern = patterns[Math.floor(Math.random() * patterns.length)];
+            
+            // Generate wrong options
+            const options = [selectedPattern.answer];
+            const wrongAnswers = generateWrongNumberAnswers(selectedPattern.answer.value);
+            
+            wrongAnswers.forEach(answer => {
+                options.push({ type: 'number', value: answer });
+            });
+            
+            // Shuffle options
+            options.sort(() => Math.random() - 0.5);
+            
+            return {
+                ...selectedPattern,
+                options,
+                correctIndex: options.findIndex(opt => 
+                    opt.type === selectedPattern.answer.type && 
+                    opt.value === selectedPattern.answer.value
+                )
+            };
+        }
+
+        // Generate shape pattern
+        function generateShapePattern() {
+            const shapes = ['circle', 'square', 'triangle', 'diamond', 'star'];
+            const patterns = [
+                // Simple rotation
+                {
+                    pattern: [
+                        { type: 'shape', value: 'circle' },
+                        { type: 'shape', value: 'square' },
+                        { type: 'shape', value: 'triangle' },
+                        { type: 'shape', value: 'diamond' },
+                        { type: 'question' }
+                    ],
+                    answer: { type: 'shape', value: 'star' },
+                    hint: 'The shapes are rotating through the sequence: circle → square → triangle → diamond → star',
+                    question: 'What shape comes next in this sequence?'
+                },
+                // Alternating pattern
+                {
+                    pattern: [
+                        { type: 'shape', value: 'circle' },
+                        { type: 'shape', value: 'triangle' },
+                        { type: 'shape', value: 'circle' },
+                        { type: 'shape', value: 'triangle' },
+                        { type: 'question' }
+                    ],
+                    answer: { type: 'shape', value: 'circle' },
+                    hint: 'The pattern alternates between circle and triangle',
+                    question: 'What shape comes next in this sequence?'
+                },
+                // Growing complexity
+                {
+                    pattern: [
+                        { type: 'shape', value: 'circle' },
+                        { type: 'shape', value: 'circle' },
+                        { type: 'shape', value: 'square' },
+                        { type: 'shape', value: 'circle' },
+                        { type: 'shape', value: 'square' },
+                        { type: 'shape', value: 'triangle' },
+                        { type: 'question' }
+                    ],
+                    answer: { type: 'shape', value: 'circle' },
+                    hint: 'The pattern grows in complexity: 1 circle, 2 circles, 1 square, 1 circle+1 square, 1 circle+1 square+1 triangle...',
+                    question: 'What shape comes next in this sequence?'
+                },
+                // Color pattern (simulated with shape order)
+                {
+                    pattern: [
+                        { type: 'shape', value: 'circle' },
+                        { type: 'shape', value: 'square' },
+                        { type: 'shape', value: 'square' },
+                        { type: 'shape', value: 'triangle' },
+                        { type: 'shape', value: 'triangle' },
+                        { type: 'shape', value: 'triangle' },
+                        { type: 'question' }
+                    ],
+                    answer: { type: 'shape', value: 'diamond' },
+                    hint: 'Each shape appears one more time than the previous: 1 circle, 2 squares, 3 triangles...',
+                    question: 'What shape comes next in this sequence?'
+                }
+            ];
+            
+            const selectedPattern = patterns[Math.floor(Math.random() * patterns.length)];
+            
+            // Generate wrong options
+            const options = [selectedPattern.answer];
+            const wrongShapes = shapes.filter(shape => shape !== selectedPattern.answer.value);
+            
+            // Take 3 random wrong shapes
+            while (options.length < 4 && wrongShapes.length > 0) {
+                const randomIndex = Math.floor(Math.random() * wrongShapes.length);
+                options.push({ type: 'shape', value: wrongShapes[randomIndex] });
+                wrongShapes.splice(randomIndex, 1);
+            }
+            
+            // Shuffle options
+            options.sort(() => Math.random() - 0.5);
+            
+            return {
+                ...selectedPattern,
+                options,
+                correctIndex: options.findIndex(opt => 
+                    opt.type === selectedPattern.answer.type && 
+                    opt.value === selectedPattern.answer.value
+                )
+            };
+        }
+
+        // Generate wrong number answers
+        function generateWrongNumberAnswers(correctAnswer) {
+            const wrongAnswers = [];
+            
+            // Add a number that's close but wrong
+            wrongAnswers.push(correctAnswer + 2);
+            
+            // Add a number that's a multiple or factor
+            if (correctAnswer % 2 === 0) {
+                wrongAnswers.push(correctAnswer / 2);
+            } else {
+                wrongAnswers.push(correctAnswer * 2);
+            }
+            
+            // Add a random number
+            wrongAnswers.push(Math.floor(Math.random() * 30) + 1);
+            
+            // Make sure all answers are unique
+            const uniqueAnswers = [...new Set(wrongAnswers)];
+            while (uniqueAnswers.length < 3) {
+                uniqueAnswers.push(Math.floor(Math.random() * 30) + 1);
+            }
+            
+            return uniqueAnswers.slice(0, 3);
+        }
+
+        // Check pattern answer
+        function checkPatternAnswer() {
+            if (selectedOption === null) {
+                // Shake animation for no selection
+                const optionsContainer = document.getElementById('patternOptions');
+                optionsContainer.style.animation = 'shake 0.5s';
+                setTimeout(() => {
+                    optionsContainer.style.animation = '';
+                }, 500);
+                return;
+            }
+            
+            if (selectedOption === currentPatternProblem.correctIndex) {
+                // Correct answer
+                closePatternChallenge();
+                if (pendingMove) {
+                    makeMove(pendingMove.row, pendingMove.col, PLAYER);
+                    pendingMove = null;
+                    
+                    if (gameActive) {
+                        currentPlayer = AI;
+                        updateTurnDisplay();
+                        setTimeout(() => makeAIMove(), 500);
+                    }
+                }
+            } else {
+                // Wrong answer
+                patternAttempts--;
+                document.getElementById('patternAttempts').textContent = `Attempts remaining: ${patternAttempts}`;
+                
+                if (patternAttempts <= 0) {
+                    // Out of attempts, skip turn
+                    closePatternChallenge();
+                    pendingMove = null;
+                    currentPlayer = AI;
+                    updateTurnDisplay();
+                    setTimeout(() => makeAIMove(), 500);
+                } else {
+                    // Shake animation for wrong answer
+                    const selectedElement = document.querySelector('.pattern-option.selected');
+                    selectedElement.style.animation = 'shake 0.5s';
+                    setTimeout(() => {
+                        selectedElement.style.animation = '';
+                    }, 500);
+                }
+            }
+        }
+
+        // Get hint
+        function getHint() {
+            document.getElementById('patternHint').textContent = currentPatternProblem.hint;
+            document.getElementById('patternHint').classList.add('show');
+        }
+
+        // Close pattern challenge
+        function closePatternChallenge() {
+            patternChallengeActive = false;
+            document.getElementById('patternChallenge').classList.remove('show');
+            document.getElementById('overlay').classList.remove('show');
+        }
+
+        // Get the lowest available row in a column
+        function getAvailableRow(col) {
+            for (let row = ROWS - 1; row >= 0; row--) {
+                if (board[row][col] === 0) {
+                    return row;
+                }
+            }
+            return -1;
+        }
+
+        // Make a move
+        function makeMove(row, col, player) {
+            board[row][col] = player;
+            updateCell(row, col, player);
+            moveCount++;
+            updateMoveCount();
+            
+            if (checkWin(row, col, player)) {
+                endGame(player);
+            } else if (checkDraw()) {
+                endGame(0);
+            } else {
+                currentPlayer = currentPlayer === PLAYER ? AI : PLAYER;
+                updateTurnDisplay();
+            }
+        }
+
+        // Update cell UI
+        function updateCell(row, col, player) {
+            const cell = document.querySelector(`[data-row="${row}"][data-col="${col}"]`);
+            const disc = document.createElement('div');
+            disc.className = `disc ${player === PLAYER ? 'player' : 'ai'}`;
+            cell.appendChild(disc);
+        }
+
+        // Check for win
+        function checkWin(row, col, player) {
+            // Check horizontal
+            if (checkDirection(row, col, player, 0, 1)) return true;
+            // Check vertical
+            if (checkDirection(row, col, player, 1, 0)) return true;
+            // Check diagonal (top-left to bottom-right)
+            if (checkDirection(row, col, player, 1, 1)) return true;
+            // Check diagonal (top-right to bottom-left)
+            if (checkDirection(row, col, player, 1, -1)) return true;
+            
+            return false;
+        }
+
+        // Check a specific direction for win
+        function checkDirection(row, col, player, deltaRow, deltaCol) {
+            let count = 1;
+            let winningCells = [{row, col}];
+            
+            // Check forward direction
+            let r = row + deltaRow;
+            let c = col + deltaCol;
+            while (r >= 0 && r < ROWS && c >= 0 && c < COLS && board[r][c] === player) {
+                count++;
+                winningCells.push({row: r, col: c});
+                r += deltaRow;
+                c += deltaCol;
+            }
+            
+            // Check backward direction
+            r = row - deltaRow;
+            c = col - deltaCol;
+            while (r >= 0 && r < ROWS && c >= 0 && c < COLS && board[r][c] === player) {
+                count++;
+                winningCells.push({row: r, col: c});
+                r -= deltaRow;
+                c -= deltaCol;
+            }
+            
+            if (count >= 4) {
+                highlightWinningCells(winningCells);
+                return true;
+            }
+            
+            return false;
+        }
+
+        // Highlight winning cells
+        function highlightWinningCells(cells) {
+            cells.forEach(({row, col}) => {
+                const cell = document.querySelector(`[data-row="${row}"][data-col="${col}"]`);
+                const disc = cell.querySelector('.disc');
+                if (disc) {
+                    disc.classList.add('winning');
+                }
+            });
+        }
+
+        // Check for draw
+        function checkDraw() {
+            for (let col = 0; col < COLS; col++) {
+                if (board[0][col] === 0) return false;
+            }
+            return true;
+        }
+
+        // AI move
+        function makeAIMove() {
+            if (!gameActive || currentPlayer !== AI) return;
+            
+            let col;
+            const difficultyLevel = document.getElementById('difficulty').value;
+            
+            if (difficultyLevel === 'easy') {
+                col = getRandomMove();
+            } else if (difficultyLevel === 'medium') {
+                col = Math.random() < 0.7 ? getBestMove() : getRandomMove();
+            } else {
+                col = getBestMove();
+            }
+            
+            const row = getAvailableRow(col);
+            if (row !== -1) {
+                makeMove(row, col, AI);
+            }
+        }
+
+        // Get random move
+        function getRandomMove() {
+            const availableCols = [];
+            for (let col = 0; col < COLS; col++) {
+                if (board[0][col] === 0) {
+                    availableCols.push(col);
+                }
+            }
+            return availableCols[Math.floor(Math.random() * availableCols.length)];
+        }
+
+        // Get best move using minimax algorithm
+        function getBestMove() {
+            let bestScore = -Infinity;
+            let bestCol = 0;
+            
+            for (let col = 0; col < COLS; col++) {
+                const row = getAvailableRow(col);
+                if (row === -1) continue;
+                
+                board[row][col] = AI;
+                const score = minimax(board, 3, -Infinity, Infinity, false);
+                board[row][col] = 0;
+                
+                if (score > bestScore) {
+                    bestScore = score;
+                    bestCol = col;
+                }
+            }
+            
+            return bestCol;
+        }
+
+        // Minimax algorithm
+        function minimax(board, depth, alpha, beta, isMaximizing) {
+            if (depth === 0) return evaluateBoard();
+            
+            if (isMaximizing) {
+                let maxScore = -Infinity;
+                for (let col = 0; col < COLS; col++) {
+                    const row = getAvailableRow(col);
+                    if (row === -1) continue;
+                    
+                    board[row][col] = AI;
+                    const score = minimax(board, depth - 1, alpha, beta, false);
+                    board[row][col] = 0;
+                    maxScore = Math.max(score, maxScore);
+                    alpha = Math.max(alpha, score);
+                    if (beta <= alpha) break;
+                }
+                return maxScore;
+            } else {
+                let minScore = Infinity;
+                for (let col = 0; col < COLS; col++) {
+                    const row = getAvailableRow(col);
+                    if (row === -1) continue;
+                    
+                    board[row][col] = PLAYER;
+                    const score = minimax(board, depth - 1, alpha, beta, true);
+                    board[row][col] = 0;
+                    minScore = Math.min(score, minScore);
+                    beta = Math.min(beta, score);
+                    if (beta <= alpha) break;
+                }
+                return minScore;
+            }
+        }
+
+        // Evaluate board position
+        function evaluateBoard() {
+            let score = 0;
+            
+            // Center column preference
+            for (let row = 0; row < ROWS; row++) {
+                if (board[row][3] === AI) score += 3;
+            }
+            
+            // Check all possible 4-in-a-row combinations
+            for (let row = 0; row < ROWS; row++) {
+                for (let col = 0; col < COLS; col++) {
+                    // Horizontal
+                    if (col <= COLS - 4) {
+                        score += evaluateLine(board[row][col], board[row][col+1], board[row][col+2], board[row][col+3]);
+                    }
+                    // Vertical
+                    if (row <= ROWS - 4) {
+                        score += evaluateLine(board[row][col], board[row+1][col], board[row+2][col], board[row+3][col]);
+                    }
+                    // Diagonal
+                    if (row <= ROWS - 4 && col <= COLS - 4) {
+                        score += evaluateLine(board[row][col], board[row+1][col+1], board[row+2][col+2], board[row+3][col+3]);
+                    }
+                    if (row <= ROWS - 4 && col >= 3) {
+                        score += evaluateLine(board[row][col], board[row+1][col-1], board[row+2][col-2], board[row+3][col-3]);
+                    }
+                }
+            }
+            
+            return score;
+        }
+
+        // Evaluate a line of 4 cells
+        function evaluateLine(a, b, c, d) {
+            let score = 0;
+            const line = [a, b, c, d];
+            
+            const aiCount = line.filter(cell => cell === AI).length;
+            const playerCount = line.filter(cell => cell === PLAYER).length;
+            
+            if (aiCount === 4) score += 1000;
+            else if (aiCount === 3 && playerCount === 0) score += 50;
+            else if (aiCount === 2 && playerCount === 0) score += 10;
+            
+            if (playerCount === 4) score -= 1000;
+            else if (playerCount === 3 && aiCount === 0) score -= 50;
+            else if (playerCount === 2 && aiCount === 0) score -= 10;
+            
+            return score;
+        }
+
+        // End game
+        function endGame(winner) {
+            gameActive = false;
+            
+            if (winner === PLAYER) {
+                playerScore++;
+                showMessage('🎉 You Win!', 'Congratulations! You beat the AI!');
+            } else if (winner === AI) {
+                aiScore++;
+                showMessage('🤖 AI Wins!', 'The AI was too smart this time!');
+            } else {
+                showMessage('🤝 Draw!', "It's a tie! Well played!");
+            }
+            
+            updateScores();
+            saveScores();
+        }
+
+        // Show message
+        function showMessage(title, text) {
+            document.getElementById('messageTitle').textContent = title;
+            document.getElementById('messageText').textContent = text;
+            document.getElementById('message').classList.add('show');
+            document.getElementById('overlay').classList.add('show');
+        }
+
+        // Close message
+        function closeMessage() {
+            document.getElementById('message').classList.remove('show');
+            document.getElementById('overlay').classList.remove('show');
+            resetGame();
+        }
+
+        // Update turn display
+        function updateTurnDisplay() {
+            const turnElement = document.getElementById('currentTurn');
+            turnElement.textContent = currentPlayer === PLAYER ? 'Your Turn' : 'AI Thinking...';
+            turnElement.style.color = currentPlayer === PLAYER ? '#ff6b6b' : '#4ecdc4';
+        }
+
+        // Update move count
+        function updateMoveCount() {
+            document.getElementById('moveCount').textContent = moveCount;
+        }
+
+        // Update scores
+        function updateScores() {
+            document.getElementById('playerScore').textContent = playerScore;
+            document.getElementById('aiScore').textContent = aiScore;
+        }
+
+        // Save scores to localStorage
+        function saveScores() {
+            localStorage.setItem('patternConnect4PlayerScore', playerScore);
+            localStorage.setItem('patternConnect4AiScore', aiScore);
+        }
+
+        // Load scores from localStorage
+        function loadScores() {
+            playerScore = parseInt(localStorage.getItem('patternConnect4PlayerScore') || '0');
+            aiScore = parseInt(localStorage.getItem('patternConnect4AiScore') || '0');
+            updateScores();
+        }
+
+        // Reset game
+        function resetGame() {
+            initGame();
+        }
+
+        // Reset scores
+        function resetScores() {
+            playerScore = 0;
+            aiScore = 0;
+            updateScores();
+            saveScores();
+            resetGame();
+        }
+
+        // Add shake animation for wrong answers
+        const style = document.createElement('style');
+        style.textContent = `
+            @keyframes shake {
+                0%, 100% { transform: translateX(0); }
+                25% { transform: translateX(-10px); }
+                75% { transform: translateX(10px); }
+            }
+        `;
+        document.head.appendChild(style);
+
+        // Initialize game on load
+        window.onload = initGame;
+    </script>
+</body>
+</html>
