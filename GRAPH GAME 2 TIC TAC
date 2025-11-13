@@ -1,0 +1,1069 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>📊 Graph Adventure Tic-Tac-Toe 🎮</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            min-height: 100vh;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 25%, #f093fb 50%, #feca57 75%, #ff6b6b 100%);
+            background-size: 400% 400%;
+            animation: gradientShift 15s ease infinite;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            overflow: hidden;
+            position: relative;
+        }
+
+        @keyframes gradientShift {
+            0% { background-position: 0% 50%; }
+            50% { background-position: 100% 50%; }
+            100% { background-position: 0% 50%; }
+        }
+
+        .floating-shapes {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            overflow: hidden;
+            z-index: 0;
+        }
+
+        .shape {
+            position: absolute;
+            opacity: 0.1;
+            animation: float 20s infinite ease-in-out;
+        }
+
+        .shape:nth-child(1) {
+            width: 80px;
+            height: 80px;
+            background: #fff;
+            border-radius: 50%;
+            left: 10%;
+            animation-delay: 0s;
+        }
+
+        .shape:nth-child(2) {
+            width: 120px;
+            height: 120px;
+            background: #fff;
+            transform: rotate(45deg);
+            left: 70%;
+            animation-delay: 2s;
+        }
+
+        .shape:nth-child(3) {
+            width: 60px;
+            height: 60px;
+            background: #fff;
+            border-radius: 50%;
+            left: 40%;
+            animation-delay: 4s;
+        }
+
+        @keyframes float {
+            0%, 100% { transform: translateY(100vh) rotate(0deg); }
+            50% { transform: translateY(-100vh) rotate(360deg); }
+        }
+
+        .container {
+            z-index: 1;
+            background: rgba(255, 255, 255, 0.95);
+            border-radius: 30px;
+            padding: 30px;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+            backdrop-filter: blur(10px);
+            animation: slideIn 0.5s ease-out;
+            max-width: 600px;
+            width: 90%;
+        }
+
+        @keyframes slideIn {
+            from {
+                opacity: 0;
+                transform: translateY(-30px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        h1 {
+            text-align: center;
+            color: #333;
+            margin-bottom: 20px;
+            font-size: 2.2em;
+            background: linear-gradient(45deg, #667eea, #764ba2, #f093fb);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            animation: pulse 2s ease-in-out infinite;
+        }
+
+        @keyframes pulse {
+            0%, 100% { transform: scale(1); }
+            50% { transform: scale(1.05); }
+        }
+
+        .game-info {
+            text-align: center;
+            margin-bottom: 20px;
+            font-size: 1.2em;
+            color: #555;
+            min-height: 30px;
+            transition: all 0.3s ease;
+        }
+
+        .current-player {
+            display: inline-block;
+            padding: 8px 20px;
+            border-radius: 20px;
+            background: linear-gradient(45deg, #feca57, #ff6b6b);
+            color: white;
+            font-weight: bold;
+            animation: bounce 1s ease-in-out infinite;
+        }
+
+        @keyframes bounce {
+            0%, 100% { transform: translateY(0); }
+            50% { transform: translateY(-5px); }
+        }
+
+        .ai-thinking {
+            display: inline-block;
+            padding: 8px 20px;
+            border-radius: 20px;
+            background: linear-gradient(45deg, #4ecdc4, #44a3aa);
+            color: white;
+            font-weight: bold;
+        }
+
+        .ai-thinking::after {
+            content: '...';
+            animation: dots 1.5s steps(4, end) infinite;
+        }
+
+        @keyframes dots {
+            0%, 20% { content: '.'; }
+            40% { content: '..'; }
+            60%, 100% { content: '...'; }
+        }
+
+        .game-board {
+            display: grid;
+            grid-template-columns: repeat(3, 110px);
+            grid-template-rows: repeat(3, 110px);
+            gap: 10px;
+            margin: 0 auto 20px;
+            background: linear-gradient(45deg, #667eea, #764ba2);
+            padding: 10px;
+            border-radius: 20px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+            position: relative;
+        }
+
+        .cell {
+            background: white;
+            border: none;
+            border-radius: 15px;
+            cursor: pointer;
+            font-size: 2.8em;
+            font-weight: bold;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.3s ease;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .cell:hover:not(.taken) {
+            transform: scale(1.05);
+            box-shadow: 0 5px 20px rgba(0, 0, 0, 0.2);
+            background: linear-gradient(45deg, #ffeaa7, #fdcb6e);
+        }
+
+        .cell.taken {
+            cursor: not-allowed;
+        }
+
+        .cell.x {
+            color: #ff6b6b;
+            animation: popIn 0.5s ease;
+        }
+
+        .cell.o {
+            color: #4ecdc4;
+            animation: popIn 0.5s ease;
+        }
+
+        .cell.hint {
+            animation: hintPulse 1s ease infinite;
+            background: linear-gradient(45deg, #a8e6cf, #dcedc1);
+        }
+
+        @keyframes hintPulse {
+            0%, 100% {
+                box-shadow: 0 0 10px rgba(168, 230, 207, 0.8);
+                transform: scale(1);
+            }
+            50% {
+                box-shadow: 0 0 20px rgba(168, 230, 207, 1);
+                transform: scale(1.05);
+            }
+        }
+
+        @keyframes popIn {
+            0% {
+                transform: scale(0) rotate(180deg);
+                opacity: 0;
+            }
+            50% {
+                transform: scale(1.2) rotate(90deg);
+            }
+            100% {
+                transform: scale(1) rotate(0deg);
+                opacity: 1;
+            }
+        }
+
+        .cell.winner {
+            animation: winnerGlow 1s ease infinite;
+            background: linear-gradient(45deg, #f9ca24, #f0932b);
+        }
+
+        @keyframes winnerGlow {
+            0%, 100% {
+                box-shadow: 0 0 20px rgba(249, 202, 36, 0.8);
+                transform: scale(1);
+            }
+            50% {
+                box-shadow: 0 0 40px rgba(249, 202, 36, 1);
+                transform: scale(1.1);
+            }
+        }
+
+        .controls {
+            display: flex;
+            gap: 10px;
+            justify-content: center;
+            flex-wrap: wrap;
+            margin-bottom: 20px;
+        }
+
+        button {
+            padding: 10px 20px;
+            font-size: 0.9em;
+            border: none;
+            border-radius: 25px;
+            cursor: pointer;
+            font-weight: bold;
+            transition: all 0.3s ease;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        .reset-btn {
+            background: linear-gradient(45deg, #667eea, #764ba2);
+            color: white;
+        }
+
+        .reset-btn:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 10px 20px rgba(102, 126, 234, 0.4);
+        }
+
+        .difficulty-btn {
+            background: linear-gradient(45deg, #00b894, #00cec9);
+            color: white;
+        }
+
+        .difficulty-btn:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 10px 20px rgba(0, 184, 148, 0.4);
+        }
+
+        .difficulty-btn.active {
+            background: linear-gradient(45deg, #e17055, #d63031);
+        }
+
+        .score-board {
+            display: flex;
+            justify-content: space-around;
+            margin-top: 20px;
+            padding: 15px;
+            background: linear-gradient(45deg, #ffeaa7, #fdcb6e);
+            border-radius: 15px;
+        }
+
+        .score {
+            text-align: center;
+            color: #333;
+        }
+
+        .score-value {
+            font-size: 1.8em;
+            font-weight: bold;
+            display: block;
+            margin-top: 5px;
+        }
+
+        .player-score { color: #ff6b6b; }
+        .ai-score { color: #4ecdc4; }
+        .draw-score { color: #636e72; }
+
+        .confetti {
+            position: fixed;
+            width: 10px;
+            height: 10px;
+            background: #f39c12;
+            position: absolute;
+            animation: confetti-fall 3s linear;
+        }
+
+        @keyframes confetti-fall {
+            to {
+                transform: translateY(100vh) rotate(360deg);
+                opacity: 0;
+            }
+        }
+
+        .ai-avatar {
+            position: absolute;
+            top: -60px;
+            right: -60px;
+            font-size: 3.5em;
+            animation: float 3s ease-in-out infinite;
+            z-index: 10;
+        }
+
+        @keyframes float {
+            0%, 100% { transform: translateY(0); }
+            50% { transform: translateY(-10px); }
+        }
+
+        .ai-message {
+            position: absolute;
+            top: -30px;
+            right: 20px;
+            background: white;
+            padding: 5px 10px;
+            border-radius: 10px;
+            font-size: 0.9em;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+            opacity: 0;
+            transition: opacity 0.3s ease;
+        }
+
+        .ai-message.show {
+            opacity: 1;
+        }
+
+        .quiz-modal {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.8);
+            display: none;
+            align-items: center;
+            justify-content: center;
+            z-index: 1000;
+        }
+
+        .quiz-modal.show {
+            display: flex;
+        }
+
+        .quiz-content {
+            background: white;
+            padding: 30px;
+            border-radius: 20px;
+            max-width: 500px;
+            width: 90%;
+            text-align: center;
+            animation: slideIn 0.3s ease-out;
+        }
+
+        .quiz-question {
+            font-size: 1.3em;
+            color: #333;
+            margin-bottom: 20px;
+            line-height: 1.5;
+        }
+
+        .quiz-options {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+            margin-bottom: 20px;
+        }
+
+        .quiz-option {
+            padding: 12px 20px;
+            background: linear-gradient(45deg, #74b9ff, #0984e3);
+            color: white;
+            border: none;
+            border-radius: 10px;
+            cursor: pointer;
+            font-size: 1.1em;
+            transition: all 0.3s ease;
+        }
+
+        .quiz-option:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(116, 185, 255, 0.4);
+        }
+
+        .quiz-option.correct {
+            background: linear-gradient(45deg, #00b894, #00cec9);
+            animation: correctAnswer 0.5s ease;
+        }
+
+        .quiz-option.incorrect {
+            background: linear-gradient(45deg, #ff6b6b, #ee5a24);
+            animation: incorrectAnswer 0.5s ease;
+        }
+
+        @keyframes correctAnswer {
+            0%, 100% { transform: scale(1); }
+            50% { transform: scale(1.1); }
+        }
+
+        @keyframes incorrectAnswer {
+            0%, 100% { transform: translateX(0); }
+            25% { transform: translateX(-5px); }
+            75% { transform: translateX(5px); }
+        }
+
+        .quiz-result {
+            font-size: 1.1em;
+            margin-top: 15px;
+            padding: 10px;
+            border-radius: 10px;
+            font-weight: bold;
+        }
+
+        .quiz-result.correct {
+            background: linear-gradient(45deg, #a8e6cf, #dcedc1);
+            color: #27ae60;
+        }
+
+        .quiz-result.incorrect {
+            background: linear-gradient(45deg, #ffb3ba, #ffdfba);
+            color: #e74c3c;
+        }
+
+        .hint-indicator {
+            position: absolute;
+            top: -40px;
+            left: 50%;
+            transform: translateX(-50%);
+            background: linear-gradient(45deg, #f9ca24, #f0932b);
+            color: white;
+            padding: 5px 15px;
+            border-radius: 15px;
+            font-size: 0.9em;
+            font-weight: bold;
+            opacity: 0;
+            transition: opacity 0.3s ease;
+        }
+
+        .hint-indicator.show {
+            opacity: 1;
+        }
+
+        @media (max-width: 480px) {
+            .game-board {
+                grid-template-columns: repeat(3, 90px);
+                grid-template-rows: repeat(3, 90px);
+            }
+            
+            h1 {
+                font-size: 1.8em;
+            }
+            
+            .cell {
+                font-size: 2.2em;
+            }
+
+            .ai-avatar {
+                font-size: 3em;
+                top: -50px;
+                right: -50px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="floating-shapes">
+        <div class="shape"></div>
+        <div class="shape"></div>
+        <div class="shape"></div>
+    </div>
+
+    <div class="container">
+        <h1>📊 Graph Adventure Tic-Tac-Toe 🎮</h1>
+        
+        <div class="game-info">
+            <span class="current-player" id="currentPlayer">Your Turn (X)</span>
+        </div>
+
+        <div class="game-board" id="gameBoard">
+            <div class="ai-avatar">🤖</div>
+            <div class="ai-message" id="aiMessage"></div>
+            <div class="hint-indicator" id="hintIndicator">Hint Available!</div>
+            <button class="cell" data-index="0"></button>
+            <button class="cell" data-index="1"></button>
+            <button class="cell" data-index="2"></button>
+            <button class="cell" data-index="3"></button>
+            <button class="cell" data-index="4"></button>
+            <button class="cell" data-index="5"></button>
+            <button class="cell" data-index="6"></button>
+            <button class="cell" data-index="7"></button>
+            <button class="cell" data-index="8"></button>
+        </div>
+
+        <div class="controls">
+            <button class="reset-btn" onclick="resetGame()">New Game</button>
+            <button class="difficulty-btn active" onclick="setDifficulty('easy')">Easy</button>
+            <button class="difficulty-btn" onclick="setDifficulty('medium')">Medium</button>
+            <button class="difficulty-btn" onclick="setDifficulty('hard')">Hard</button>
+        </div>
+
+        <div class="score-board">
+            <div class="score">
+                <span>You (X)</span>
+                <span class="score-value player-score" id="scorePlayer">0</span>
+            </div>
+            <div class="score">
+                <span>Draws</span>
+                <span class="score-value draw-score" id="scoreDraw">0</span>
+            </div>
+            <div class="score">
+                <span>AI (O)</span>
+                <span class="score-value ai-score" id="scoreAI">0</span>
+            </div>
+        </div>
+    </div>
+
+    <div class="quiz-modal" id="quizModal">
+        <div class="quiz-content">
+            <div class="quiz-question" id="quizQuestion"></div>
+            <div class="quiz-options" id="quizOptions"></div>
+            <div class="quiz-result" id="quizResult"></div>
+        </div>
+    </div>
+
+    <script>
+        let currentPlayer = 'X';
+        let gameBoard = ['', '', '', '', '', '', '', '', ''];
+        let gameActive = true;
+        let isAIThinking = false;
+        let difficulty = 'easy';
+        let scores = { player: 0, ai: 0, draw: 0 };
+        let playerMoveCount = 0;
+        let hasHint = false;
+
+        const winningConditions = [
+            [0, 1, 2],
+            [3, 4, 5],
+            [6, 7, 8],
+            [0, 3, 6],
+            [1, 4, 7],
+            [2, 5, 8],
+            [0, 4, 8],
+            [2, 4, 6]
+        ];
+
+        const graphQuestions = [
+            {
+                question: "What is a bar graph used for?",
+                options: ["Showing parts of a whole", "Comparing different things", "Showing how things change over time", "Drawing pictures"],
+                correct: 1
+            },
+            {
+                question: "Which graph looks like a pizza?",
+                options: ["Bar graph", "Line graph", "Pie chart", "Scatter plot"],
+                correct: 2
+            },
+            {
+                question: "What does a pie chart show?",
+                options: ["How things change over time", "Parts of a whole", "Comparing different things", "Connecting dots"],
+                correct: 1
+            },
+            {
+                question: "Which graph uses bars of different heights?",
+                options: ["Pie chart", "Bar graph", "Line graph", "Picture graph"],
+                correct: 1
+            },
+            {
+                question: "What is a graph?",
+                options: ["A type of game", "A picture that shows information", "A math problem", "A drawing of animals"],
+                correct: 1
+            },
+            {
+                question: "Which graph is best for showing temperature changes during the week?",
+                options: ["Pie chart", "Bar graph", "Line graph", "Circle graph"],
+                correct: 2
+            },
+            {
+                question: "What do the tall bars in a bar graph mean?",
+                options: ["Less of something", "More of something", "The same amount", "Nothing special"],
+                correct: 1
+            },
+            {
+                question: "Which graph uses dots connected by lines?",
+                options: ["Bar graph", "Pie chart", "Line graph", "Picture graph"],
+                correct: 2
+            },
+            {
+                question: "If you want to show favorite fruits of students, which graph is best?",
+                options: ["Line graph", "Bar graph", "Scatter plot", "None of these"],
+                correct: 1
+            },
+            {
+                question: "What do we call the numbers on the side of a graph?",
+                options: ["Labels", "Scale", "Colors", "Pictures"],
+                correct: 1
+            },
+            {
+                question: "Which graph shows how many students like each color?",
+                options: ["Line graph", "Bar graph", "Pie chart", "Both bar and pie charts"],
+                correct: 3
+            },
+            {
+                question: "What is a title on a graph used for?",
+                options: ["Making it pretty", "Telling what the graph is about", "Drawing lines", "Counting numbers"],
+                correct: 1
+            },
+            {
+                question: "Which graph is shaped like a circle?",
+                options: ["Bar graph", "Line graph", "Pie chart", "Scatter plot"],
+                correct: 2
+            },
+            {
+                question: "If you want to show your height from age 5 to 10, which graph is best?",
+                options: ["Pie chart", "Bar graph", "Line graph", "Circle graph"],
+                correct: 2
+            },
+            {
+                question: "What do colors on a graph help us do?",
+                options: ["Make it pretty", "Tell different things apart", "Draw better", "Count faster"],
+                correct: 1
+            }
+        ];
+
+        const cells = document.querySelectorAll('.cell');
+        const currentPlayerDisplay = document.getElementById('currentPlayer');
+        const aiMessage = document.getElementById('aiMessage');
+        const quizModal = document.getElementById('quizModal');
+        const hintIndicator = document.getElementById('hintIndicator');
+
+        cells.forEach(cell => {
+            cell.addEventListener('click', handleCellClick);
+        });
+
+        function handleCellClick(event) {
+            if (currentPlayer !== 'X' || !gameActive || isAIThinking) {
+                return;
+            }
+
+            const cell = event.target;
+            const index = parseInt(cell.getAttribute('data-index'));
+
+            if (gameBoard[index] !== '') {
+                return;
+            }
+
+            makeMove(index, 'X');
+            playerMoveCount++;
+            
+            // Show quiz after every 2 moves
+            if (playerMoveCount % 2 === 0 && gameActive) {
+                setTimeout(() => {
+                    showQuiz();
+                }, 500);
+            } else if (gameActive) {
+                setTimeout(() => {
+                    aiMove();
+                }, 500);
+            }
+        }
+
+        function makeMove(index, player) {
+            gameBoard[index] = player;
+            const cell = cells[index];
+            cell.textContent = player;
+            cell.classList.add('taken', player.toLowerCase());
+            createParticles(cell);
+            checkResult();
+        }
+
+        function showQuiz() {
+            const randomQuestion = graphQuestions[Math.floor(Math.random() * graphQuestions.length)];
+            
+            document.getElementById('quizQuestion').textContent = randomQuestion.question;
+            const optionsContainer = document.getElementById('quizOptions');
+            optionsContainer.innerHTML = '';
+            
+            randomQuestion.options.forEach((option, index) => {
+                const button = document.createElement('button');
+                button.className = 'quiz-option';
+                button.textContent = option;
+                button.onclick = () => checkAnswer(index, randomQuestion.correct);
+                optionsContainer.appendChild(button);
+            });
+            
+            document.getElementById('quizResult').textContent = '';
+            quizModal.classList.add('show');
+        }
+
+        function checkAnswer(selected, correct) {
+            const options = document.querySelectorAll('.quiz-option');
+            const resultDiv = document.getElementById('quizResult');
+            
+            if (selected === correct) {
+                options[selected].classList.add('correct');
+                resultDiv.textContent = '✅ Awesome! You get a hint for your next move!';
+                resultDiv.className = 'quiz-result correct';
+                hasHint = true;
+                showHintIndicator();
+            } else {
+                options[selected].classList.add('incorrect');
+                options[correct].classList.add('correct');
+                resultDiv.textContent = `❌ Oops! The correct answer was: ${options[correct].textContent}`;
+                resultDiv.className = 'quiz-result incorrect';
+            }
+            
+            options.forEach(option => {
+                option.style.pointerEvents = 'none';
+            });
+            
+            setTimeout(() => {
+                quizModal.classList.remove('show');
+                if (gameActive) {
+                    aiMove();
+                }
+            }, 2500);
+        }
+
+        function showHintIndicator() {
+            hintIndicator.classList.add('show');
+            setTimeout(() => {
+                hintIndicator.classList.remove('show');
+            }, 3000);
+        }
+
+        function aiMove() {
+            if (!gameActive) return;
+            
+            isAIThinking = true;
+            showAIMessage("Thinking...");
+            currentPlayerDisplay.innerHTML = '<span class="ai-thinking">AI is thinking</span>';
+            
+            setTimeout(() => {
+                let move;
+                
+                if (difficulty === 'easy') {
+                    move = getRandomMove();
+                } else if (difficulty === 'medium') {
+                    move = Math.random() < 0.5 ? getBestMove() : getRandomMove();
+                } else {
+                    move = getBestMove();
+                }
+                
+                if (move !== -1) {
+                    makeMove(move, 'O');
+                    showAIMessage(getAIMessage());
+                }
+                
+                isAIThinking = false;
+                if (gameActive) {
+                    updateCurrentPlayerDisplay();
+                    
+                    // Show hint if available
+                    if (hasHint) {
+                        showGameHint();
+                        hasHint = false;
+                    }
+                }
+            }, 800);
+        }
+
+        function showGameHint() {
+            // Find best move for player
+            let bestMove = -1;
+            let bestScore = -Infinity;
+            
+            for (let i = 0; i < 9; i++) {
+                if (gameBoard[i] === '') {
+                    gameBoard[i] = 'X';
+                    let score = minimax(gameBoard, 0, false);
+                    gameBoard[i] = '';
+                    
+                    if (score > bestScore) {
+                        bestScore = score;
+                        bestMove = i;
+                    }
+                }
+            }
+            
+            if (bestMove !== -1) {
+                cells[bestMove].classList.add('hint');
+                setTimeout(() => {
+                    cells[bestMove].classList.remove('hint');
+                }, 2000);
+            }
+        }
+
+        function getRandomMove() {
+            const availableMoves = [];
+            for (let i = 0; i < 9; i++) {
+                if (gameBoard[i] === '') {
+                    availableMoves.push(i);
+                }
+            }
+            return availableMoves[Math.floor(Math.random() * availableMoves.length)];
+        }
+
+        function getBestMove() {
+            let bestScore = -Infinity;
+            let bestMove = -1;
+            
+            for (let i = 0; i < 9; i++) {
+                if (gameBoard[i] === '') {
+                    gameBoard[i] = 'O';
+                    let score = minimax(gameBoard, 0, false);
+                    gameBoard[i] = '';
+                    
+                    if (score > bestScore) {
+                        bestScore = score;
+                        bestMove = i;
+                    }
+                }
+            }
+            
+            return bestMove;
+        }
+
+        function minimax(board, depth, isMaximizing) {
+            const result = checkWinner();
+            
+            if (result === 'O') return 10 - depth;
+            if (result === 'X') return depth - 10;
+            if (result === 'draw') return 0;
+            
+            if (isMaximizing) {
+                let bestScore = -Infinity;
+                for (let i = 0; i < 9; i++) {
+                    if (board[i] === '') {
+                        board[i] = 'O';
+                        let score = minimax(board, depth + 1, false);
+                        board[i] = '';
+                        bestScore = Math.max(score, bestScore);
+                    }
+                }
+                return bestScore;
+            } else {
+                let bestScore = Infinity;
+                for (let i = 0; i < 9; i++) {
+                    if (board[i] === '') {
+                        board[i] = 'X';
+                        let score = minimax(board, depth + 1, true);
+                        board[i] = '';
+                        bestScore = Math.min(score, bestScore);
+                    }
+                }
+                return bestScore;
+            }
+        }
+
+        function checkWinner() {
+            // Check rows
+            for (let i = 0; i < 3; i++) {
+                if (gameBoard[i*3] && gameBoard[i*3] === gameBoard[i*3+1] && gameBoard[i*3] === gameBoard[i*3+2]) {
+                    return gameBoard[i*3];
+                }
+            }
+            
+            // Check columns
+            for (let i = 0; i < 3; i++) {
+                if (gameBoard[i] && gameBoard[i] === gameBoard[i+3] && gameBoard[i] === gameBoard[i+6]) {
+                    return gameBoard[i];
+                }
+            }
+            
+            // Check diagonals
+            if (gameBoard[0] && gameBoard[0] === gameBoard[4] && gameBoard[0] === gameBoard[8]) {
+                return gameBoard[0];
+            }
+            if (gameBoard[2] && gameBoard[2] === gameBoard[4] && gameBoard[2] === gameBoard[6]) {
+                return gameBoard[2];
+            }
+            
+            // Check for draw
+            if (!gameBoard.includes('')) {
+                return 'draw';
+            }
+            
+            return null;
+        }
+
+        function checkResult() {
+            const winner = checkWinner();
+            
+            if (winner) {
+                gameActive = false;
+                
+                if (winner === 'X') {
+                    scores.player++;
+                    showAIMessage("Good game! You won! 🎉");
+                    currentPlayerDisplay.textContent = '🎉 You Win! 🎉';
+                    currentPlayerDisplay.style.background = 'linear-gradient(45deg, #f9ca24, #f0932b)';
+                    createCelebration();
+                } else if (winner === 'O') {
+                    scores.ai++;
+                    showAIMessage("Victory is mine! 🤖");
+                    currentPlayerDisplay.textContent = '🤖 AI Wins! 🤖';
+                    currentPlayerDisplay.style.background = 'linear-gradient(45deg, #4ecdc4, #44a3aa)';
+                } else {
+                    scores.draw++;
+                    showAIMessage("Well played! It's a draw! 🤝");
+                    currentPlayerDisplay.textContent = '🤝 It\'s a Draw! 🤝';
+                    currentPlayerDisplay.style.background = 'linear-gradient(45deg, #636e72, #95a5a6)';
+                }
+                
+                updateScoreDisplay();
+                highlightWinningCells();
+            }
+        }
+
+        function highlightWinningCells() {
+            const winner = checkWinner();
+            if (!winner || winner === 'draw') return;
+            
+            for (let condition of winningConditions) {
+                const [a, b, c] = condition;
+                if (gameBoard[a] && gameBoard[a] === gameBoard[b] && gameBoard[a] === gameBoard[c]) {
+                    cells[a].classList.add('winner');
+                    cells[b].classList.add('winner');
+                    cells[c].classList.add('winner');
+                    break;
+                }
+            }
+        }
+
+        function createParticles(cell) {
+            const rect = cell.getBoundingClientRect();
+            const colors = ['#ff6b6b', '#4ecdc4', '#f9ca24', '#667eea', '#764ba2'];
+            
+            for (let i = 0; i < 6; i++) {
+                const particle = document.createElement('div');
+                particle.className = 'confetti';
+                particle.style.left = rect.left + rect.width / 2 + 'px';
+                particle.style.top = rect.top + rect.height / 2 + 'px';
+                particle.style.background = colors[Math.floor(Math.random() * colors.length)];
+                particle.style.transform = `rotate(${Math.random() * 360}deg)`;
+                document.body.appendChild(particle);
+                
+                setTimeout(() => particle.remove(), 3000);
+            }
+        }
+
+        function createCelebration() {
+            for (let i = 0; i < 30; i++) {
+                setTimeout(() => {
+                    const confetti = document.createElement('div');
+                    confetti.className = 'confetti';
+                    confetti.style.left = Math.random() * window.innerWidth + 'px';
+                    confetti.style.top = '-10px';
+                    confetti.style.background = `hsl(${Math.random() * 360}, 100%, 50%)`;
+                    confetti.style.width = Math.random() * 10 + 5 + 'px';
+                    confetti.style.height = confetti.style.width;
+                    document.body.appendChild(confetti);
+                    
+                    setTimeout(() => confetti.remove(), 3000);
+                }, i * 50);
+            }
+        }
+
+        function updateCurrentPlayerDisplay() {
+            currentPlayerDisplay.textContent = 'Your Turn (X)';
+            currentPlayerDisplay.style.background = 'linear-gradient(45deg, #ff6b6b, #ee5a24)';
+        }
+
+        function updateScoreDisplay() {
+            document.getElementById('scorePlayer').textContent = scores.player;
+            document.getElementById('scoreAI').textContent = scores.ai;
+            document.getElementById('scoreDraw').textContent = scores.draw;
+        }
+
+        function showAIMessage(message) {
+            aiMessage.textContent = message;
+            aiMessage.classList.add('show');
+            setTimeout(() => {
+                aiMessage.classList.remove('show');
+            }, 3000);
+        }
+
+        function getAIMessage() {
+            const messages = [
+                "Nice move! 😉",
+                "Interesting strategy... 🤔",
+                "I see what you did there! 👀",
+                "Challenge accepted! 💪",
+                "Let's see... 🧐",
+                "Good thinking! 🤓",
+                "My turn! 🎯",
+                "Calculating... 📊"
+            ];
+            return messages[Math.floor(Math.random() * messages.length)];
+        }
+
+        function setDifficulty(level) {
+            difficulty = level;
+            document.querySelectorAll('.difficulty-btn').forEach(btn => {
+                btn.classList.remove('active');
+            });
+            event.target.classList.add('active');
+            resetGame();
+        }
+
+        function resetGame() {
+            gameActive = true;
+            currentPlayer = 'X';
+            gameBoard = ['', '', '', '', '', '', '', '', ''];
+            isAIThinking = false;
+            playerMoveCount = 0;
+            hasHint = false;
+            
+            cells.forEach(cell => {
+                cell.textContent = '';
+                cell.classList.remove('taken', 'x', 'o', 'winner', 'hint');
+            });
+            
+            updateCurrentPlayerDisplay();
+            showAIMessage("Let's play! Answer graph questions to get hints! 📊");
+        }
+
+        // Initialize
+        updateCurrentPlayerDisplay();
+        updateScoreDisplay();
+        showAIMessage("Ready to play? Answer graph questions to get hints! 📊");
+    </script>
+</body>
+</html>
