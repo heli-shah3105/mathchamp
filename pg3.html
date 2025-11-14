@@ -15,7 +15,9 @@
         
         html, body {
             font-family: 'Nunito', sans-serif;
-            background: linear-gradient(135deg, #ffecd2 0%, #fcb69f 100%);
+            background: linear-gradient(180deg, #ff9a9e 0%, #fecfef 45%, #ffeaa7 55%, #fdcb6e 100%);
+            background-size: 100% 200%;
+            animation: gradientShift 30s ease infinite;
             height: 100vh;
             width: 100vw;
             display: flex;
@@ -25,6 +27,12 @@
             position: fixed;
             top: 0;
             left: 0;
+        }
+        
+        @keyframes gradientShift {
+            0% { background-position: 0% 0%; }
+            50% { background-position: 0% 5%; }
+            100% { background-position: 0% 0%; }
         }
         
         /* Soft Stars */
@@ -38,10 +46,13 @@
         
         .star:before {
             content: "✦";
-            color: rgba(255, 255, 255, 0.8);
-            text-shadow: 0 0 10px rgba(255, 255, 255, 0.8);
+            text-shadow: 0 0 10px;
             font-size: 24px;
         }
+        
+        .star:nth-child(3n+1):before { color: rgba(255, 154, 158, 0.6); text-shadow: 0 0 10px rgba(255, 154, 158, 0.3); }
+        .star:nth-child(3n+2):before { color: rgba(254, 207, 239, 0.6); text-shadow: 0 0 10px rgba(254, 207, 239, 0.3); }
+        .star:nth-child(3n+3):before { color: rgba(253, 203, 110, 0.6); text-shadow: 0 0 10px rgba(253, 203, 110, 0.3); }
         
         @keyframes twinkle {
             0% {
@@ -65,12 +76,15 @@
             position: absolute;
             z-index: 0;
             border-radius: 50%;
-            background: radial-gradient(circle at 30% 30%, rgba(255, 255, 255, 0.8), rgba(255, 255, 255, 0.2));
-            box-shadow: 0 0 10px rgba(255, 255, 255, 0.5);
             opacity: 0;
             animation: floatBubble 12s linear infinite;
             pointer-events: none;
         }
+        
+        .bubble:nth-child(4n+1) { background: radial-gradient(circle at 30% 30%, rgba(255, 154, 158, 0.4), rgba(255, 154, 158, 0.1)); }
+        .bubble:nth-child(4n+2) { background: radial-gradient(circle at 30% 30%, rgba(254, 207, 239, 0.4), rgba(254, 207, 239, 0.1)); }
+        .bubble:nth-child(4n+3) { background: radial-gradient(circle at 30% 30%, rgba(255, 234, 167, 0.4), rgba(255, 234, 167, 0.1)); }
+        .bubble:nth-child(4n+4) { background: radial-gradient(circle at 30% 30%, rgba(253, 203, 110, 0.4), rgba(253, 203, 110, 0.1)); }
         
         @keyframes floatBubble {
             0% {
@@ -91,10 +105,10 @@
         
         .container {
             text-align: center;
-            background: rgba(255, 255, 255, 0.85);
+            background: rgba(255, 255, 255, 0.95);
             padding: 30px;
             border-radius: 30px;
-            box-shadow: 0 15px 35px rgba(0, 0, 0, 0.2);
+            box-shadow: 0 15px 35px rgba(0, 0, 0, 0.1);
             max-width: 500px;
             width: 90%;
             max-height: 90vh;
@@ -102,12 +116,9 @@
             z-index: 5;
             overflow: hidden;
             animation: popIn 0.8s cubic-bezier(0.175, 0.885, 0.32, 1.275);
-        }
-        
-        @keyframes popIn {
-            0% { transform: scale(0.8); opacity: 0; }
-            80% { transform: scale(1.05); }
-            100% { transform: scale(1); opacity: 1; }
+            border: 6px solid transparent;
+            background-clip: padding-box;
+            position: relative;
         }
         
         .container::before {
@@ -115,11 +126,14 @@
             position: absolute;
             top: 0;
             left: 0;
-            width: 100%;
-            height: 8px;
-            background: linear-gradient(90deg, #ff6ec4, #7873f5, #4ade80, #22d3ee, #facc15, #f97316);
+            right: 0;
+            bottom: 0;
+            z-index: -1;
+            margin: -6px;
+            border-radius: 30px;
+            background: linear-gradient(45deg, rgba(255, 154, 158, 0.3), rgba(254, 207, 239, 0.3), rgba(255, 234, 167, 0.3), rgba(253, 203, 110, 0.3));
             background-size: 300% 300%;
-            animation: gradient 3s ease infinite;
+            animation: gradient 10s ease infinite;
         }
         
         @keyframes gradient {
@@ -128,12 +142,18 @@
             100% { background-position: 0% 50%; }
         }
         
+        @keyframes popIn {
+            0% { transform: scale(0.8); opacity: 0; }
+            80% { transform: scale(1.05); }
+            100% { transform: scale(1); opacity: 1; }
+        }
+        
         .welcome-interface {
             font-family: 'Fredoka One', cursive;
             font-size: 36px;
             margin-bottom: 20px;
-            color: #ff6ec4;
-            text-shadow: 3px 3px 0px rgba(0,0,0,0.1);
+            color: #222;
+            text-shadow: 2px 2px 0px rgba(0,0,0,0.1);
             animation: bounce 2s infinite;
         }
         
@@ -147,18 +167,18 @@
             display: block;
             margin: 0 auto 20px;
             border-radius: 20px;
-            box-shadow: 0 10px 20px rgba(0, 0, 0, 0.15);
+            box-shadow: 0 10px 20px rgba(0, 0, 0, 0.1);
             transition: all 0.3s ease;
         }
         
         .center-image:hover {
             transform: scale(1.05) rotate(2deg);
-            box-shadow: 0 15px 30px rgba(0, 0, 0, 0.2);
+            box-shadow: 0 15px 30px rgba(0, 0, 0, 0.15);
         }
         
         .first-question {
             font-size: 22px;
-            color: #7873f5;
+            color: #8b5cf6;
             margin-bottom: 25px;
             font-weight: bold;
             line-height: 1.4;
@@ -172,7 +192,7 @@
             max-width: 350px;
             font-size: 18px;
             border-radius: 50px;
-            border: 3px solid #ff6ec4;
+            border: 3px solid rgba(255, 154, 158, 0.7);
             background: rgba(255, 255, 255, 0.9);
             box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
             transition: all 0.3s ease;
@@ -182,8 +202,8 @@
         
         .search-bar:focus {
             outline: none;
-            border-color: #7873f5;
-            box-shadow: 0 5px 15px rgba(120, 115, 245, 0.3);
+            border-color: rgba(253, 203, 110, 0.7);
+            box-shadow: 0 5px 15px rgba(253, 203, 110, 0.3);
             transform: translateY(-3px);
         }
         
@@ -197,7 +217,7 @@
             text-decoration: none;
             text-align: center;
             line-height: 40px;
-            background: linear-gradient(135deg, #ff6ec4, #7873f5);
+            background: linear-gradient(135deg, rgba(255, 154, 158, 0.7), rgba(253, 203, 110, 0.7));
             color: white;
             border: none;
             height: 40px;
@@ -208,14 +228,14 @@
             cursor: pointer;
             margin-top: 20px;
             transition: all 0.3s ease;
-            box-shadow: 0 8px 15px rgba(0, 0, 0, 0.2);
+            box-shadow: 0 8px 15px rgba(0, 0, 0, 0.1);
             position: relative;
             overflow: hidden;
         }
         
         .next-button:hover {
             transform: translateY(-5px);
-            box-shadow: 0 12px 20px rgba(0, 0, 0, 0.25);
+            box-shadow: 0 12px 20px rgba(0, 0, 0, 0.15);
         }
         
         .next-button:active {
@@ -244,12 +264,12 @@
             right: -20px;
             width: 80px;
             height: 80px;
-            background: #ff6ec4;
+            background: linear-gradient(135deg, rgba(255, 154, 158, 0.8), rgba(253, 203, 110, 0.8));
             border-radius: 50%;
             display: flex;
             align-items: center;
             justify-content: center;
-            box-shadow: 0 8px 16px rgba(0,0,0,0.2);
+            box-shadow: 0 8px 16px rgba(0,0,0,0.1);
             animation: mascot-bounce 3s infinite;
             border: 5px solid white;
             z-index: 10;
@@ -335,7 +355,7 @@
             max-width: 180px;
             font-size: 12px;
             font-weight: bold;
-            color: #7873f5;
+            color: #8b5cf6;
             display: none;
             animation: fadeIn 0.5s ease;
         }
@@ -403,7 +423,7 @@
 
         <input class="search-bar" type="text" placeholder="Enter a fun nickname!">
         
-        <a href="pg5.html" class="next-button">
+        <a href="pg4.html" class="next-button">
             <i class="fas fa-play"></i> Let's Go!
         </a>
         
@@ -433,7 +453,7 @@
             star.className = 'star';
             star.style.left = Math.random() * 100 + '%';
             star.style.animationDuration = (Math.random() * 8 + 5) + 's';
-            star.style.animationDelay = Math.random() * 5 + 's';
+            // Removed animation delay to start immediately
             star.style.fontSize = (Math.random() * 16 + 12) + 'px';
             backgroundAnimation.appendChild(star);
             
@@ -452,7 +472,7 @@
             bubble.style.height = size + 'px';
             bubble.style.left = Math.random() * 100 + '%';
             bubble.style.animationDuration = (Math.random() * 10 + 8) + 's';
-            bubble.style.animationDelay = Math.random() * 5 + 's';
+            // Removed animation delay to start immediately
             
             backgroundAnimation.appendChild(bubble);
             
@@ -462,13 +482,13 @@
             }, 20000);
         }
         
-        // Create initial stars and bubbles
+        // Create initial stars and bubbles immediately
         for (let i = 0; i < 15; i++) {
-            setTimeout(createStar, i * 300);
+            createStar();
         }
         
         for (let i = 0; i < 10; i++) {
-            setTimeout(createBubble, i * 500);
+            createBubble();
         }
         
         // Continue creating stars and bubbles periodically
@@ -543,6 +563,14 @@
                 e.preventDefault();
                 alert('Please enter a nickname!');
             }
+        });
+        
+        // Initialize all animations immediately on page load
+        window.addEventListener('load', function() {
+            // Ensure all animations start immediately
+            document.querySelectorAll('.star, .bubble, .sparkle').forEach(element => {
+                element.style.animationPlayState = 'running';
+            });
         });
     </script>
 </body>
