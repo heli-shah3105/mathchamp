@@ -9,58 +9,79 @@
             justify-content: center;
             align-items: center;
             font-family: Verdana, Sans-serif;
-            background: linear-gradient(135deg, #ffecd2 0%, #fcb69f 100%);
+            background: linear-gradient(180deg, #ff9a9e 0%, #fecfef 45%, #ffeaa7 55%, #fdcb6e 100%);
+            background-size: 100% 200%;
+            animation: gradientShift 30s ease infinite;
             overflow: hidden; /* Hide shapes outside view */
         }
 
-        /* Static shapes (no animation now) */
+        @keyframes gradientShift {
+            0% { background-position: 0% 0%; }
+            50% { background-position: 0% 5%; }
+            100% { background-position: 0% 0%; }
+        }
+
+        /* Animated shapes */
         .shape {
             position: absolute;
             width: 20px;
             height: 20px;
             background-color: rgba(255, 255, 255, 0.4);
             border-radius: 50%;
+            animation: float 15s infinite ease-in-out;
         }
 
         .shape.star {
-            background-color: rgba(255, 223, 0, 0.6);
+            background-color: rgba(255, 154, 158, 0.6);
             clip-path: polygon(
                 50% 0%, 61% 35%, 98% 35%,
                 68% 57%, 79% 91%, 50% 70%,
                 21% 91%, 32% 57%, 2% 35%,
                 39% 35%
             );
+            animation: twinkle 3s infinite ease-in-out;
+        }
+
+        @keyframes float {
+            0%, 100% { transform: translateY(0) rotate(0deg); }
+            50% { transform: translateY(-20px) rotate(180deg); }
+        }
+
+        @keyframes twinkle {
+            0%, 100% { opacity: 0.3; transform: scale(0.8); }
+            50% { opacity: 1; transform: scale(1.2); }
         }
 
         .container {
             text-align: center;
-            background: rgba(255, 255, 255, 0.7);
+            background: rgba(255, 255, 255, 0.95);
             padding: 30px;
             border-radius: 20px;
-            box-shadow: 0px 4px 15px rgba(0, 0, 0, 0.2);
+            box-shadow: 0px 4px 15px rgba(0, 0, 0, 0.1);
+            border: 6px solid transparent;
+            background-clip: padding-box;
+            position: relative;
         }
 
-        .next-button {
-            display: inline-block;
-            text-decoration: none;
-            text-align: center;
-            line-height: 36px;
-            background-color: rgb(127, 70, 133);
-            color: white;
-            border: none;
-            height: 36px;
-            width: 120px;
+        .container::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            z-index: -1;
+            margin: -6px;
             border-radius: 20px;
-            font-weight: bold;
-            font-size: 16px;
-            cursor: pointer;
-            margin-top: 20px;
-            transition: all 0.3s ease;
+            background: linear-gradient(45deg, rgba(255, 154, 158, 0.3), rgba(254, 207, 239, 0.3), rgba(255, 234, 167, 0.3), rgba(253, 203, 110, 0.3));
+            background-size: 300% 300%;
+            animation: gradient 10s ease infinite;
         }
 
-        .next-button:hover {
-            background-color: rgb(150, 90, 160);
-            transform: scale(1.1);
+        @keyframes gradient {
+            0% { background-position: 0% 50%; }
+            50% { background-position: 100% 50%; }
+            100% { background-position: 0% 50%; }
         }
 
         .center-image {
@@ -74,37 +95,96 @@
             font-style: italic;
             font-size: 35px;
             margin-bottom: 20px;
-            color: #444;
+            color: #222;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.1);
         }
 
         .first-question {
             font-size: 22px;
             font-style: italic;
+            margin-bottom: 30px;
         }
 
-        .option-btn {
-            background: #7f4685;
+        /* Fun, poppy style for option boxes - original purple gradient */
+        .option-box {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
             color: white;
             border: none;
-            padding: 25px 35px;
-            margin: 15px;
-            border-radius: 20px;
+            padding: 15px 20px;
+            margin: 10px;
+            border-radius: 25px;
             cursor: pointer;
-            font-size: 25px;
-            width: 210px;
-            height: 85px;
-            transition: transform 0.2s;
+            font-size: 20px;
+            font-weight: bold;
+            width: 200px;
+            height: 60px;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.2);
+            position: relative;
+            overflow: hidden;
+            animation: pulse 2s infinite;
         }
 
-        .option-btn:hover {
-            background: #9b5ca3;
-            transform: scale(1.1);
+        .option-box:hover {
+            transform: scale(1.1) translateY(-5px) rotate(-3deg);
+            box-shadow: 0 10px 20px rgba(0,0,0,0.3);
+        }
+
+        .option-box.selected {
+            transform: scale(1.15);
+            box-shadow: 0 0 20px rgba(255,255,255,0.8), 0 10px 20px rgba(0,0,0,0.3);
+            animation: bounce 0.5s ease;
+        }
+
+        .option-box::before {
+            content: '';
+            position: absolute;
+            top: -50%;
+            left: -50%;
+            width: 200%;
+            height: 200%;
+            background: rgba(255,255,255,0.2);
+            transform: rotate(45deg);
+            transition: all 0.5s;
+        }
+
+        .option-box:hover::before {
+            animation: shine 0.5s ease;
+        }
+
+        @keyframes pulse {
+            0%, 100% { transform: scale(1); }
+            50% { transform: scale(1.05); }
+        }
+
+        @keyframes bounce {
+            0%, 100% { transform: scale(1.15) translateY(0); }
+            50% { transform: scale(1.2) translateY(-10px); }
+        }
+
+        @keyframes shine {
+            0% { transform: rotate(45deg) translateY(-100%); }
+            100% { transform: rotate(45deg) translateY(100%); }
+        }
+
+        /* Hide the actual radio buttons */
+        #ageForm {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: center;
+        }
+
+        #ageForm input[type="radio"] {
+            display: none;
         }
     </style>
 </head>
 <body>
 
-    <!-- Static shapes (no animation) -->
+    <!-- Animated shapes -->
     <div class="shape" style="left: 10%; top: 20%;"></div>
     <div class="shape star" style="left: 30%; top: 40%;"></div>
     <div class="shape" style="left: 50%; top: 60%;"></div>
@@ -116,31 +196,86 @@
 
         <img src="image.png" alt="Centered Image" class="center-image">
 
-        <p class="first-question">How old is your child?</p>
+        <p class="first-question"> What class is your child in?</p>
 
         <form id="ageForm">
-            <label><input type="radio" name="age" value="3"> 3</label><br>
-            <label><input type="radio" name="age" value="4"> 4</label><br>
-            <label><input type="radio" name="age" value="5"> 5</label><br>
-            <label><input type="radio" name="age" value="6"> 6</label><br>
-            <label><input type="radio" name="age" value="7"> 7</label><br>
-            <label><input type="radio" name="age" value="8"> 8</label><br>
+            <label class="option-box" for="lkg">LKG</label>
+            <input type="radio" name="age" id="lkg" value="LKG">
+            
+            <label class="option-box" for="1st">1st</label>
+            <input type="radio" name="age" id="1st" value="1st">
+            
+            <label class="option-box" for="2nd">2nd</label>
+            <input type="radio" name="age" id="2nd" value="2nd">
+            
+            <label class="option-box" for="3rd">3rd</label>
+            <input type="radio" name="age" id="3rd" value="3rd">
+            
+            <label class="option-box" for="4th">4th</label>
+            <input type="radio" name="age" id="4th" value="4th">
         </form>
-
-        <button id="ageNextBtn" class="next-button">Next</button>
+        
         <hr style="margin: 30px 0;">
     </div>
 
     <script>
-        document.getElementById("ageNextBtn").addEventListener("click", function() {
-            const selected = document.querySelector('input[name="age"]:checked');
-            if (!selected) {
-                alert("Please select an age!");
-                return;
-            }
-            localStorage.setItem("childAge", selected.value); // save for later
-            window.location.href = "pg5.html"; // go to topics page
+        // Add click event listeners to option boxes
+        document.querySelectorAll('.option-box').forEach(box => {
+            box.addEventListener('click', function() {
+                // Remove selected class from all boxes
+                document.querySelectorAll('.option-box').forEach(b => {
+                    b.classList.remove('selected');
+                });
+                
+                // Add selected class to clicked box
+                this.classList.add('selected');
+                
+                // Check the corresponding radio button
+                const radioId = this.getAttribute('for');
+                document.getElementById(radioId).checked = true;
+                
+                // Handle redirects for each class
+                if (radioId === 'lkg') {
+                    // Save the selection before redirecting
+                    localStorage.setItem("childAge", "LKG");
+                    // Add a small delay to show the selection animation
+                    setTimeout(() => {
+                        window.location.href = "pg6.html";
+                    }, 300);
+                } else if (radioId === '1st') {
+                    localStorage.setItem("childAge", "1st");
+                    setTimeout(() => {
+                        window.location.href = "pg20.html";  // Changed from pg5.html to pg20.html
+                    }, 300);
+                } else if (radioId === '2nd') {
+                    localStorage.setItem("childAge", "2nd");
+                    setTimeout(() => {
+                        window.location.href = "pg7.html";
+                    }, 300);
+                } else if (radioId === '3rd') {
+                    localStorage.setItem("childAge", "3rd");
+                    setTimeout(() => {
+                        window.location.href = "pg8.html";
+                    }, 300);
+                } else if (radioId === '4th') {
+                    localStorage.setItem("childAge", "4th");
+                    setTimeout(() => {
+                        window.location.href = "pg9.html";
+                    }, 300);
+                }
+            });
         });
+
+        // Add shake animation
+        const style = document.createElement('style');
+        style.textContent = `
+            @keyframes shake {
+                0%, 100% { transform: translate(-50%, -50%) rotate(0deg); }
+                25% { transform: translate(-52%, -50%) rotate(-5deg); }
+                75% { transform: translate(-48%, -50%) rotate(5deg); }
+            }
+        `;
+        document.head.appendChild(style);
     </script>
 </body>
 </html>
