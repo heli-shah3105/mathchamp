@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>MathChamp - Let's Learn Math!</title>
-    <link href="https://fonts.googleapis.com/css2?family=Fredoka+One&family=Nunito:wght@400;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Fredoka+One&family=Nunito:wght@400;700&family=Bubblegum+Sans&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
     <style>
         * {
@@ -15,7 +15,9 @@
         
         html, body {
             font-family: 'Nunito', sans-serif;
-            background: linear-gradient(135deg, #ffecd2 0%, #fcb69f 100%);
+            background: linear-gradient(180deg, #ff9a9e 0%, #fecfef 45%, #ffeaa7 55%, #fdcb6e 100%);
+            background-size: 100% 200%;
+            animation: gradientShift 30s ease infinite;
             height: 100vh;
             width: 100vw;
             display: flex;
@@ -25,6 +27,12 @@
             position: fixed;
             top: 0;
             left: 0;
+        }
+        
+        @keyframes gradientShift {
+            0% { background-position: 0% 0%; }
+            50% { background-position: 0% 5%; }
+            100% { background-position: 0% 0%; }
         }
         
         /* Soft Stars */
@@ -38,10 +46,13 @@
         
         .star:before {
             content: "✦";
-            color: rgba(255, 255, 255, 0.8);
-            text-shadow: 0 0 10px rgba(255, 255, 255, 0.8);
+            text-shadow: 0 0 10px;
             font-size: 24px;
         }
+        
+        .star:nth-child(3n+1):before { color: rgba(255, 154, 158, 0.6); text-shadow: 0 0 10px rgba(255, 154, 158, 0.3); }
+        .star:nth-child(3n+2):before { color: rgba(254, 207, 239, 0.6); text-shadow: 0 0 10px rgba(254, 207, 239, 0.3); }
+        .star:nth-child(3n+3):before { color: rgba(253, 203, 110, 0.6); text-shadow: 0 0 10px rgba(253, 203, 110, 0.3); }
         
         @keyframes twinkle {
             0% {
@@ -60,17 +71,20 @@
             }
         }
         
-        /* Bubbles */
+        /* Soft Bubbles */
         .bubble {
             position: absolute;
             z-index: 0;
             border-radius: 50%;
-            background: radial-gradient(circle at 30% 30%, rgba(255, 255, 255, 0.8), rgba(255, 255, 255, 0.2));
-            box-shadow: 0 0 10px rgba(255, 255, 255, 0.5);
             opacity: 0;
             animation: floatBubble 12s linear infinite;
             pointer-events: none;
         }
+        
+        .bubble:nth-child(4n+1) { background: radial-gradient(circle at 30% 30%, rgba(255, 154, 158, 0.4), rgba(255, 154, 158, 0.1)); }
+        .bubble:nth-child(4n+2) { background: radial-gradient(circle at 30% 30%, rgba(254, 207, 239, 0.4), rgba(254, 207, 239, 0.1)); }
+        .bubble:nth-child(4n+3) { background: radial-gradient(circle at 30% 30%, rgba(255, 234, 167, 0.4), rgba(255, 234, 167, 0.1)); }
+        .bubble:nth-child(4n+4) { background: radial-gradient(circle at 30% 30%, rgba(253, 203, 110, 0.4), rgba(253, 203, 110, 0.1)); }
         
         @keyframes floatBubble {
             0% {
@@ -91,10 +105,10 @@
         
         .container {
             text-align: center;
-            background: rgba(255, 255, 255, 0.85);
+            background: rgba(255, 255, 255, 0.95);
             padding: 30px;
             border-radius: 30px;
-            box-shadow: 0 15px 35px rgba(0, 0, 0, 0.2);
+            box-shadow: 0 15px 35px rgba(0, 0, 0, 0.1);
             max-width: 500px;
             width: 90%;
             max-height: 90vh;
@@ -102,12 +116,9 @@
             z-index: 5;
             overflow: hidden;
             animation: popIn 0.8s cubic-bezier(0.175, 0.885, 0.32, 1.275);
-        }
-        
-        @keyframes popIn {
-            0% { transform: scale(0.8); opacity: 0; }
-            80% { transform: scale(1.05); }
-            100% { transform: scale(1); opacity: 1; }
+            border: 6px solid transparent;
+            background-clip: padding-box;
+            position: relative;
         }
         
         .container::before {
@@ -115,11 +126,14 @@
             position: absolute;
             top: 0;
             left: 0;
-            width: 100%;
-            height: 8px;
-            background: linear-gradient(90deg, #ff6ec4, #7873f5, #4ade80, #22d3ee, #facc15, #f97316);
+            right: 0;
+            bottom: 0;
+            z-index: -1;
+            margin: -6px;
+            border-radius: 30px;
+            background: linear-gradient(45deg, rgba(255, 154, 158, 0.3), rgba(254, 207, 239, 0.3), rgba(255, 234, 167, 0.3), rgba(253, 203, 110, 0.3));
             background-size: 300% 300%;
-            animation: gradient 3s ease infinite;
+            animation: gradient 10s ease infinite;
         }
         
         @keyframes gradient {
@@ -128,12 +142,18 @@
             100% { background-position: 0% 50%; }
         }
         
+        @keyframes popIn {
+            0% { transform: scale(0.8); opacity: 0; }
+            80% { transform: scale(1.05); }
+            100% { transform: scale(1); opacity: 1; }
+        }
+        
         .welcome-interface {
-            font-family: 'Fredoka One', cursive;
-            font-size: 36px;
+            font-family: 'Bubblegum Sans', cursive;
+            font-size: 42px;
             margin-bottom: 15px;
-            color: #ff6ec4;
-            text-shadow: 3px 3px 0px rgba(0,0,0,0.1);
+            color: #222;
+            text-shadow: 2px 2px 0px rgba(0,0,0,0.1);
             animation: bounce 2s infinite;
         }
         
@@ -143,10 +163,16 @@
         }
         
         .subtitle {
-            font-size: 18px;
-            color: #7873f5;
+            font-size: 22px;
+            color: #8b5cf6;
             margin-bottom: 20px;
             font-weight: bold;
+            animation: pulse 2s infinite;
+        }
+        
+        @keyframes pulse {
+            0%, 100% { transform: scale(1); }
+            50% { transform: scale(1.05); }
         }
         
         .center-image {
@@ -154,43 +180,55 @@
             display: block;
             margin: 0 auto 20px;
             border-radius: 20px;
-            box-shadow: 0 10px 20px rgba(0, 0, 0, 0.15);
+            box-shadow: 0 10px 20px rgba(0, 0, 0, 0.1);
             transition: all 0.3s ease;
+            animation: float 3s ease-in-out infinite;
+        }
+        
+        @keyframes float {
+            0%, 100% { transform: translateY(0); }
+            50% { transform: translateY(-10px); }
         }
         
         .center-image:hover {
-            transform: scale(1.05) rotate(2deg);
-            box-shadow: 0 15px 30px rgba(0, 0, 0, 0.2);
+            transform: scale(1.1) rotate(5deg);
+            box-shadow: 0 15px 30px rgba(0, 0, 0, 0.15);
         }
         
         .next-button {
             display: inline-block;
             text-decoration: none;
             text-align: center;
-            line-height: 40px;
-            background: linear-gradient(135deg, #ff6ec4, #7873f5);
+            line-height: 50px;
+            background: linear-gradient(135deg, rgba(255, 154, 158, 0.7), rgba(253, 203, 110, 0.7));
             color: white;
             border: none;
-            height: 40px;
-            width: 150px;
+            height: 50px;
+            width: 180px;
             border-radius: 50px;
-            font-family: 'Fredoka One', cursive;
-            font-size: 18px;
+            font-family: 'Bubblegum Sans', cursive;
+            font-size: 22px;
             cursor: pointer;
             margin-top: 5px;
             transition: all 0.3s ease;
-            box-shadow: 0 8px 15px rgba(0, 0, 0, 0.2);
+            box-shadow: 0 8px 15px rgba(0, 0, 0, 0.1);
             position: relative;
             overflow: hidden;
+            animation: buttonPulse 2s infinite;
+        }
+        
+        @keyframes buttonPulse {
+            0%, 100% { transform: scale(1); }
+            50% { transform: scale(1.05); }
         }
         
         .next-button:hover {
-            transform: translateY(-5px);
-            box-shadow: 0 12px 20px rgba(0, 0, 0, 0.25);
+            transform: translateY(-5px) scale(1.1);
+            box-shadow: 0 12px 20px rgba(0, 0, 0, 0.15);
         }
         
         .next-button:active {
-            transform: translateY(2px);
+            transform: translateY(2px) scale(0.98);
         }
         
         .next-button::before {
@@ -211,20 +249,23 @@
         .icon-container {
             display: flex;
             justify-content: center;
-            gap: 15px;
-            margin-bottom: 15px;
+            gap: 20px;
+            margin-bottom: 20px;
         }
         
         .math-icon {
-            font-size: 30px;
-            color: #f97316;
+            font-size: 40px;
             animation: wiggle 2s infinite;
             transition: all 0.3s ease;
+            cursor: pointer;
         }
         
+        .math-icon:nth-child(1) { color: rgba(255, 154, 158, 0.8); }
+        .math-icon:nth-child(2) { color: rgba(254, 207, 239, 0.8); }
+        .math-icon:nth-child(3) { color: rgba(253, 203, 110, 0.8); }
+        
         .math-icon:hover {
-            transform: scale(1.2) rotate(15deg);
-            color: #ff6ec4;
+            transform: scale(1.3) rotate(15deg);
         }
         
         @keyframes wiggle {
@@ -238,14 +279,14 @@
             position: absolute;
             bottom: -20px;
             right: -20px;
-            width: 80px;
-            height: 80px;
-            background: #ff6ec4;
+            width: 100px;
+            height: 100px;
+            background: linear-gradient(135deg, rgba(255, 154, 158, 0.8), rgba(253, 203, 110, 0.8));
             border-radius: 50%;
             display: flex;
             align-items: center;
             justify-content: center;
-            box-shadow: 0 8px 16px rgba(0,0,0,0.2);
+            box-shadow: 0 8px 16px rgba(0,0,0,0.1);
             animation: mascot-bounce 3s infinite;
             border: 5px solid white;
             z-index: 10;
@@ -253,21 +294,21 @@
         }
         
         @keyframes mascot-bounce {
-            0%, 100% { transform: translateY(0); }
-            50% { transform: translateY(-15px); }
+            0%, 100% { transform: translateY(0) rotate(0deg); }
+            50% { transform: translateY(-15px) rotate(5deg); }
         }
         
         .mascot-face {
-            font-size: 40px;
+            font-size: 50px;
             position: relative;
         }
         
         .mascot-eyes {
             position: absolute;
-            top: 12px;
-            left: 12px;
-            width: 25px;
-            height: 25px;
+            top: 15px;
+            left: 15px;
+            width: 30px;
+            height: 30px;
             background: white;
             border-radius: 50%;
             overflow: hidden;
@@ -276,24 +317,24 @@
         .mascot-eyes::before {
             content: '';
             position: absolute;
-            width: 8px;
-            height: 8px;
+            width: 10px;
+            height: 10px;
             background: #333;
             border-radius: 50%;
-            top: 8px;
-            left: 8px;
+            top: 10px;
+            left: 10px;
             animation: eyes-move 4s infinite;
         }
         
         .mascot-eyes::after {
             content: '';
             position: absolute;
-            width: 8px;
-            height: 8px;
+            width: 10px;
+            height: 10px;
             background: #333;
             border-radius: 50%;
-            top: 8px;
-            right: 8px;
+            top: 10px;
+            right: 10px;
             animation: eyes-move 4s infinite;
         }
         
@@ -305,33 +346,33 @@
         
         .mascot-mouth {
             position: absolute;
-            bottom: 15px;
+            bottom: 20px;
             left: 50%;
             transform: translateX(-50%);
-            width: 30px;
-            height: 15px;
-            border-bottom: 4px solid white;
+            width: 35px;
+            height: 18px;
+            border-bottom: 5px solid white;
             border-radius: 0 0 40px 40px;
             animation: mouth-move 3s infinite;
         }
         
         @keyframes mouth-move {
-            0%, 100% { height: 15px; }
-            50% { height: 8px; }
+            0%, 100% { height: 18px; }
+            50% { height: 10px; }
         }
         
         .mascot-speech {
             position: absolute;
-            bottom: 90px;
+            bottom: 110px;
             right: 15px;
             background: white;
-            padding: 12px;
+            padding: 15px;
             border-radius: 20px;
             box-shadow: 0 4px 8px rgba(0,0,0,0.1);
-            max-width: 180px;
-            font-size: 12px;
+            max-width: 200px;
+            font-size: 14px;
             font-weight: bold;
-            color: #7873f5;
+            color: #8b5cf6;
             display: none;
             animation: fadeIn 0.5s ease;
         }
@@ -367,11 +408,16 @@
         
         .math-symbol {
             position: absolute;
-            font-size: 20px;
-            color: rgba(255, 110, 196, 0.4);
+            font-size: 24px;
             font-weight: bold;
             animation: floatSymbol 15s infinite linear;
         }
+        
+        .math-symbol:nth-child(5n+1) { color: rgba(255, 154, 158, 0.4); }
+        .math-symbol:nth-child(5n+2) { color: rgba(254, 207, 239, 0.4); }
+        .math-symbol:nth-child(5n+3) { color: rgba(255, 234, 167, 0.4); }
+        .math-symbol:nth-child(5n+4) { color: rgba(253, 203, 110, 0.4); }
+        .math-symbol:nth-child(5n+5) { color: rgba(253, 182, 97, 0.4); }
         
         @keyframes floatSymbol {
             0% {
@@ -379,10 +425,10 @@
                 opacity: 0;
             }
             10% {
-                opacity: 0.4;
+                opacity: 0.6;
             }
             90% {
-                opacity: 0.4;
+                opacity: 0.6;
             }
             100% {
                 transform: translateY(-100px) rotate(360deg);
@@ -393,8 +439,8 @@
         /* Sparkle effects */
         .sparkle {
             position: absolute;
-            width: 3px;
-            height: 3px;
+            width: 4px;
+            height: 4px;
             background: white;
             border-radius: 50%;
             box-shadow: 0 0 10px 2px rgba(255, 255, 255, 0.8);
@@ -406,6 +452,47 @@
             100% { transform: translateY(-80px) scale(1); opacity: 0; }
         }
         
+        /* Confetti */
+        .confetti {
+            position: absolute;
+            width: 10px;
+            height: 10px;
+            opacity: 0.6;
+            animation: confettiFall 5s linear infinite;
+        }
+        
+        @keyframes confettiFall {
+            0% {
+                transform: translateY(-100vh) rotate(0deg);
+                opacity: 0;
+            }
+            10% {
+                opacity: 0.6;
+            }
+            90% {
+                opacity: 0.6;
+            }
+            100% {
+                transform: translateY(100vh) rotate(720deg);
+                opacity: 0;
+            }
+        }
+        
+        /* Rainbow border animation */
+        .rainbow-border {
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            border-radius: 30px;
+            padding: 6px;
+            background: linear-gradient(45deg, rgba(255, 154, 158, 0.3), rgba(254, 207, 239, 0.3), rgba(255, 234, 167, 0.3), rgba(253, 203, 110, 0.3));
+            background-size: 300% 300%;
+            animation: gradient 10s ease infinite;
+            z-index: -1;
+        }
+        
         /* Prevent scrolling on touch devices */
         .no-scroll {
             touch-action: none;
@@ -414,15 +501,94 @@
             width: 100%;
             height: 100%;
         }
+        
+        /* Sound button */
+        .sound-button {
+            position: absolute;
+            top: 20px;
+            right: 20px;
+            width: 50px;
+            height: 50px;
+            background: linear-gradient(135deg, rgba(255, 154, 158, 0.7), rgba(253, 203, 110, 0.7));
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-size: 24px;
+            cursor: pointer;
+            box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+            z-index: 100;
+            transition: all 0.3s ease;
+        }
+        
+        .sound-button:hover {
+            transform: scale(1.1);
+            box-shadow: 0 6px 12px rgba(0,0,0,0.15);
+        }
+        
+        .sound-button:active {
+            transform: scale(0.95);
+        }
+        
+        /* Floating shapes */
+        .shape {
+            position: absolute;
+            opacity: 0.5;
+            animation: floatShape 20s infinite linear;
+        }
+        
+        .shape-circle {
+            width: 30px;
+            height: 30px;
+            border-radius: 50%;
+        }
+        
+        .shape-square {
+            width: 25px;
+            height: 25px;
+        }
+        
+        .shape-triangle {
+            width: 0;
+            height: 0;
+            border-left: 15px solid transparent;
+            border-right: 15px solid transparent;
+        }
+        
+        @keyframes floatShape {
+            0% {
+                transform: translateY(100vh) rotate(0deg);
+                opacity: 0;
+            }
+            10% {
+                opacity: 0.5;
+            }
+            90% {
+                opacity: 0.5;
+            }
+            100% {
+                transform: translateY(-100px) rotate(360deg);
+                opacity: 0;
+            }
+        }
     </style>
 </head>
 <body class="no-scroll">
+
+    <!-- Sound button -->
+    <div class="sound-button" id="soundButton">
+        <i class="fas fa-volume-up"></i>
+    </div>
 
     <!-- Background animation container -->
     <div id="backgroundAnimation"></div>
     
     <!-- Floating math symbols -->
     <div class="math-symbols" id="mathSymbols"></div>
+    
+    <!-- Floating shapes -->
+    <div id="floatingShapes"></div>
 
     <div class="container">
         <p class="welcome-interface">
@@ -441,7 +607,7 @@
              alt="MathChamp Character"
              class="center-image">
         
-        <a href="pg2.html" class="next-button">
+        <a href="pg2.html" class="next-button" id="nextButton">
             <i class="fas fa-play"></i> Let's Go!
         </a>
         
@@ -463,6 +629,21 @@
             e.preventDefault();
         }, { passive: false });
         
+        // Sound toggle
+        let soundEnabled = true;
+        const soundButton = document.getElementById('soundButton');
+        
+        soundButton.addEventListener('click', function() {
+            soundEnabled = !soundEnabled;
+            this.innerHTML = soundEnabled ? '<i class="fas fa-volume-up"></i>' : '<i class="fas fa-volume-mute"></i>';
+            
+            // Create a visual feedback
+            this.style.transform = 'scale(1.2)';
+            setTimeout(() => {
+                this.style.transform = 'scale(1)';
+            }, 200);
+        });
+        
         // Create soft stars and bubbles for background animation
         const backgroundAnimation = document.getElementById('backgroundAnimation');
         
@@ -471,7 +652,7 @@
             star.className = 'star';
             star.style.left = Math.random() * 100 + '%';
             star.style.animationDuration = (Math.random() * 8 + 5) + 's';
-            star.style.animationDelay = Math.random() * 5 + 's';
+            // Removed animation delay to start immediately
             star.style.fontSize = (Math.random() * 16 + 12) + 'px';
             backgroundAnimation.appendChild(star);
             
@@ -490,7 +671,7 @@
             bubble.style.height = size + 'px';
             bubble.style.left = Math.random() * 100 + '%';
             bubble.style.animationDuration = (Math.random() * 10 + 8) + 's';
-            bubble.style.animationDelay = Math.random() * 5 + 's';
+            // Removed animation delay to start immediately
             
             backgroundAnimation.appendChild(bubble);
             
@@ -500,13 +681,13 @@
             }, 20000);
         }
         
-        // Create initial stars and bubbles
+        // Create initial stars and bubbles immediately
         for (let i = 0; i < 15; i++) {
-            setTimeout(createStar, i * 300);
+            createStar();
         }
         
         for (let i = 0; i < 10; i++) {
-            setTimeout(createBubble, i * 500);
+            createBubble();
         }
         
         // Continue creating stars and bubbles periodically
@@ -523,6 +704,7 @@
             symbol.textContent = symbols[Math.floor(Math.random() * symbols.length)];
             symbol.style.left = Math.random() * 100 + '%';
             symbol.style.animationDuration = (Math.random() * 10 + 10) + 's';
+            // Removed animation delay to start immediately
             symbol.style.fontSize = (Math.random() * 15 + 12) + 'px';
             mathSymbols.appendChild(symbol);
             
@@ -535,9 +717,104 @@
         // Create symbols periodically
         setInterval(createMathSymbol, 2000);
         
-        // Create initial symbols
+        // Create initial symbols immediately
         for (let i = 0; i < 8; i++) {
-            setTimeout(createMathSymbol, i * 500);
+            createMathSymbol();
+        }
+        
+        // Create confetti
+        function createConfetti() {
+            const confetti = document.createElement('div');
+            confetti.className = 'confetti';
+            
+            // Random color
+            const colors = [
+                'rgba(255, 154, 158, 0.6)', 
+                'rgba(254, 207, 239, 0.6)', 
+                'rgba(255, 234, 167, 0.6)', 
+                'rgba(253, 203, 110, 0.6)', 
+                'rgba(253, 182, 97, 0.6)'
+            ];
+            confetti.style.backgroundColor = colors[Math.floor(Math.random() * colors.length)];
+            
+            // Random shape
+            const shapes = ['circle', 'square'];
+            const shape = shapes[Math.floor(Math.random() * shapes.length)];
+            
+            if (shape === 'circle') {
+                confetti.style.borderRadius = '50%';
+            } else {
+                confetti.style.borderRadius = '0';
+            }
+            
+            // Random position and animation
+            confetti.style.left = Math.random() * 100 + '%';
+            confetti.style.animationDuration = (Math.random() * 5 + 5) + 's';
+            // Removed animation delay to start immediately
+            
+            document.body.appendChild(confetti);
+            
+            // Remove confetti after animation completes
+            setTimeout(() => {
+                confetti.remove();
+            }, 10000);
+        }
+        
+        // Create confetti periodically
+        setInterval(createConfetti, 800);
+        
+        // Create initial confetti immediately
+        for (let i = 0; i < 10; i++) {
+            createConfetti();
+        }
+        
+        // Create floating shapes
+        const floatingShapes = document.getElementById('floatingShapes');
+        
+        function createFloatingShape() {
+            const shape = document.createElement('div');
+            shape.className = 'shape';
+            
+            // Random shape type
+            const shapeTypes = ['shape-circle', 'shape-square', 'shape-triangle'];
+            const shapeType = shapeTypes[Math.floor(Math.random() * shapeTypes.length)];
+            shape.classList.add(shapeType);
+            
+            // Random color
+            const colors = [
+                'rgba(255, 154, 158, 0.5)', 
+                'rgba(254, 207, 239, 0.5)', 
+                'rgba(255, 234, 167, 0.5)', 
+                'rgba(253, 203, 110, 0.5)', 
+                'rgba(253, 182, 97, 0.5)'
+            ];
+            const color = colors[Math.floor(Math.random() * colors.length)];
+            
+            if (shapeType === 'shape-circle' || shapeType === 'shape-square') {
+                shape.style.backgroundColor = color;
+            } else if (shapeType === 'shape-triangle') {
+                shape.style.borderBottomColor = color;
+            }
+            
+            // Random position and animation
+            shape.style.left = Math.random() * 100 + '%';
+            shape.style.animationDuration = (Math.random() * 10 + 15) + 's';
+            // Removed animation delay to start immediately
+            
+            floatingShapes.appendChild(shape);
+            
+            // Remove shape after animation completes
+            setTimeout(() => {
+                shape.remove();
+            }, 25000);
+        }
+        
+        // Create shapes periodically
+        setInterval(createFloatingShape, 2000);
+        
+        // Create initial shapes immediately
+        for (let i = 0; i < 5; i++) {
+            createFloatingShape();
         }
         
         // Mascot interaction
@@ -546,6 +823,17 @@
         
         mascot.addEventListener('click', function() {
             mascotSpeech.style.display = mascotSpeech.style.display === 'block' ? 'none' : 'block';
+            
+            // Add a bounce animation when clicked
+            this.style.animation = 'none';
+            setTimeout(() => {
+                this.style.animation = 'mascot-bounce 3s infinite';
+            }, 10);
+            
+            // Create sparkles around mascot
+            for (let i = 0; i < 10; i++) {
+                setTimeout(createSparkle, i * 50);
+            }
         });
         
         // Change mascot face expressions
@@ -555,7 +843,11 @@
             "I love counting! Can you count with me?",
             "Shapes are so cool! Let's explore them!",
             "Let's solve some fun math problems!",
-            "Math adventures are the best!"
+            "Math adventures are the best!",
+            "Numbers are my best friends!",
+            "Let's count to 10 together!",
+            "I love puzzles! Do you?",
+            "Math is like magic! ✨"
         ];
         
         let messageIndex = 0;
@@ -598,6 +890,159 @@
         
         // Create sparkles periodically
         setInterval(createSparkle, 500);
+        
+        // Math icon interactions
+        document.querySelectorAll('.math-icon').forEach(icon => {
+            icon.addEventListener('click', function() {
+                // Create a burst of sparkles
+                for (let i = 0; i < 15; i++) {
+                    setTimeout(() => {
+                        const sparkle = document.createElement('div');
+                        sparkle.className = 'sparkle';
+                        
+                        const iconRect = this.getBoundingClientRect();
+                        const angle = Math.random() * Math.PI * 2;
+                        const distance = Math.random() * 50 + 20;
+                        
+                        sparkle.style.left = (iconRect.left + iconRect.width/2 + Math.cos(angle) * distance) + 'px';
+                        sparkle.style.top = (iconRect.top + iconRect.height/2 + Math.sin(angle) * distance) + 'px';
+                        
+                        document.body.appendChild(sparkle);
+                        
+                        setTimeout(() => {
+                            sparkle.remove();
+                        }, 3000);
+                    }, i * 30);
+                }
+                
+                // Play a sound effect if enabled
+                if (soundEnabled) {
+                    // Create a simple beep sound using Web Audio API
+                    const audioContext = new (window.AudioContext || window.webkitAudioContext)();
+                    const oscillator = audioContext.createOscillator();
+                    const gainNode = audioContext.createGain();
+                    
+                    oscillator.connect(gainNode);
+                    gainNode.connect(audioContext.destination);
+                    
+                    oscillator.frequency.value = 800;
+                    oscillator.type = 'sine';
+                    
+                    gainNode.gain.setValueAtTime(0.3, audioContext.currentTime);
+                    gainNode.gain.exponentialRampToValueAtTime(0.01, audioContext.currentTime + 0.5);
+                    
+                    oscillator.start(audioContext.currentTime);
+                    oscillator.stop(audioContext.currentTime + 0.5);
+                }
+            });
+        });
+        
+        // Next button interaction
+        const nextButton = document.getElementById('nextButton');
+        
+        nextButton.addEventListener('click', function(e) {
+            // Create a burst of confetti
+            for (let i = 0; i < 30; i++) {
+                setTimeout(() => {
+                    const confetti = document.createElement('div');
+                    confetti.className = 'confetti';
+                    
+                    // Random color
+                    const colors = [
+                        'rgba(255, 154, 158, 0.6)', 
+                        'rgba(254, 207, 239, 0.6)', 
+                        'rgba(255, 234, 167, 0.6)', 
+                        'rgba(253, 203, 110, 0.6)', 
+                        'rgba(253, 182, 97, 0.6)'
+                    ];
+                    confetti.style.backgroundColor = colors[Math.floor(Math.random() * colors.length)];
+                    
+                    // Random shape
+                    const shapes = ['circle', 'square'];
+                    const shape = shapes[Math.floor(Math.random() * shapes.length)];
+                    
+                    if (shape === 'circle') {
+                        confetti.style.borderRadius = '50%';
+                    } else {
+                        confetti.style.borderRadius = '0';
+                    }
+                    
+                    // Position at button
+                    const buttonRect = this.getBoundingClientRect();
+                    confetti.style.left = (buttonRect.left + buttonRect.width/2) + 'px';
+                    confetti.style.top = (buttonRect.top + buttonRect.height/2) + 'px';
+                    
+                    // Random direction
+                    const angle = Math.random() * Math.PI * 2;
+                    const velocity = Math.random() * 5 + 5;
+                    const vx = Math.cos(angle) * velocity;
+                    const vy = Math.sin(angle) * velocity - 5;
+                    
+                    confetti.style.animation = 'none';
+                    document.body.appendChild(confetti);
+                    
+                    // Animate confetti
+                    let x = 0;
+                    let y = 0;
+                    let opacity = 1;
+                    let rotation = 0;
+                    
+                    const animateConfetti = () => {
+                        x += vx;
+                        y += vy;
+                        opacity -= 0.02;
+                        rotation += 5;
+                        
+                        confetti.style.transform = `translate(${x}px, ${y}px) rotate(${rotation}deg)`;
+                        confetti.style.opacity = opacity;
+                        
+                        if (opacity > 0) {
+                            requestAnimationFrame(animateConfetti);
+                        } else {
+                            confetti.remove();
+                        }
+                    };
+                    
+                    requestAnimationFrame(animateConfetti);
+                }, i * 20);
+            }
+            
+            // Play a sound effect if enabled
+            if (soundEnabled) {
+                // Create a simple sound effect using Web Audio API
+                const audioContext = new (window.AudioContext || window.webkitAudioContext)();
+                const oscillator = audioContext.createOscillator();
+                const gainNode = audioContext.createGain();
+                
+                oscillator.connect(gainNode);
+                gainNode.connect(audioContext.destination);
+                
+                oscillator.frequency.setValueAtTime(400, audioContext.currentTime);
+                oscillator.frequency.exponentialRampToValueAtTime(800, audioContext.currentTime + 0.2);
+                oscillator.type = 'sine';
+                
+                gainNode.gain.setValueAtTime(0.3, audioContext.currentTime);
+                gainNode.gain.exponentialRampToValueAtTime(0.01, audioContext.currentTime + 0.5);
+                
+                oscillator.start(audioContext.currentTime);
+                oscillator.stop(audioContext.currentTime + 0.5);
+            }
+        });
+        
+        // Add keyboard interaction
+        document.addEventListener('keydown', function(e) {
+            if (e.key === 'Enter' || e.key === ' ') {
+                nextButton.click();
+            }
+        });
+        
+        // Initialize all animations immediately on page load
+        window.addEventListener('load', function() {
+            // Ensure all animations start immediately
+            document.querySelectorAll('.star, .bubble, .math-symbol, .confetti, .shape').forEach(element => {
+                element.style.animationPlayState = 'running';
+            });
+        });
     </script>
 </body>
 </html>
