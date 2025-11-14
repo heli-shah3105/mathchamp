@@ -1,0 +1,1553 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>MathChamp - Super Fun Math Adventure!</title>
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=Fredoka:wght@400;600;700&display=swap');
+    
+    body {
+      margin: 0;
+      font-family: 'Fredoka', sans-serif;
+      background: linear-gradient(135deg, #ff9a9e 0%, #fad0c4 25%, #fad0c4 50%, #a1c4fd 75%, #c2e9fb 100%);
+      background-size: 400% 400%;
+      animation: gradientShift 15s ease infinite;
+      color: #333;
+      overflow-x: hidden;
+      min-height: 100vh;
+      transition: background 0.3s ease, color 0.3s ease;
+    }
+    
+    /* Dark theme styles */
+    body.dark-theme {
+      background: linear-gradient(135deg, #1a237e 0%, #283593 50%, #3949ab 100%);
+      color: #e0e0e0;
+    }
+    
+    @keyframes gradientShift {
+      0% { background-position: 0% 50%; }
+      50% { background-position: 100% 50%; }
+      100% { background-position: 0% 50%; }
+    }
+
+    /* Floating shapes */
+    .shape {
+      position: absolute;
+      z-index: 0;
+      opacity: 0.4;
+      animation: float 20s infinite ease-in-out;
+    }
+    
+    .circle {
+      border-radius: 50%;
+      background: linear-gradient(45deg, #ff6ec4, #7873f5);
+    }
+    
+    .triangle {
+      width: 0;
+      height: 0;
+      border-left: 30px solid transparent;
+      border-right: 30px solid transparent;
+      border-bottom: 60px solid #4ade80;
+    }
+    
+    .square {
+      background: linear-gradient(45deg, #facc15, #f97316);
+    }
+    
+    /* Dark theme shapes */
+    body.dark-theme .circle {
+      background: linear-gradient(45deg, #64b5f6, #42a5f5);
+    }
+
+    body.dark-theme .triangle {
+      border-bottom-color: #64b5f6;
+    }
+
+    body.dark-theme .square {
+      background: linear-gradient(45deg, #5c6bc0, #7986cb);
+    }
+    
+    @keyframes float {
+      0%, 100% { transform: translateY(0) rotate(0deg); }
+      50% { transform: translateY(-20px) rotate(10deg); }
+    }
+
+    /* Header */
+    .header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 15px 25px;
+      background: rgba(255, 255, 255, 0.9);
+      border-bottom: 2px dashed #f87171;
+      border-radius: 0 0 20px 20px;
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+      position: relative;
+      z-index: 10;
+      transition: background 0.3s ease, border-color 0.3s ease;
+    }
+
+    /* Dark theme header */
+    body.dark-theme .header {
+      background: rgba(30, 41, 59, 0.9);
+      border-bottom: 2px dashed #64b5f6;
+    }
+
+    .brand {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      font-weight: 700;
+      font-size: 26px;
+      color: #333;
+      text-shadow: 2px 2px 0px #f87171;
+      transition: color 0.3s ease, text-shadow 0.3s ease;
+    }
+    
+    /* Dark theme brand */
+    body.dark-theme .brand {
+      color: #e0e0e0;
+      text-shadow: 2px 2px 0px #64b5f6;
+    }
+    
+    .brand-logo {
+      width: 40px;
+      height: 40px;
+      border-radius: 50%;
+      background: conic-gradient(from 180deg,#ff6ec4,#7873f5,#4ade80,#22d3ee,#facc15,#f97316,#ff6ec4);
+      box-shadow: 0 0 15px rgba(120,115,245,0.7);
+      animation: pulse 2s infinite;
+      transition: background 0.3s ease, box-shadow 0.3s ease;
+    }
+    
+    /* Dark theme brand logo */
+    body.dark-theme .brand-logo {
+      background: conic-gradient(from 180deg,#64b5f6,#42a5f5,#5c6bc0,#7986cb,#64b5f6,#42a5f5,#64b5f6);
+      box-shadow: 0 0 15px rgba(100,181,246,0.7);
+    }
+    
+    @keyframes pulse {
+      0% { box-shadow: 0 0 0 0 rgba(120,115,245,0.7); }
+      70% { box-shadow: 0 0 0 15px rgba(120,115,245,0); }
+      100% { box-shadow: 0 0 0 0 rgba(120,115,245,0); }
+    }
+
+    .right-controls { 
+      display: flex; 
+      align-items: center; 
+      gap: 16px; 
+    }
+    .settings-btn, .avatar, .chatbot-btn {
+      width: 42px; 
+      height: 42px;
+      border-radius: 50%;
+      display:flex; 
+      align-items:center; 
+      justify-content:center;
+      font-weight:bold; 
+      cursor:pointer;
+      transition: all 0.3s ease;
+    }
+    .settings-btn { 
+      background:#f87171; 
+      font-size:20px;
+      box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+    }
+
+    /* Dark theme settings button */
+    body.dark-theme .settings-btn {
+      background: #64b5f6;
+    }
+    
+    .settings-btn:hover { 
+      background:#ef4444;
+      transform: rotate(30deg);
+    }
+
+    body.dark-theme .settings-btn:hover {
+      background: #42a5f5;
+    }
+    
+    .avatar { 
+      background:#8b5cf6; 
+      color:#fff;
+      font-size:18px;
+      box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+    }
+
+    /* Dark theme avatar */
+    body.dark-theme .avatar {
+      background: #5c6bc0;
+    }
+    
+    .avatar:hover {
+      transform: scale(1.1);
+    }
+    .chatbot-btn {
+      background:#4ade80;
+      font-size:20px;
+      box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+    }
+
+    /* Dark theme chatbot button */
+    body.dark-theme .chatbot-btn {
+      background: #5c6bc0;
+    }
+    
+    .chatbot-btn:hover {
+      background:#22c55e;
+      transform: scale(1.1);
+    }
+
+    body.dark-theme .chatbot-btn:hover {
+      background: #7986cb;
+    }
+
+    /* Welcome */
+    .welcome-box { 
+      padding:25px; 
+      font-size:28px; 
+      font-weight:700; 
+      color:#030f2e; 
+      text-align:center;
+      margin: 20px 0; 
+      width: 100%;
+      background: rgba(255, 255, 255, 0.7);
+      border-radius: 20px;
+      box-shadow: 0 8px 20px rgba(0,0,0,0.1);
+      position: relative;
+      z-index: 5;
+      animation: bounce 2s infinite;
+      transition: color 0.3s ease, background 0.3s ease, box-shadow 0.3s ease;
+    }
+    
+    /* Dark theme welcome box */
+    body.dark-theme .welcome-box {
+      color: #e0e0e0;
+      background: rgba(30, 41, 59, 0.7);
+      box-shadow: 0 8px 20px rgba(0, 0, 0, 0.3);
+    }
+    
+    @keyframes bounce {
+      0%, 100% { transform: translateY(0); }
+      50% { transform: translateY(-10px); }
+    }
+
+    /* First Row - Welcome box at top, Fun fact below */
+    .first-row { 
+      display:flex; 
+      gap:20px; 
+      padding:0;
+      margin:20px auto;
+      justify-content:center;
+      flex-wrap: wrap;
+      max-width: 95%;
+      align-items: stretch;
+    }
+
+    /* Fun Fact Box - with larger text and more kid-friendly design */
+    .fun-fact-box {
+      padding:20px 25px;
+      font-size:20px;
+      font-weight:600; 
+      color:#7c2d12;
+      text-align:center;
+      background:linear-gradient(135deg,#fef3c7,#fde68a); 
+      border-radius:20px;
+      box-shadow:0 8px 20px rgba(0,0,0,0.15);
+      position: relative;
+      z-index: 5;
+      transition:all 0.3s ease;
+      cursor: pointer;
+      width: 100%;
+      margin: 5px 0;
+      min-height: 100px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      animation: bounce 2s infinite;
+      animation-delay: 0.5s;
+      border: 3px dashed #f59e0b;
+    }
+
+    /* Dark theme fun fact box */
+    body.dark-theme .fun-fact-box {
+      background:linear-gradient(135deg,#1e3a8a,#283593);
+      color:#bbdefb;
+      box-shadow:0 8px 20px rgba(0, 0, 0, 0.3);
+      border-color: #64b5f6;
+    }
+    
+    /* Subtle hover effect */
+    .fun-fact-box:hover { 
+      transform: translateY(-3px);
+      box-shadow: 0 12px 25px rgba(0,0,0,0.2);
+    }
+
+    body.dark-theme .fun-fact-box:hover {
+      box-shadow: 0 12px 25px rgba(0, 0, 0, 0.4);
+    }
+
+    /* Fun fact icon */
+    .fun-fact-icon {
+      position: absolute;
+      font-size: 30px;
+      animation: spin 3s infinite linear;
+    }
+
+    .fun-fact-icon.left {
+      left: 15px;
+      top: 15px;
+    }
+
+    .fun-fact-icon.right {
+      right: 15px;
+      top: 15px;
+    }
+
+    @keyframes spin {
+      0% { transform: rotate(0deg); }
+      100% { transform: rotate(360deg); }
+    }
+
+    /* Second Row - Challenge, Rewards, Learn & Revise, and Take Quiz boxes in one line */
+    .second-row { 
+      display:flex; 
+      gap:20px; 
+      padding:0;
+      margin:0 auto;
+      justify-content:center;
+      flex-wrap: wrap;
+      max-width: 95%;
+      align-items: stretch;
+    }
+
+    /* Challenge Card - with subtle animations */
+    .challenge-card {
+      padding:20px;
+      border-radius:20px;
+      box-shadow:0 10px 20px rgba(0,0,0,0.15); 
+      background: rgba(255, 255, 255, 0.8);
+      flex: 1;
+      min-width: 280px;
+      max-width: 320px;
+      height: 140px;
+      box-sizing:border-box;
+      transition: all 0.3s ease;
+      position: relative;
+      overflow: hidden;
+      cursor: pointer;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+    }
+
+    /* Dark theme challenge card */
+    body.dark-theme .challenge-card {
+      background: rgba(30, 41, 59, 0.8);
+      box-shadow:0 10px 20px rgba(0, 0, 0, 0.3);
+    }
+    
+    .challenge-card:hover { 
+      transform: translateY(-5px) scale(1.02);
+      box-shadow: 0 15px 30px rgba(0,0,0,0.2);
+    }
+
+    body.dark-theme .challenge-card:hover {
+      box-shadow: 0 15px 30px rgba(0, 0, 0, 0.4);
+    }
+    
+    .challenge-card h3 { 
+      margin:0 0 8px 0; 
+      color:#ef4444; 
+      font-size:22px; 
+    }
+
+    /* Dark theme challenge */
+    body.dark-theme .challenge-card h3 { 
+      color: #ef5350; 
+    }
+    
+    .challenge-card p { 
+      font-size:15px; 
+      margin:0; 
+      text-align: center;
+    }
+
+    /* Dark theme challenge paragraph */
+    body.dark-theme .challenge-card p { 
+      color: #e0e0e0; 
+    }
+    
+    .streak { 
+      margin-top:10px; 
+      font-weight:bold; 
+      color:#f97316; 
+      font-size:15px; 
+    }
+
+    /* Dark theme streak */
+    body.dark-theme .streak { 
+      color: #ffb74d; 
+    }
+
+    /* Timer for daily challenge - integrated in the challenge card */
+    .challenge-timer {
+      font-size: 12px;
+      color: #f97316;
+      margin-top: 5px;
+      font-weight: 600;
+      transition: color 0.3s ease;
+    }
+
+    body.dark-theme .challenge-timer {
+      color: #ffb74d;
+    }
+
+    .timer-warning {
+      animation: pulse 1s infinite;
+      color: #ef4444;
+    }
+
+    body.dark-theme .timer-warning {
+      color: #ef5350;
+    }
+
+    /* Rewards Card - with subtle animations */
+    .rewards-card { 
+      padding:20px;
+      border-radius:20px;
+      box-shadow:0 10px 20px rgba(0,0,0,0.15); 
+      background: rgba(255, 255, 255, 0.8);
+      flex: 1;
+      min-width: 280px;
+      max-width: 320px;
+      height: 140px;
+      box-sizing:border-box;
+      transition: all 0.3s ease;
+      position: relative;
+      overflow: hidden;
+      cursor: pointer;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      text-align: center;
+    }
+
+    /* Dark theme rewards card */
+    body.dark-theme .rewards-card {
+      background: rgba(30, 41, 59, 0.8);
+      box-shadow:0 10px 20px rgba(0, 0, 0, 0.3);
+    }
+    
+    .rewards-card:hover { 
+      transform: translateY(-5px) scale(1.02);
+      box-shadow: 0 15px 30px rgba(0,0,0,0.2);
+    }
+
+    body.dark-theme .rewards-card:hover {
+      box-shadow: 0 15px 30px rgba(0, 0, 0, 0.4);
+    }
+    
+    .rewards-card h3 { 
+      margin:0 0 8px 0; 
+      color:#22c55e; 
+      font-size:24px; 
+    }
+
+    /* Dark theme rewards */
+    body.dark-theme .rewards-card h3 { 
+      color: #64b5f6; 
+    }
+    
+    .rewards-card p { 
+      font-size:17px; 
+      margin:0; 
+    }
+
+    /* Dark theme rewards paragraph */
+    body.dark-theme .rewards-card p { 
+      color: #e0e0e0; 
+    }
+    
+    .rewards-card .highlight { 
+      color:#f59e0b; 
+      font-weight:bold; 
+    }
+
+    /* Dark theme rewards highlight */
+    body.dark-theme .rewards-card .highlight { 
+      color: #ffb74d; 
+    }
+    
+    .badge-preview { 
+      font-size:42px; 
+      margin-top:8px; 
+      animation: bounce 2s infinite; 
+      animation-delay: 1s;
+    }
+
+    /* Top Boxes - Modified to match challenge card style */
+    .boxes { 
+      display: none; /* Hide the separate boxes container */
+    }
+    .box {
+      width: 320px;
+      height: 140px;
+      background: rgba(255, 255, 255, 0.8);
+      border-radius: 20px;
+      text-align: center;
+      font-size: 22px;
+      font-weight: 700;
+      color: #8b5cf6;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      box-shadow: 0 10px 20px rgba(0,0,0,0.15);
+      transition: all 0.3s ease;
+      cursor: pointer;
+      position: relative;
+      overflow: hidden;
+      text-decoration: none;
+      flex: 1;
+      min-width: 280px;
+      max-width: 320px;
+      box-sizing:border-box;
+    }
+
+    /* Dark theme box */
+    body.dark-theme .box {
+      background: rgba(30, 41, 59, 0.8);
+      color: #a78bfa;
+      box-shadow: 0 10px 20px rgba(0, 0, 0, 0.3);
+    }
+
+    .box:hover { 
+      transform: translateY(-5px) scale(1.02);
+      box-shadow: 0 15px 30px rgba(0,0,0,0.2);
+    }
+
+    body.dark-theme .box:hover {
+      box-shadow: 0 15px 30px rgba(0, 0, 0, 0.4);
+    }
+
+    .box:active {
+      transform: translateY(5px);
+    }
+
+    /* Box emoji icon */
+    .box-icon {
+      position: absolute;
+      top: 10px;
+      left: 10px;
+      font-size: 28px;
+      animation: bounce 2s infinite;
+      animation-delay: 0.3s;
+    }
+
+    /* Modals */
+    .modal { 
+      display:none; 
+      position:fixed; 
+      z-index:1000; 
+      left:0; top:0; 
+      width:100%; height:100%; 
+      background:rgba(0,0,0,0.6); 
+      justify-content:center; 
+      align-items:center;
+      backdrop-filter: blur(5px);
+    }
+    .modal-content {
+      background:#fff; 
+      border-radius:20px; 
+      padding:25px;
+      width:90%; 
+      max-width:450px; 
+      box-shadow:0 15px 30px rgba(0,0,0,0.3);
+      text-align:center; 
+      position:relative; 
+      animation: popIn 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+      transition: background 0.3s ease, color 0.3s ease;
+    }
+
+    /* Dark theme modal content */
+    body.dark-theme .modal-content {
+      background: #1e293b;
+      color: #e0e0e0;
+    }
+    
+    .close { 
+      position:absolute; 
+      top:15px; 
+      right:20px; 
+      font-size:28px; 
+      font-weight:bold; 
+      cursor:pointer;
+      color: #ef4444;
+      transition: all 0.3s ease;
+    }
+
+    /* Dark theme close button */
+    body.dark-theme .close {
+      color: #ef5350;
+    }
+    
+    .close:hover {
+      transform: rotate(90deg);
+    }
+    .options { 
+      margin-top:20px; 
+      display:flex; 
+      flex-direction:column; 
+      gap:15px; 
+    }
+    .options button { 
+      padding:15px; 
+      border:none; 
+      border-radius:15px; 
+      background:linear-gradient(135deg, #93c5fd, #60a5fa); 
+      color:#1e3a8a; 
+      font-weight:bold;
+      font-size:18px;
+      cursor:pointer; 
+      transition: all 0.3s ease;
+      box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+    }
+
+    /* Dark theme options buttons */
+    body.dark-theme .options button {
+      background:linear-gradient(135deg, #42a5f5, #5c6bc0);
+      color: #e0e0e0;
+      box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3);
+    }
+    
+    .options button:hover { 
+      background:linear-gradient(135deg, #60a5fa, #3b82f6);
+      transform: translateY(-5px);
+      box-shadow: 0 8px 15px rgba(0,0,0,0.2);
+    }
+
+    body.dark-theme .options button:hover { 
+      background:linear-gradient(135deg, #5c6bc0, #7986cb);
+      box-shadow: 0 8px 15px rgba(0, 0, 0, 0.4);
+    }
+    
+    .options button:active {
+      transform: translateY(2px);
+    }
+    .feedback { 
+      margin-top:15px; 
+      font-weight:bold;
+      font-size:18px;
+    }
+    .done-btn { 
+      margin-top:20px; 
+      padding:12px 25px; 
+      border:none; 
+      border-radius:15px; 
+      background:linear-gradient(135deg, #22c55e, #16a34a); 
+      color:#fff; 
+      font-weight:bold;
+      font-size:18px;
+      cursor:pointer; 
+      transition: all 0.3s ease;
+      box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+    }
+
+    /* Dark theme done button */
+    body.dark-theme .done-btn {
+      background:linear-gradient(135deg, #42a5f5, #5c6bc0);
+      box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3);
+    }
+    
+    .done-btn:hover { 
+      background:linear-gradient(135deg, #16a34a, #15803d);
+      transform: translateY(-5px);
+      box-shadow: 0 8px 15px rgba(0,0,0,0.2);
+    }
+
+    body.dark-theme .done-btn:hover { 
+      background:linear-gradient(135deg, #5c6bc0, #7986cb);
+      box-shadow: 0 8px 15px rgba(0, 0, 0, 0.4);
+    }
+
+    /* Chatbot Styles */
+    .chatbot-container {
+      position: fixed;
+      bottom: 20px;
+      right: 20px;
+      width: 400px;
+      height: 600px;
+      background: white;
+      border-radius: 20px;
+      box-shadow: 0 10px 25px rgba(0,0,0,0.2);
+      z-index: 1001;
+      display: none;
+      flex-direction: column;
+      overflow: hidden;
+      transition: all 0.3s ease;
+    }
+
+    /* Dark theme chatbot container */
+    body.dark-theme .chatbot-container {
+      background: #1e293b;
+      box-shadow: 0 10px 25px rgba(0, 0, 0, 0.4);
+    }
+    
+    .chatbot-header {
+      background: linear-gradient(135deg, #8b5cf6, #6366f1);
+      color: white;
+      padding: 15px;
+      font-weight: bold;
+      font-size: 18px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    /* Dark theme chatbot header */
+    body.dark-theme .chatbot-header {
+      background: linear-gradient(135deg, #42a5f5, #5c6bc0);
+    }
+    
+    .chatbot-close {
+      cursor: pointer;
+      font-size: 20px;
+      transition: transform 0.3s ease;
+    }
+    
+    .chatbot-close:hover {
+      transform: rotate(90deg);
+    }
+    
+    .chatbot-iframe {
+      flex-grow: 1;
+      width: 100%;
+      border: none;
+      height: 100%;
+    }
+    
+    .chatbot-toggle {
+      position: fixed;
+      bottom: 30px;
+      right: 30px;
+      width: 60px;
+      height: 60px;
+      background: linear-gradient(135deg, #4ade80, #22c55e);
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: white;
+      font-size: 24px;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.2);
+      cursor: pointer;
+      z-index: 1000;
+      transition: all 0.3s ease;
+    }
+
+    /* Dark theme chatbot toggle */
+    body.dark-theme .chatbot-toggle {
+      background: linear-gradient(135deg, #42a5f5, #5c6bc0);
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.4);
+    }
+    
+    .chatbot-toggle:hover {
+      transform: scale(1.1);
+      box-shadow: 0 6px 16px rgba(0,0,0,0.3);
+    }
+
+    body.dark-theme .chatbot-toggle:hover {
+      box-shadow: 0 6px 16px rgba(0, 0, 0, 0.5);
+    }
+    
+    /* Settings Modal Styles */
+    .settings-option {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin: 15px 0;
+    }
+    
+    .toggle-switch {
+      position: relative;
+      display: inline-block;
+      width: 60px;
+      height: 30px;
+    }
+    
+    .toggle-switch input {
+      opacity: 0;
+      width: 0;
+      height: 0;
+    }
+    
+    .slider {
+      position: absolute;
+      cursor: pointer;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      background-color: #ccc;
+      transition: .4s;
+      border-radius: 34px;
+    }
+    
+    .slider:before {
+      position: absolute;
+      content: "";
+      height: 22px;
+      width: 22px;
+      left: 4px;
+      bottom: 4px;
+      background-color: white;
+      transition: .4s;
+      border-radius: 50%;
+    }
+    
+    input:checked + .slider {
+      background-color: #8b5cf6;
+    }
+    
+    input:checked + .slider:before {
+      transform: translateX(30px);
+    }
+    
+    .brightness-container {
+      margin: 15px 0;
+    }
+    
+    .brightness-slider {
+      width: 100%;
+      margin-top: 10px;
+    }
+    
+    .brightness-value {
+      font-weight: bold;
+    }
+    
+    .settings-buttons {
+      display: flex;
+      justify-content: space-between;
+      margin-top: 20px;
+    }
+    
+    .save-btn, .cancel-btn {
+      padding: 10px 20px;
+      border: none;
+      border-radius: 10px;
+      font-weight: bold;
+      cursor: pointer;
+      transition: all 0.3s ease;
+    }
+    
+    .save-btn {
+      background: linear-gradient(135deg, #22c55e, #16a34a);
+      color: white;
+    }
+    
+    .cancel-btn {
+      background: linear-gradient(135deg, #f87171, #ef4444);
+      color: white;
+    }
+
+    /* Dark theme settings buttons */
+    body.dark-theme .save-btn {
+      background: linear-gradient(135deg, #42a5f5, #5c6bc0);
+    }
+
+    body.dark-theme .cancel-btn {
+      background: linear-gradient(135deg, #ef5350, #e53935);
+    }
+    
+    .save-btn:hover, .cancel-btn:hover {
+      transform: translateY(-3px);
+      box-shadow: 0 5px 10px rgba(0,0,0,0.2);
+    }
+
+    body.dark-theme .save-btn:hover,
+    body.dark-theme .cancel-btn:hover {
+      box-shadow: 0 5px 10px rgba(0, 0, 0, 0.4);
+    }
+
+    @keyframes popIn { 
+      from { transform:scale(0.7); opacity:0; } 
+      to { transform:scale(1); opacity:1; } 
+    }
+
+    /* Responsive */
+    @media(max-width: 1000px) { 
+      .first-row, .second-row { justify-content:center; } 
+    }
+    
+    @media(max-width: 768px) {
+      .welcome-box {
+        font-size: 20px;
+        padding: 15px;
+      }
+      .box {
+        width: 280px;
+        height: 120px;
+        font-size: 18px;
+      }
+      .fun-fact-box {
+        font-size: 16px;
+        padding: 15px;
+        min-height: 90px;
+        margin: 2px 0;
+      }
+      
+      .chatbot-container {
+        width: 90%;
+        height: 70%;
+        bottom: 10px;
+        right: 5%;
+        left: 5%;
+      }
+    }
+    
+    /* Confetti effect */
+    .confetti {
+      position: fixed;
+      width: 10px;
+      height: 10px;
+      background-color: #f87171;
+      position: absolute;
+      animation: confetti-fall 3s linear forwards;
+    }
+    
+    @keyframes confetti-fall {
+      to {
+        transform: translateY(100vh) rotate(360deg);
+        opacity: 0;
+      }
+    }
+
+    /* Additional kid-friendly elements - More subtle stars */
+    .star-decoration {
+      position: absolute;
+      color: #fbbf24;
+      font-size: 14px;
+      animation: twinkle 3s infinite alternate;
+      z-index: 1;
+      opacity: 0.2;
+    }
+
+    body.dark-theme .star-decoration {
+      color: #64b5f6;
+    }
+
+    @keyframes twinkle {
+      0% { opacity: 0.1; }
+      100% { opacity: 0.3; }
+    }
+
+    .math-icon {
+      font-size: 24px;
+      margin-right: 5px;
+      animation: bounce 2s infinite;
+      animation-delay: var(--delay);
+    }
+  </style>
+</head>
+<body>
+
+  <!-- Floating shapes for background -->
+  <div class="shape circle" style="width: 80px; height: 80px; top: 10%; left: 5%;"></div>
+  <div class="shape triangle" style="top: 20%; right: 10%;"></div>
+  <div class="shape square" style="width: 60px; height: 60px; bottom: 30%; left: 8%;"></div>
+  <div class="shape circle" style="width: 50px; height: 50px; bottom: 20%; right: 15%;"></div>
+  <div class="shape triangle" style="top: 60%; left: 15%;"></div>
+
+  <!-- Star decorations - More subtle -->
+  <div class="star-decoration" style="top: 15%; left: 20%;">⭐</div>
+  <div class="star-decoration" style="top: 25%; right: 25%; animation-delay: 0.5s;">⭐</div>
+  <div class="star-decoration" style="bottom: 30%; left: 30%; animation-delay: 1s;">⭐</div>
+  <div class="star-decoration" style="bottom: 20%; right: 20%; animation-delay: 1.5s;">⭐</div>
+
+  <header class="header">
+    <div class="brand">
+      <div class="brand-logo"></div> MathChamp
+    </div>
+    <div class="right-controls">
+      <div class="settings-btn" title="Settings" onclick="openSettings()">⚙️</div>
+      <div class="chatbot-btn" title="Math Helper" onclick="toggleChatbot()">🤖</div>
+      <div class="avatar" title="Profile">HS</div>
+    </div>
+  </header>
+
+  <!-- First Row - Welcome box at top -->
+  <div class="first-row" id="firstRow">
+    <div class="welcome-box" id="welcomeBox">
+      <span class="math-icon" style="--delay: 0s;">🧮</span>
+      Welcome back, young champ! Ready to play and learn?
+      <span class="math-icon" style="--delay: 0.5s;">🎲</span>
+    </div>
+  </div>
+
+  <!-- Second Row - Fun fact box below welcome -->
+  <div class="first-row">
+    <div class="fun-fact-box" id="funFactBox">
+      <div class="fun-fact-icon left">💡</div>
+      <div class="fun-fact-icon right">✨</div>
+      <div id="funFactText">Today's Math Fact: Did you know? A circle has no corners—it goes round and round forever! From planets to bubbles to wheels, circles show that math is everywhere!</div>
+    </div>
+  </div>
+
+  <!-- Second Row - Challenge, Rewards, Learn & Revise, and Take Quiz boxes in one line -->
+  <div class="second-row" id="secondRow">
+    <div class="challenge-card" onclick="openChallenge()">
+      <div class="box-icon">🔥</div>
+      <h3>Today's Challenge</h3>
+      <p id="challenge-card-text">Loading question...</p>
+      <div class="challenge-timer" id="challengeTimer">
+        ⏰ Expires in: <span id="timerCountdown">24:00:00</span>
+      </div>
+      <div class="streak">  <b></b></div>
+    </div>
+    
+    <div class="rewards-card" onclick="openRewards()">
+      <div class="box-icon">🏆</div>
+      <h3>Rewards</h3>
+      <p>Earn <b>20 stars</b> to unlock <span class="highlight">Golden Brain</span>!</p>
+      <div class="badge-preview"></div>
+    </div>
+    
+    <!-- Learn & Revise box - Changed to link to pg18.html -->
+    <a href="pg19.html" class="box-link" style="text-decoration: none;">
+      <div class="box">
+        <div class="box-icon">📚</div>
+        Learn & Revise
+      </div>
+    </a>
+    
+    <!-- Take Quiz box -->
+    <a href="pg22.html" class="box-link" style="text-decoration: none;">
+      <div class="box">
+        <div class="box-icon">📝</div>
+        Take Quiz
+      </div>
+    </a>
+  </div>
+
+  <!-- Challenge Modal -->
+  <div id="challengeModal" class="modal">
+    <div class="modal-content">
+      <span class="close" onclick="closeChallenge()">&times;</span>
+      <h3>🔥 Today's Challenge</h3>
+      <p id="challenge-modal-question">Loading question...</p>
+      <div class="options" id="challenge-modal-options">
+        <!-- Options will be dynamically inserted here -->
+      </div>
+      <div id="feedback" class="feedback"></div>
+      <button id="doneBtn" class="done-btn" style="display:none;" onclick="closeChallenge()">Great Job!</button>
+    </div>
+  </div>
+
+  <!-- Rewards Modal -->
+  <div id="rewardsModal" class="modal">
+    <div class="modal-content">
+      <span class="close" onclick="closeRewards()">&times;</span>
+      <h3>🏆 Rewards</h3>
+      <p>You're close to unlocking <b>Golden Brain</b> badge. Just 20 stars needed! 🌟</p>
+      <button class="done-btn" onclick="closeRewards()">Cool!</button>
+    </div>
+  </div>
+
+  <!-- Settings Modal -->
+  <div id="settingsModal" class="modal">
+    <div class="modal-content">
+      <span class="close" onclick="closeSettings()">&times;</span>
+      <h3>⚙️ Fun Settings!</h3>
+      
+      <div class="settings-option">
+        <label for="theme-toggle">Dark Theme</label>
+        <label class="toggle-switch">
+          <input type="checkbox" id="theme-toggle">
+          <span class="slider"></span>
+        </label>
+      </div>
+      
+      <div class="settings-option">
+        <label for="parental-toggle">Parental Control</label>
+        <label class="toggle-switch">
+          <input type="checkbox" id="parental-toggle">
+          <span class="slider"></span>
+        </label>
+      </div>
+      
+      <div class="settings-option">
+        <label for="sound-toggle">Sound Effects</label>
+        <label class="toggle-switch">
+          <input type="checkbox" id="sound-toggle">
+          <span class="slider"></span>
+        </label>
+      </div>
+      
+      <div class="brightness-container">
+        <label for="brightness-slider">Brightness: <span id="brightness-value" class="brightness-value">100</span>%</label>
+        <input type="range" id="brightness-slider" class="brightness-slider" min="50" max="150" value="100">
+      </div>
+      
+      <div class="settings-buttons">
+        <button class="save-btn" onclick="saveSettings()">Save</button>
+        <button class="cancel-btn" onclick="closeSettings()">Cancel</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Chatbot Container -->
+<div id="chatbotContainer" class="chatbot-container">
+  <div class="chatbot-header">
+    <span>Math Helper</span>
+    <span class="chatbot-close" onclick="toggleChatbot()">&times;</span>
+  </div>
+
+  <iframe
+    src="https://www.chatbase.co/chatbot-iframe/xuA-H0JZCY4Mo6tdF3tLM"
+    class="chatbot-iframe"
+    frameborder="0"
+  ></iframe>
+</div>
+
+  <!-- Chatbot Toggle Button -->
+  <div id="chatbotToggle" class="chatbot-toggle" onclick="toggleChatbot()">
+    🤖
+  </div>
+
+  <script>
+    // Initialize settings
+    let settings = {
+      darkTheme: false,
+      parentalControl: false,
+      sound: true,
+      brightness: 100
+    };
+    
+    // Timer variables
+    let timerInterval;
+    let challengeExpiryTime;
+    
+    // Load settings from localStorage if available
+    function loadSettings() {
+      const savedSettings = localStorage.getItem('mathChampSettings');
+      if (savedSettings) {
+        settings = JSON.parse(savedSettings);
+        applySettings();
+      }
+    }
+    
+    // Apply settings to UI
+    function applySettings() {
+      // Apply theme
+      if (settings.darkTheme) {
+        document.body.classList.add('dark-theme');
+        document.getElementById('theme-toggle').checked = true;
+      } else {
+        document.body.classList.remove('dark-theme');
+        document.getElementById('theme-toggle').checked = false;
+      }
+      
+      // Apply parental control
+      document.getElementById('parental-toggle').checked = settings.parentalControl;
+      
+      // Apply sound setting
+      document.getElementById('sound-toggle').checked = settings.sound;
+      
+      // Apply brightness
+      document.getElementById('brightness-slider').value = settings.brightness;
+      document.getElementById('brightness-value').textContent = settings.brightness;
+      document.body.style.filter = `brightness(${settings.brightness}%)`;
+    }
+    
+    // Save settings to localStorage
+    function saveSettings() {
+      settings.darkTheme = document.getElementById('theme-toggle').checked;
+      settings.parentalControl = document.getElementById('parental-toggle').checked;
+      settings.sound = document.getElementById('sound-toggle').checked;
+      settings.brightness = document.getElementById('brightness-slider').value;
+      
+      localStorage.setItem('mathChampSettings', JSON.stringify(settings));
+      applySettings();
+      closeSettings();
+    }
+    
+    // Modal functions
+    function openRewards() { 
+      document.getElementById("rewardsModal").style.display = "flex"; 
+    }
+    function closeRewards() { 
+      document.getElementById("rewardsModal").style.display = "none"; 
+    }
+    function openChallenge() { 
+      document.getElementById("challengeModal").style.display = "flex"; 
+    }
+    function closeChallenge() { 
+      document.getElementById("challengeModal").style.display = "none"; 
+      document.getElementById("feedback").textContent = ""; 
+      document.getElementById("doneBtn").style.display = "none"; 
+    }
+    function openSettings() {
+      document.getElementById("settingsModal").style.display = "flex";
+    }
+    function closeSettings() {
+      document.getElementById("settingsModal").style.display = "none";
+    }
+    
+    // Chatbot functions
+    function toggleChatbot() {
+      const chatbotContainer = document.getElementById("chatbotContainer");
+      const chatbotToggle = document.getElementById("chatbotToggle");
+      
+      if (chatbotContainer.style.display === "flex") {
+        chatbotContainer.style.display = "none";
+        chatbotToggle.style.display = "flex";
+      } else {
+        chatbotContainer.style.display = "flex";
+        chatbotToggle.style.display = "none";
+      }
+    }
+    
+    // Create confetti effect
+    function createConfetti() {
+      const colors = settings.darkTheme ? 
+        ['#64b5f6', '#42a5f5', '#5c6bc0', '#7986cb', '#90caf9'] : 
+        ['#f87171', '#60a5fa', '#34d399', '#fbbf24', '#a78bfa'];
+      
+      const confettiCount = 50;
+      
+      for (let i = 0; i < confettiCount; i++) {
+        const confetti = document.createElement('div');
+        confetti.className = 'confetti';
+        confetti.style.left = Math.random() * 100 + '%';
+        confetti.style.backgroundColor = colors[Math.floor(Math.random() * colors.length)];
+        confetti.style.width = Math.random() * 10 + 5 + 'px';
+        confetti.style.height = confetti.style.width;
+        confetti.style.opacity = Math.random() * 0.5 + 0.5;
+        confetti.style.animationDuration = Math.random() * 3 + 2 + 's';
+        confetti.style.animationDelay = Math.random() * 0.5 + 's';
+        document.body.appendChild(confetti);
+        
+        // Remove confetti after animation completes
+        setTimeout(() => {
+          confetti.remove();
+        }, 5000);
+      }
+    }
+    
+    // Brightness slider update
+    document.getElementById('brightness-slider').addEventListener('input', function() {
+      document.getElementById('brightness-value').textContent = this.value;
+    });
+    
+    // Fun fact functionality
+    function initializeFunFact() {
+      const facts = [
+        "✨ Today's Math Fact: Did you know? A circle has no corners—it goes round and round forever! From planets to bubbles to wheels, circles show that math is everywhere!",
+        "🌟 Today's Math Fact: The number zero was invented in India! Before zero, people had to use a blank space to show nothing.",
+        "🚀 Today's Math Fact: The word 'math' comes from 'mathema,' which means 'knowledge' in Greek!",
+        "🎈 Today's Math Fact: A pizza is a circle, and when you cut it, you're practicing fractions! Yummy math!",
+        "🦋 Today's Math Fact: Butterfly wings are the same on both sides - that's called symmetry, a cool math concept!",
+        "🎯 Today's Math Fact: The number 7 is considered lucky in many cultures around the world!",
+        "🌈 Today's Math Fact: Rainbows are actually circles! We only see half of them from the ground."
+      ];
+      
+      // Get today's date to use as a seed
+      const today = new Date();
+      const dayOfYear = Math.floor((today - new Date(today.getFullYear(), 0, 0)) / 86400000);
+      
+      // Calculate which fact to show based on the day
+      const factIndex = dayOfYear % facts.length;
+      
+      // Display the fact
+      const funFactText = document.getElementById('funFactText');
+      funFactText.textContent = facts[factIndex];
+      
+      // Store the current fact index to check if we need to update
+      localStorage.setItem('currentFactDate', today.toDateString());
+      localStorage.setItem('currentFactIndex', factIndex);
+    }
+    
+    // Add interactive fun fact box - now shows a random different fact on click
+    document.getElementById('funFactBox').addEventListener('click', function() {
+      const facts = [
+        "✨ Today's Math Fact: Did you know? A circle has no corners—it goes round and round forever! From planets to bubbles to wheels, circles show that math is everywhere!",
+        "🌟 Today's Math Fact: The number zero was invented in India! Before zero, people had to use a blank space to show nothing.",
+        "🚀 Today's Math Fact: The word 'math' comes from 'mathema,' which means 'knowledge' in Greek!",
+        "🎈 Today's Math Fact: A pizza is a circle, and when you cut it, you're practicing fractions! Yummy math!",
+        "🦋 Today's Math Fact: Butterfly wings are the same on both sides - that's called symmetry, a cool math concept!",
+        "🎯 Today's Math Fact: The number 7 is considered lucky in many cultures around the world!",
+        "🌈 Today's Math Fact: Rainbows are actually circles! We only see half of them from the ground."
+      ];
+      
+      const funFactText = document.getElementById('funFactText');
+      const currentFact = funFactText.textContent;
+      
+      // Get a random fact that's different from the current one
+      let newFact;
+      do {
+        newFact = facts[Math.floor(Math.random() * facts.length)];
+      } while (newFact === currentFact);
+      
+      funFactText.textContent = newFact;
+    });
+    
+    // Timer function for daily challenge
+    function startChallengeTimer() {
+      // Check if we have a saved expiry time
+      const savedExpiry = localStorage.getItem('challengeExpiryTime');
+      
+      if (savedExpiry) {
+        challengeExpiryTime = new Date(parseInt(savedExpiry));
+        
+        // If saved time is in the past, reset it
+        if (challengeExpiryTime <= new Date()) {
+          resetChallengeTimer();
+        }
+      } else {
+        // Set a new expiry time (24 hours from now)
+        resetChallengeTimer();
+      }
+      
+      // Update timer immediately
+      updateTimerDisplay();
+      
+      // Set up interval to update timer every second
+      timerInterval = setInterval(updateTimerDisplay, 1000);
+    }
+    
+    function resetChallengeTimer() {
+      // Set expiry time to 24 hours from now
+      challengeExpiryTime = new Date();
+      challengeExpiryTime.setHours(challengeExpiryTime.getHours() + 24);
+      
+      // Save to localStorage
+      localStorage.setItem('challengeExpiryTime', challengeExpiryTime.getTime().toString());
+      
+      // Reset question
+      setupDailyChallenge();
+    }
+    
+    function updateTimerDisplay() {
+      const now = new Date();
+      const timeLeft = challengeExpiryTime - now;
+      
+      if (timeLeft <= 0) {
+        // Timer has expired
+        clearInterval(timerInterval);
+        document.getElementById('timerCountdown').textContent = "EXPIRED!";
+        document.getElementById('timerCountdown').classList.add('timer-warning');
+        
+        // Reset timer and question
+        setTimeout(() => {
+          resetChallengeTimer();
+          startChallengeTimer();
+        }, 2000);
+        
+        return;
+      }
+      
+      // Calculate hours, minutes, seconds
+      const hours = Math.floor(timeLeft / (1000 * 60 * 60));
+      const minutes = Math.floor((timeLeft % (1000 * 60 * 60)) / (1000 * 60));
+      const seconds = Math.floor((timeLeft % (1000 * 60)) / 1000);
+      
+      // Format time display
+      const formattedTime = 
+        `${hours.toString().padStart(2, '0')}:${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}`;
+      
+      // Update display
+      document.getElementById('timerCountdown').textContent = formattedTime;
+      
+      // Add warning class if less than 1 hour remaining
+      if (hours === 0) {
+        document.getElementById('timerCountdown').classList.add('timer-warning');
+      } else {
+        document.getElementById('timerCountdown').classList.remove('timer-warning');
+      }
+    }
+    
+    // --- DAILY CHALLENGE LOGIC ---
+
+    const questionBank = [
+      {
+        question: "If you have 4 boxes of crayons and each box has 5 crayons, how many crayons do you have in total?",
+        options: ["9", "20", "25", "15"],
+        correctAnswer: "B"
+      },
+      {
+        question: "There are 3 wheels on a tricycle. How many wheels are there on 6 tricycles?",
+        options: ["9", "18", "12", "21"],
+        correctAnswer: "B"
+      },
+      {
+        question: "You have 12 cookies and you want to share them equally among 4 friends. How many cookies does each friend get?",
+        options: ["2", "3", "4", "6"],
+        correctAnswer: "B"
+      },
+      {
+        question: "A farmer has 15 carrots. He puts 5 carrots in each bunch. How many bunches can he make?",
+        options: ["2", "3", "5", "10"],
+        correctAnswer: "B"
+      },
+      {
+        question: "An ice cream costs ₹30. If you pay with a ₹50 note, how much change will you get back?",
+        options: ["₹10", "₹20", "₹30", "₹40"],
+        correctAnswer: "B"
+      },
+      {
+        question: "You buy a pencil for ₹8 and an eraser for ₹5. How much money do you spend in total?",
+        options: ["₹12", "₹13", "₹14", "₹15"],
+        correctAnswer: "B"
+      },
+      {
+        question: "What number is ten more than 87?",
+        options: ["77", "97", "88", "90"],
+        correctAnswer: "B"
+      },
+      {
+        question: "Write number three hundred and forty-two in digits.",
+        options: ["3024", "324", "342", "432"],
+        correctAnswer: "C"
+      },
+      {
+        question: "Which number is bigger: 429 or 482?",
+        options: ["429", "482", "They are equal", "I don't know"],
+        correctAnswer: "B"
+      },
+      {
+        question: "Lily had 25 stickers. Her friend gave her 10 more. Then, she gave 5 to her brother. How many does she have left?",
+        options: ["20", "30", "35", "40"],
+        correctAnswer: "B"
+      },
+      {
+        question: "A pack of gum has 5 pieces. If you buy 3 packs, how many pieces? If your friend gives you 2 more, how many now?",
+        options: ["15", "17", "10", "12"],
+        correctAnswer: "B"
+      },
+      {
+        question: "There are 20 children in a class, put into 4 equal teams. How many per team? If 2 go home, how many left on that team?",
+        options: ["5, 3", "4, 2", "6, 4", "5, 2"],
+        correctAnswer: "A"
+      },
+      {
+        question: "What number comes next in this pattern: 5, 10, 15, 20, ___?",
+        options: ["15", "25", "30", "35"],
+        correctAnswer: "B"
+      },
+      {
+        question: "Look at this pattern of shapes: Circle, Square, Triangle, Circle, Square, ___. What shape comes next?",
+        options: ["Circle", "Square", "Triangle", "Star"],
+        correctAnswer: "C"
+      },
+      {
+        question: "Find the missing number in this pattern: 2, 4, 6, ___, 10, 12.",
+        options: ["5", "7", "8", "9"],
+        correctAnswer: "C"
+      }
+    ];
+
+    let currentDailyQuestion = null;
+
+    function getDailyQuestion() {
+      // Get current date (year-month-day)
+      const today = new Date();
+      const dateString = today.getFullYear() + '-' + (today.getMonth() + 1) + '-' + today.getDate();
+      
+      // Use date string to create a simple hash
+      let hash = 0;
+      for (let i = 0; i < dateString.length; i++) {
+        hash = ((hash << 5) - hash) + dateString.charCodeAt(i);
+        hash |= 0; // Convert to 32bit integer
+      }
+      
+      // Use absolute value of hash to select a question
+      const questionIndex = Math.abs(hash) % questionBank.length;
+      return questionBank[questionIndex];
+    }
+
+    function setupDailyChallenge() {
+      currentDailyQuestion = getDailyQuestion();
+      
+      // Update challenge card text
+      const cardText = document.getElementById('challenge-card-text');
+      // Truncate question for card if it's too long
+      cardText.textContent = currentDailyQuestion.question.length > 50 
+        ? currentDailyQuestion.question.substring(0, 47) + '...' 
+        : currentDailyQuestion.question;
+
+      // Update modal question and options
+      const modalQuestion = document.getElementById('challenge-modal-question');
+      modalQuestion.textContent = currentDailyQuestion.question;
+
+      const modalOptions = document.getElementById('challenge-modal-options');
+      modalOptions.innerHTML = ''; // Clear existing options
+
+      currentDailyQuestion.options.forEach((option, index) => {
+        const button = document.createElement('button');
+        const letter = String.fromCharCode(65 + index); // A, B, C, D
+        button.textContent = `${letter}. ${option}`;
+        button.onclick = () => checkAnswer(letter);
+        modalOptions.appendChild(button);
+      });
+    }
+
+    function checkAnswer(choice) {
+      const feedback = document.getElementById("feedback");
+      const doneBtn = document.getElementById("doneBtn");
+      if (choice === currentDailyQuestion.correctAnswer) {
+        feedback.textContent = "✅ Correct! You're a math superstar!"; 
+        feedback.style.color = "green";
+        createConfetti();
+      } else { 
+        feedback.textContent = "❌ Oops! That's not it. Try again tomorrow!"; 
+        feedback.style.color = "red"; 
+      }
+      doneBtn.style.display = "inline-block";
+    }
+
+    // Load settings and set daily question on page load
+    window.onload = function() {
+      loadSettings();
+      // Initialize chatbot as hidden
+      document.getElementById("chatbotContainer").style.display = "none";
+      
+      // Check if we need to update the fun fact
+      const today = new Date().toDateString();
+      const lastFactDate = localStorage.getItem('currentFactDate');
+      
+      if (lastFactDate !== today) {
+        // It's a new day, update the fun fact
+        initializeFunFact();
+      } else {
+        // It's the same day, keep the current fact
+        const factIndex = localStorage.getItem('currentFactIndex');
+        if (factIndex !== null) {
+          const facts = [
+            "✨ Today's Math Fact: Did you know? A circle has no corners—it goes round and round forever! From planets to bubbles to wheels, circles show that math is everywhere!",
+            "🌟 Today's Math Fact: The number zero was invented in India! Before zero, people had to use a blank space to show nothing.",
+            "🚀 Today's Math Fact: The word 'math' comes from 'mathema,' which means 'knowledge' in Greek!",
+            "🎈 Today's Math Fact: A pizza is a circle, and when you cut it, you're practicing fractions! Yummy math!",
+            "🦋 Today's Math Fact: Butterfly wings are the same on both sides - that's called symmetry, a cool math concept!",
+            "🎯 Today's Math Fact: The number 7 is considered lucky in many cultures around the world!",
+            "🌈 Today's Math Fact: Rainbows are actually circles! We only see half of them from the ground."
+          ];
+          
+          const funFactText = document.getElementById('funFactText');
+          funFactText.textContent = facts[factIndex];
+        }
+      }
+      
+      // Set up daily challenge
+      setupDailyChallenge();
+      // Start timer
+      startChallengeTimer();
+    };
+  </script>
+</body>
+</html>
