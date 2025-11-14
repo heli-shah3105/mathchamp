@@ -3,636 +3,948 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>MathChamp Adventure — Learning is Fun!</title>
-  <link href="https://fonts.googleapis.com/css2?family=Fredoka+One&family=Nunito:wght@400;700&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+  <title>MathChamp - Super Fun Math Adventure!</title>
   <style>
-    * {
-      box-sizing: border-box;
-    }
+    @import url('https://fonts.googleapis.com/css2?family=Fredoka:wght@400;600;700&display=swap');
     
     body {
       margin: 0;
-      font-family: 'Nunito', sans-serif;
-      background: linear-gradient(135deg, #8A2BE2 0%, #00BFFF 50%, #00FF7F 100%);
+      font-family: 'Fredoka', sans-serif;
+      background: linear-gradient(135deg, #ff9a9e 0%, #fad0c4 25%, #fad0c4 50%, #a1c4fd 75%, #c2e9fb 100%);
+      background-size: 400% 400%;
+      animation: gradientShift 15s ease infinite;
       color: #333;
-      min-height: 100vh;
-      position: relative;
       overflow-x: hidden;
+      min-height: 100vh;
+      transition: background 0.3s ease, color 0.3s ease;
+      display: flex;
+      flex-direction: column;
     }
     
-    /* Floating math symbols in background */
-    .math-symbols {
-      position: fixed;
-      top: 0;
-      left: 0;
-      width: 100%;
-      height: 100%;
-      pointer-events: none;
-      z-index: 0;
-      overflow: hidden;
+    body.dark-theme {
+      background: linear-gradient(135deg, #1a237e 0%, #283593 50%, #3949ab 100%);
+      color: #e0e0e0;
     }
     
-    .math-symbol {
+    @keyframes gradientShift {
+      0% { background-position: 0% 50%; }
+      50% { background-position: 100% 50%; }
+      100% { background-position: 0% 50%; }
+    }
+
+    .shape {
       position: absolute;
-      font-size: 2rem;
-      color: rgba(255, 255, 255, 0.2);
-      animation: float 15s infinite linear;
-      font-weight: bold;
+      z-index: 0;
+      opacity: 0.4;
+      animation: float 20s infinite ease-in-out;
+    }
+    
+    .circle {
+      border-radius: 50%;
+      background: linear-gradient(45deg, #ff6ec4, #7873f5);
+    }
+    
+    .triangle {
+      width: 0;
+      height: 0;
+      border-left: 30px solid transparent;
+      border-right: 30px solid transparent;
+      border-bottom: 60px solid #4ade80;
+    }
+    
+    .square {
+      background: linear-gradient(45deg, #facc15, #f97316);
+    }
+    
+    body.dark-theme .circle {
+      background: linear-gradient(45deg, #64b5f6, #42a5f5);
+    }
+
+    body.dark-theme .triangle {
+      border-bottom-color: #64b5f6;
+    }
+
+    body.dark-theme .square {
+      background: linear-gradient(45deg, #5c6bc0, #7986cb);
     }
     
     @keyframes float {
-      0% {
-        transform: translateY(100vh) rotate(0deg);
-        opacity: 0;
-      }
-      10% {
-        opacity: 1;
-      }
-      90% {
-        opacity: 1;
-      }
-      100% {
-        transform: translateY(-100px) rotate(360deg);
-        opacity: 0;
-      }
+      0%, 100% { transform: translateY(0) rotate(0deg); }
+      50% { transform: translateY(-20px) rotate(10deg); }
     }
-    
-    header {
-      background: rgba(255, 255, 255, 0.9);
-      border-bottom: 4px solid #FF6B6B;
-      padding: 15px 20px;
+
+    .header {
       display: flex;
       justify-content: space-between;
       align-items: center;
+      padding: 15px 25px;
+      background: rgba(255, 255, 255, 0.9);
+      border-bottom: 2px dashed #f87171;
+      border-radius: 0 0 20px 20px;
       box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
       position: relative;
       z-index: 10;
+      transition: background 0.3s ease, border-color 0.3s ease;
     }
-    
+
+    body.dark-theme .header {
+      background: rgba(30, 41, 59, 0.9);
+      border-bottom: 2px dashed #64b5f6;
+    }
+
     .brand {
       display: flex;
       align-items: center;
-      gap: 15px;
-      font-family: 'Fredoka One', cursive;
-      font-size: 24px;
-      text-decoration: none;
-      color: #FF6B6B;
-      text-shadow: 2px 2px 0px rgba(0,0,0,0.1);
+      gap: 12px;
+      font-weight: 700;
+      font-size: 26px;
+      color: #333;
+      text-shadow: 2px 2px 0px #f87171;
+      transition: color 0.3s ease, text-shadow 0.3s ease;
+    }
+    
+    body.dark-theme .brand {
+      color: #e0e0e0;
+      text-shadow: 2px 2px 0px #64b5f6;
     }
     
     .brand-logo {
       width: 40px;
       height: 40px;
       border-radius: 50%;
-      background: conic-gradient(
-        from 180deg,
-        #FF6B6B,
-        #4ECDC4,
-        #FFE66D,
-        #FF9F1C,
-        #6A0572,
-        #AB83A1,
-        #FF6B6B
-      );
-      box-shadow: 0 0 15px rgba(255,107,107,.6),
-                  0 0 25px rgba(78,205,196,.5),
-                  0 0 35px rgba(255,230,109,.45);
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      color: white;
-      font-size: 20px;
+      background: conic-gradient(from 180deg,#ff6ec4,#7873f5,#4ade80,#22d3ee,#facc15,#f97316,#ff6ec4);
+      box-shadow: 0 0 15px rgba(120,115,245,0.7);
       animation: pulse 2s infinite;
+      transition: background 0.3s ease, box-shadow 0.3s ease;
+    }
+    
+    body.dark-theme .brand-logo {
+      background: conic-gradient(from 180deg,#64b5f6,#42a5f5,#5c6bc0,#7986cb,#64b5f6,#42a5f5,#64b5f6);
+      box-shadow: 0 0 15px rgba(100,181,246,0.7);
     }
     
     @keyframes pulse {
-      0% { transform: scale(1); }
-      50% { transform: scale(1.1); }
-      100% { transform: scale(1); }
+      0% { box-shadow: 0 0 0 0 rgba(120,115,245,0.7); }
+      70% { box-shadow: 0 0 0 15px rgba(120,115,245,0); }
+      100% { box-shadow: 0 0 0 0 rgba(120,115,245,0); }
+    }
+
+    .right-controls { 
+      display: flex; 
+      align-items: center; 
+      gap: 16px; 
+    }
+    .settings-btn, .avatar, .chatbot-btn {
+      width: 42px; 
+      height: 42px;
+      border-radius: 50%;
+      display:flex; 
+      align-items:center; 
+      justify-content:center;
+      font-weight:bold; 
+      cursor:pointer;
+      transition: all 0.3s ease;
+    }
+    .settings-btn { 
+      background:#f87171; 
+      font-size:20px;
+      box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+    }
+
+    body.dark-theme .settings-btn {
+      background: #64b5f6;
     }
     
-    main {
-      max-width: 1000px;
-      margin: 30px auto;
-      padding: 0 20px;
+    .settings-btn:hover { 
+      background:#ef4444;
+      transform: rotate(30deg);
+    }
+
+    body.dark-theme .settings-btn:hover {
+      background: #42a5f5;
+    }
+    
+    .avatar { 
+      background:#8b5cf6; 
+      color:#fff;
+      font-size:18px;
+      box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+    }
+
+    body.dark-theme .avatar {
+      background: #5c6bc0;
+    }
+    
+    .avatar:hover {
+      transform: scale(1.1);
+    }
+    .chatbot-btn {
+      background:#4ade80;
+      font-size:20px;
+      box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+    }
+
+    body.dark-theme .chatbot-btn {
+      background: #5c6bc0;
+    }
+    
+    .chatbot-btn:hover {
+      background:#22c55e;
+      transform: scale(1.1);
+    }
+
+    body.dark-theme .chatbot-btn:hover {
+      background: #7986cb;
+    }
+
+    .main-content {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+      position: relative;
+      z-index: 5;
+      padding: 20px;
+      gap: 30px;
+    }
+
+    .page-title {
+      font-size: 48px;
+      font-weight: 700;
+      color: #333;
+      text-shadow: 3px 3px 0px rgba(255, 107, 107, 0.3);
+      animation: titleFloat 3s ease-in-out infinite;
+      margin: 0;
+      padding: 20px;
+      text-align: center;
+      transition: color 0.3s ease, text-shadow 0.3s ease;
+    }
+
+    body.dark-theme .page-title {
+      color: #e0e0e0;
+      text-shadow: 3px 3px 0px rgba(100, 181, 246, 0.3);
+    }
+
+    @keyframes titleFloat {
+      0%, 100% { 
+        transform: translateY(0) scale(1); 
+      }
+      50% { 
+        transform: translateY(-15px) scale(1.05); 
+      }
+    }
+
+    .topic-boxes-container {
+      display: flex;
+      flex-direction: column;
+      gap: 25px;
+      width: 100%;
+      max-width: 1200px;
+    }
+
+    .topic-row {
+      display: flex;
+      justify-content: center;
+      gap: 25px;
+      flex-wrap: wrap;
+    }
+
+    .topic-box {
+      width: 220px;
+      height: 220px;
+      background: rgba(255, 255, 255, 0.9);
+      border-radius: 25px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      text-align: center;
+      font-size: 22px;
+      font-weight: 700;
+      color: #333;
+      text-decoration: none;
+      box-shadow: 0 10px 25px rgba(0, 0, 0, 0.15);
+      transition: all 0.3s ease;
+      cursor: pointer;
+      position: relative;
+      overflow: hidden;
+      padding: 20px;
+    }
+
+    body.dark-theme .topic-box {
+      background: rgba(30, 41, 59, 0.9);
+      color: #e0e0e0;
+      box-shadow: 0 10px 25px rgba(0, 0, 0, 0.3);
+    }
+
+    .topic-box:hover {
+      transform: translateY(-8px) scale(1.05);
+      box-shadow: 0 15px 35px rgba(0, 0, 0, 0.2);
+    }
+
+    body.dark-theme .topic-box:hover {
+      box-shadow: 0 15px 35px rgba(0, 0, 0, 0.4);
+    }
+
+    .topic-icon {
+      font-size: 48px;
+      margin-bottom: 15px;
+      display: block;
+    }
+
+    .topic-text {
+      margin: 0;
+      line-height: 1.3;
+    }
+
+    .topic-box:nth-child(1) {
+      background: linear-gradient(135deg, rgba(255, 154, 158, 0.9), rgba(255, 182, 193, 0.9));
+    }
+
+    body.dark-theme .topic-box:nth-child(1) {
+      background: linear-gradient(135deg, rgba(239, 83, 80, 0.9), rgba(229, 57, 53, 0.9));
+    }
+
+    .topic-box:nth-child(2) {
+      background: linear-gradient(135deg, rgba(74, 222, 128, 0.9), rgba(134, 239, 172, 0.9));
+    }
+
+    body.dark-theme .topic-box:nth-child(2) {
+      background: linear-gradient(135deg, rgba(56, 142, 60, 0.9), rgba(76, 175, 80, 0.9));
+    }
+
+    .topic-box:nth-child(3) {
+      background: linear-gradient(135deg, rgba(251, 191, 36, 0.9), rgba(252, 211, 77, 0.9));
+    }
+
+    body.dark-theme .topic-box:nth-child(3) {
+      background: linear-gradient(135deg, rgba(245, 124, 0, 0.9), rgba(255, 160, 0, 0.9));
+    }
+
+    .topic-box:nth-child(4) {
+      background: linear-gradient(135deg, rgba(139, 92, 246, 0.9), rgba(167, 139, 250, 0.9));
+    }
+
+    body.dark-theme .topic-box:nth-child(4) {
+      background: linear-gradient(135deg, rgba(103, 58, 183, 0.9), rgba(124, 77, 255, 0.9));
+    }
+
+    .topic-box:nth-child(5) {
+      background: linear-gradient(135deg, rgba(236, 72, 153, 0.9), rgba(244, 114, 182, 0.9));
+    }
+
+    body.dark-theme .topic-box:nth-child(5) {
+      background: linear-gradient(135deg, rgba(194, 24, 91, 0.9), rgba(233, 30, 99, 0.9));
+    }
+
+    .topic-box:nth-child(6) {
+      background: linear-gradient(135deg, rgba(59, 130, 246, 0.9), rgba(96, 165, 250, 0.9));
+    }
+
+    body.dark-theme .topic-box:nth-child(6) {
+      background: linear-gradient(135deg, rgba(30, 64, 175, 0.9), rgba(66, 165, 245, 0.9));
+    }
+
+    .topic-box::before {
+      content: '';
+      position: absolute;
+      top: -50%;
+      left: -50%;
+      width: 200%;
+      height: 200%;
+      background: linear-gradient(
+        45deg,
+        transparent 30%,
+        rgba(255, 255, 255, 0.3) 50%,
+        transparent 70%
+      );
+      transform: rotate(45deg);
+      transition: all 0.6s ease;
+      opacity: 0;
+    }
+
+    .topic-box:hover::before {
+      animation: shimmer 0.6s ease;
+    }
+
+    @keyframes shimmer {
+      0% {
+        transform: translateX(-100%) translateY(-100%) rotate(45deg);
+        opacity: 0;
+      }
+      50% {
+        opacity: 1;
+      }
+      100% {
+        transform: translateX(100%) translateY(100%) rotate(45deg);
+        opacity: 0;
+      }
+    }
+
+    .footer {
+      padding: 20px;
+      text-align: center;
       position: relative;
       z-index: 5;
     }
-    
-    .page-title {
-      text-align: center;
-      font-family: 'Fredoka One', cursive;
-      font-size: 36px;
-      color: white;
-      text-shadow: 3px 3px 0px rgba(0,0,0,0.2);
-      margin-bottom: 30px;
-      animation: bounce 2s infinite;
-    }
-    
-    @keyframes bounce {
-      0%, 100% { transform: translateY(0); }
-      50% { transform: translateY(-15px); }
-    }
-    
-    .controls {
-      display: flex;
-      justify-content: space-between;
-      margin-bottom: 30px;
-      background: rgba(255, 255, 255, 0.9);
-      padding: 15px;
-      border-radius: 20px;
-      box-shadow: 0 8px 16px rgba(0,0,0,0.1);
-    }
-    
-    .search {
-      position: relative;
-      flex-grow: 1;
-      max-width: 500px;
-    }
-    
-    .search input {
-      padding: 12px 18px 12px 45px;
-      border: 3px solid #4ECDC4;
-      border-radius: 50px;
-      width: 100%;
-      font-size: 16px;
-      font-family: 'Nunito', sans-serif;
-      transition: all 0.3s;
-      box-shadow: 0 4px 8px rgba(0,0,0,0.1);
-    }
-    
-    .search input:focus {
-      outline: none;
-      border-color: #FF6B6B;
-      box-shadow: 0 0 0 5px rgba(255,107,107,0.3);
-    }
-    
-    .search-icon {
-      position: absolute;
-      left: 16px;
-      top: 50%;
-      transform: translateY(-50%);
-      color: #4ECDC4;
-      font-size: 18px;
-    }
-    
-    .filters button {
-      padding: 10px 18px;
-      border: none;
-      border-radius: 50px;
-      background: #FF9F1C;
-      color: white;
-      font-weight: bold;
-      font-size: 14px;
-      cursor: pointer;
-      transition: all 0.3s;
-      box-shadow: 0 4px 8px rgba(0,0,0,0.1);
-      display: flex;
+
+    .prev-page-btn {
+      display: inline-flex;
       align-items: center;
       gap: 8px;
+      padding: 12px 24px;
+      background: linear-gradient(135deg, #f87171, #ef4444);
+      color: white;
+      border: none;
+      border-radius: 30px;
+      font-family: 'Fredoka', sans-serif;
+      font-size: 18px;
+      font-weight: 600;
+      cursor: pointer;
+      text-decoration: none;
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+      transition: all 0.3s ease;
     }
-    
-    .filters button:hover {
-      background: #FF6B6B;
-      transform: translateY(-3px);
-      box-shadow: 0 6px 12px rgba(0,0,0,0.15);
+
+    body.dark-theme .prev-page-btn {
+      background: linear-gradient(135deg, #64b5f6, #42a5f5);
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
     }
-    
-    .cards {
-      display: grid;
-      grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
-      gap: 20px;
+
+    .prev-page-btn:hover {
+      transform: translateY(-3px) scale(1.05);
+      box-shadow: 0 6px 16px rgba(0, 0, 0, 0.2);
     }
-    
-    .card {
+
+    body.dark-theme .prev-page-btn:hover {
+      box-shadow: 0 6px 16px rgba(0, 0, 0, 0.4);
+    }
+
+    .prev-page-btn:active {
+      transform: translateY(-1px) scale(1.02);
+    }
+
+    .chatbot-container {
+      position: fixed;
+      bottom: 20px;
+      right: 20px;
+      width: 400px;
+      height: 600px;
       background: white;
       border-radius: 20px;
-      padding: 16px;
-      display: flex;
+      box-shadow: 0 10px 25px rgba(0,0,0,0.2);
+      z-index: 1001;
+      display: none;
       flex-direction: column;
-      transition: all 0.3s;
-      box-shadow: 0 8px 16px rgba(0,0,0,0.1);
-      position: relative;
       overflow: hidden;
+      transition: all 0.3s ease;
+    }
+
+    body.dark-theme .chatbot-container {
+      background: #1e293b;
+      box-shadow: 0 10px 25px rgba(0, 0, 0, 0.4);
+    }
+    
+    .chatbot-header {
+      background: linear-gradient(135deg, #8b5cf6, #6366f1);
+      color: white;
+      padding: 15px;
+      font-weight: bold;
+      font-size: 18px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    body.dark-theme .chatbot-header {
+      background: linear-gradient(135deg, #42a5f5, #5c6bc0);
+    }
+    
+    .chatbot-close {
+      cursor: pointer;
+      font-size: 20px;
+      transition: transform 0.3s ease;
+    }
+    
+    .chatbot-close:hover {
+      transform: rotate(90deg);
+    }
+    
+    .chatbot-iframe {
+      flex-grow: 1;
+      width: 100%;
+      border: none;
       height: 100%;
     }
     
-    .card::before {
-      content: '';
+    .chatbot-toggle {
+      position: fixed;
+      bottom: 30px;
+      right: 30px;
+      width: 60px;
+      height: 60px;
+      background: linear-gradient(135deg, #4ade80, #22c55e);
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: white;
+      font-size: 24px;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.2);
+      cursor: pointer;
+      z-index: 1000;
+      transition: all 0.3s ease;
+    }
+
+    body.dark-theme .chatbot-toggle {
+      background: linear-gradient(135deg, #42a5f5, #5c6bc0);
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.4);
+    }
+    
+    .chatbot-toggle:hover {
+      transform: scale(1.1);
+      box-shadow: 0 6px 16px rgba(0,0,0,0.3);
+    }
+
+    body.dark-theme .chatbot-toggle:hover {
+      box-shadow: 0 6px 16px rgba(0, 0, 0, 0.5);
+    }
+    
+    .modal { 
+      display:none; 
+      position:fixed; 
+      z-index:1000; 
+      left:0; top:0; 
+      width:100%; height:100%; 
+      background:rgba(0,0,0,0.6); 
+      justify-content:center; 
+      align-items:center;
+      backdrop-filter: blur(5px);
+    }
+    .modal-content {
+      background:#fff; 
+      border-radius:20px; 
+      padding:25px;
+      width:90%; 
+      max-width:450px; 
+      box-shadow:0 15px 30px rgba(0,0,0,0.3);
+      text-align:center; 
+      position:relative; 
+      animation: popIn 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+      transition: background 0.3s ease, color 0.3s ease;
+    }
+
+    body.dark-theme .modal-content {
+      background: #1e293b;
+      color: #e0e0e0;
+    }
+    
+    .close { 
+      position:absolute; 
+      top:15px; 
+      right:20px; 
+      font-size:28px; 
+      font-weight:bold; 
+      cursor:pointer;
+      color: #ef4444;
+      transition: all 0.3s ease;
+    }
+
+    body.dark-theme .close {
+      color: #ef5350;
+    }
+    
+    .close:hover {
+      transform: rotate(90deg);
+    }
+    
+    .settings-option {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin: 15px 0;
+    }
+    
+    .toggle-switch {
+      position: relative;
+      display: inline-block;
+      width: 60px;
+      height: 30px;
+    }
+    
+    .toggle-switch input {
+      opacity: 0;
+      width: 0;
+      height: 0;
+    }
+    
+    .slider {
       position: absolute;
+      cursor: pointer;
       top: 0;
       left: 0;
+      right: 0;
+      bottom: 0;
+      background-color: #ccc;
+      transition: .4s;
+      border-radius: 34px;
+    }
+    
+    .slider:before {
+      position: absolute;
+      content: "";
+      height: 22px;
+      width: 22px;
+      left: 4px;
+      bottom: 4px;
+      background-color: white;
+      transition: .4s;
+      border-radius: 50%;
+    }
+    
+    input:checked + .slider {
+      background-color: #8b5cf6;
+    }
+    
+    input:checked + .slider:before {
+      transform: translateX(30px);
+    }
+    
+    .brightness-container {
+      margin: 15px 0;
+    }
+    
+    .brightness-slider {
       width: 100%;
-      height: 8px;
-      background: linear-gradient(90deg, #FF6B6B, #4ECDC4, #FFE66D, #FF9F1C);
-      background-size: 300% 300%;
-      animation: gradient 3s ease infinite;
+      margin-top: 10px;
     }
     
-    @keyframes gradient {
-      0% { background-position: 0% 50%; }
-      50% { background-position: 100% 50%; }
-      100% { background-position: 0% 50%; }
+    .brightness-value {
+      font-weight: bold;
     }
     
-    .card:hover {
-      transform: translateY(-10px) scale(1.02);
-      box-shadow: 0 15px 30px rgba(0,0,0,0.15);
-    }
-    
-    .card-icon {
-      font-size: 40px;
-      margin-bottom: 12px;
-      text-align: center;
-    }
-    
-    .card[data-title="Numbers and counting"] .card-icon {
-      color: #FF6B6B;
-    }
-    
-    .card[data-title="Comparing & Sorting"] .card-icon {
-      color: #4ECDC4;
-    }
-    
-    .card[data-title="Patterns, Shapes and Space"] .card-icon {
-      color: #FFE66D;
-    }
-    
-    .card[data-title="Measurements"] .card-icon {
-      color: #FF9F1C;
-    }
-    
-    .card[data-title="Basic addition-subtraction"] .card-icon {
-      color: #6A0572;
-    }
-    
-    .card[data-title="Problem solving"] .card-icon {
-      color: #AB83A1;
-    }
-    
-    .card[data-title="Geometry"] .card-icon {
-      color: #3A86FF;
-    }
-    
-    .card[data-title="Multiplication & Division"] .card-icon {
-      color: #FB5607;
-    }
-    
-    .card[data-title="Fractions and Decimals"] .card-icon {
-      color: #8338EC;
-    }
-    
-    .card[data-title="Data and Graphs"] .card-icon {
-      color: #3A86FF;
-    }
-    
-    .meta {
+    .settings-buttons {
       display: flex;
-      flex-direction: column;
-      gap: 8px;
-      margin-bottom: 16px;
-      flex-grow: 1;
+      justify-content: space-between;
+      margin-top: 20px;
     }
     
-    .title {
-      font-family: 'Fredoka One', cursive;
-      font-size: 18px;
-      color: #333;
-      text-align: center;
-      margin: 0;
-    }
-    
-    .stats {
-      color: #666;
-      font-size: 12px;
-      text-align: center;
-    }
-    
-    .preview-btn {
-      display: block;
-      padding: 10px 16px;
-      border-radius: 50px;
-      background: linear-gradient(90deg, #FF6B6B, #4ECDC4);
+    .save-btn, .cancel-btn {
+      padding: 10px 20px;
       border: none;
-      color: white;
+      border-radius: 10px;
       font-weight: bold;
-      text-decoration: none;
-      transition: all 0.3s;
-      text-align: center;
-      box-shadow: 0 4px 8px rgba(0,0,0,0.1);
-      font-size: 14px;
-      margin-top: auto;
+      cursor: pointer;
+      transition: all 0.3s ease;
     }
     
-    .preview-btn:hover {
+    .save-btn {
+      background: linear-gradient(135deg, #22c55e, #16a34a);
+      color: white;
+    }
+    
+    .cancel-btn {
+      background: linear-gradient(135deg, #f87171, #ef4444);
+      color: white;
+    }
+
+    body.dark-theme .save-btn {
+      background: linear-gradient(135deg, #42a5f5, #5c6bc0);
+    }
+
+    body.dark-theme .cancel-btn {
+      background: linear-gradient(135deg, #ef5350, #e53935);
+    }
+    
+    .save-btn:hover, .cancel-btn:hover {
       transform: translateY(-3px);
-      box-shadow: 0 6px 12px rgba(0,0,0,0.15);
+      box-shadow: 0 5px 10px rgba(0,0,0,0.2);
     }
-    
-    .nav-buttons {
-      display: flex;
-      justify-content: center;
-      margin: 40px auto;
-      max-width: 900px;
+
+    body.dark-theme .save-btn:hover,
+    body.dark-theme .cancel-btn:hover {
+      box-shadow: 0 5px 10px rgba(0, 0, 0, 0.4);
     }
-    
-    .nav-buttons a {
-      display: inline-flex;
-      align-items: center;
-      gap: 10px;
-      padding: 12px 24px;
-      background: #FF6B6B;
-      color: white;
-      font-family: 'Fredoka One', cursive;
-      font-size: 16px;
-      border-radius: 50px;
-      text-decoration: none;
-      text-align: center;
-      transition: all 0.3s;
-      box-shadow: 0 8px 16px rgba(0,0,0,0.1);
+
+    @keyframes popIn { 
+      from { transform:scale(0.7); opacity:0; } 
+      to { transform:scale(1); opacity:1; } 
     }
-    
-    .nav-buttons a:hover {
-      background: #FF5252;
-      transform: translateY(-5px);
-      box-shadow: 0 12px 24px rgba(0,0,0,0.15);
-    }
-    
-    .no-results {
-      text-align: center;
-      padding: 60px 20px;
-      color: white;
-      font-size: 20px;
-      font-family: 'Fredoka One', cursive;
-      display: none;
-      background: rgba(255, 255, 255, 0.2);
-      border-radius: 20px;
-      margin: 20px 0;
-    }
-    
-    .highlight {
-      background-color: #FFE66D;
-      padding: 0 5px;
-      border-radius: 4px;
-      font-weight: bold;
-    }
-    
-    @media (max-width: 768px) {
-      .brand {
-        font-size: 20px;
-      }
-      
-      .brand-logo {
-        width: 35px;
-        height: 35px;
-      }
-      
+
+    @media(max-width: 768px) {
       .page-title {
-        font-size: 28px;
+        font-size: 36px;
       }
-      
-      .controls {
-        flex-direction: column;
+      .topic-box {
+        width: 180px;
+        height: 180px;
+        font-size: 18px;
+      }
+      .topic-icon {
+        font-size: 36px;
+      }
+      .topic-row {
         gap: 15px;
       }
-      
-      .search {
-        max-width: 100%;
+      .chatbot-container {
+        width: 90%;
+        height: 70%;
+        bottom: 10px;
+        right: 5%;
+        left: 5%;
       }
-      
-      .cards {
-        grid-template-columns: 1fr;
+      .prev-page-btn {
+        font-size: 16px;
+        padding: 10px 20px;
+      }
+    }
+
+    @media(max-width: 480px) {
+      .topic-box {
+        width: 150px;
+        height: 150px;
+        font-size: 16px;
+        padding: 15px;
+      }
+      .topic-icon {
+        font-size: 32px;
+        margin-bottom: 10px;
+      }
+      .prev-page-btn {
+        font-size: 14px;
+        padding: 8px 16px;
       }
     }
   </style>
 </head>
 <body>
-  <!-- Floating math symbols in background -->
-  <div class="math-symbols" id="mathSymbols"></div>
-  
-  <header>
-    <a href="#" class="brand">
-      <div class="brand-logo">+</div>
-      MathChamp Adventure
-    </a>
+  <!-- Floating shapes for background -->
+  <div class="shape circle" style="width: 80px; height: 80px; top: 10%; left: 5%;"></div>
+  <div class="shape triangle" style="top: 20%; right: 10%;"></div>
+  <div class="shape square" style="width: 60px; height: 60px; bottom: 30%; left: 8%;"></div>
+  <div class="shape circle" style="width: 50px; height: 50px; bottom: 20%; right: 15%;"></div>
+  <div class="shape triangle" style="top: 60%; left: 15%;"></div>
+
+  <header class="header">
+    <div class="brand">
+      <div class="brand-logo"></div> MathChamp
+    </div>
+    <div class="right-controls">
+      <div class="settings-btn" title="Settings" onclick="openSettings()">⚙️</div>
+      <div class="chatbot-btn" title="Math Helper" onclick="toggleChatbot()">🤖</div>
+      <div class="avatar" title="Profile">HS</div>
+    </div>
   </header>
 
-  <main>
-    <h1 class="page-title">Super Math Lessons! 🚀</h1>
+  <div class="main-content">
+    <h1 class="page-title">Choose a topic!</h1>
     
-    <div class="controls">
-      <div class="search">
-        <span class="search-icon"><i class="fas fa-search"></i></span>
-        <input type="text" id="searchInput" placeholder="Search for cool math lessons...">
-      </div>
-      <div class="filters">
-        <button><i class="fas fa-filter"></i> FILTERS</button>
-      </div>
-    </div>
-
-    <div class="cards" id="cardsContainer">
-      <div class="card" data-title="Numbers and counting">
-        <div class="card-icon"><i class="fas fa-sort-numeric-up"></i></div>
-        <div class="meta">
-          <h3 class="title">Numbers and counting</h3>
-          <div class="stats">Language: EN • Author: Admin • Sep 19, 2025</div>
-        </div>
-        <a class="preview-btn" href="nums n counting.pdf" target="_blank">
-          <i class="fas fa-play-circle"></i> START LEARNING!
+    <div class="topic-boxes-container">
+      <div class="topic-row">
+        <a href="pg14.html" class="topic-box">
+          <span class="topic-icon">🔢</span>
+          <span class="topic-text">Basic Counting</span>
+        </a>
+        <a href="pg12.html" class="topic-box">
+          <span class="topic-icon">🔺</span>
+          <span class="topic-text">Shapes</span>
+        </a>
+        <a href="pg16.html" class="topic-box">
+          <span class="topic-icon">⚖️</span>
+          <span class="topic-text">Comparing & Sorting</span>
         </a>
       </div>
-
-      <div class="card" data-title="Comparing & Sorting">
-        <div class="card-icon"><i class="fas fa-balance-scale"></i></div>
-        <div class="meta">
-          <h3 class="title">Comparing & Sorting</h3>
-          <div class="stats">Language: EN • Author: Admin • Sep 20, 2025</div>
-        </div>
-        <a class="preview-btn" href="patterns n shapes.pdf" target="_blank">
-          <i class="fas fa-play-circle"></i> START LEARNING!
+      
+      <div class="topic-row">
+        <a href="pg13.html" class="topic-box">
+          <span class="topic-icon">❓</span>
+          <span class="topic-text">Missing Numbers & Matching</span>
         </a>
-      </div>
-
-      <div class="card" data-title="Patterns, Shapes and Space">
-        <div class="card-icon"><i class="fas fa-shapes"></i></div>
-        <div class="meta">
-          <h3 class="title">Patterns, Shapes and Space</h3>
-          <div class="stats">Language: EN • Author: Admin • Sep 18, 2025</div>
-        </div>
-        <a class="preview-btn" href="patterns n shapes.pdf" target="_blank">
-          <i class="fas fa-play-circle"></i> START LEARNING!
+        <a href="pg15.html" class="topic-box">
+          <span class="topic-icon">📏</span>
+          <span class="topic-text">Size (Big/Small, Long/Short)</span>
         </a>
-      </div>
-
-      <div class="card" data-title="Measurements">
-        <div class="card-icon"><i class="fas fa-ruler"></i></div>
-        <div class="meta">
-          <h3 class="title">Measurements</h3>
-          <div class="stats">Language: EN • Author: Admin • Sep 20, 2025</div>
-        </div>
-        <a class="preview-btn" href="measurement.pdf" target="_blank">
-          <i class="fas fa-play-circle"></i> START LEARNING!
-        </a>
-      </div>
-
-      <div class="card" data-title="Basic addition-subtraction">
-        <div class="card-icon"><i class="fas fa-plus-minus"></i></div>
-        <div class="meta">
-          <h3 class="title">Basic addition-subtraction</h3>
-          <div class="stats">Language: EN • Author: Admin • Sep 21, 2025</div>
-        </div>
-        <a class="preview-btn" href="AddSub.pdf" target="_blank">
-          <i class="fas fa-play-circle"></i> START LEARNING!
-        </a>
-      </div>
-
-      <div class="card" data-title="Problem solving">
-        <div class="card-icon"><i class="fas fa-puzzle-piece"></i></div>
-        <div class="meta">
-          <h3 class="title">Problem solving</h3>
-          <div class="stats">Language: EN • Author: Admin • Sep 20, 2025</div>
-        </div>
-        <a class="preview-btn" href="Class2 (word problem).pdf" target="_blank">
-          <i class="fas fa-play-circle"></i> START LEARNING!
-        </a>
-      </div>
-
-      <div class="card" data-title="Geometry">
-        <div class="card-icon"><i class="fas fa-draw-polygon"></i></div>
-        <div class="meta">
-          <h3 class="title">Geometry</h3>
-          <div class="stats">Language: EN • Author: Admin • Sep 19, 2025</div>
-        </div>
-        <a class="preview-btn" href="Geometry.pdf" target="_blank">
-          <i class="fas fa-play-circle"></i> START LEARNING!
-        </a>
-      </div>
-
-      <div class="card" data-title="Multiplication & Division">
-        <div class="card-icon"><i class="fas fa-times"></i></div>
-        <div class="meta">
-          <h3 class="title">Multiplication & Division</h3>
-          <div class="stats">Language: EN • Author: Admin • Sep 18, 2025</div>
-        </div>
-        <a class="preview-btn" href="MultiplicationDivision.pdf" target="_blank">
-          <i class="fas fa-play-circle"></i> START LEARNING!
-        </a>
-      </div>
-
-      <div class="card" data-title="Fractions and Decimals">
-        <div class="card-icon"><i class="fas fa-chart-pie"></i></div>
-        <div class="meta">
-          <h3 class="title">Fractions and Decimals</h3>
-          <div class="stats">Language: EN • Author: Admin • Sep 21, 2025</div>
-        </div>
-        <a class="preview-btn" href="Fractions.pdf" target="_blank">
-          <i class="fas fa-play-circle"></i> START LEARNING!
-        </a>
-      </div>
-
-      <div class="card" data-title="Data and Graphs">
-        <div class="card-icon"><i class="fas fa-chart-bar"></i></div>
-        <div class="meta">
-          <h3 class="title">Data and Graphs</h3>
-          <div class="stats">Language: EN • Author: Admin • Sep 20, 2025</div>
-        </div>
-        <a class="preview-btn" href="DataGraphs.pdf" target="_blank">
-          <i class="fas fa-play-circle"></i> START LEARNING!
+        <a href="pg17.html" class="topic-box">
+          <span class="topic-icon">🔶</span>
+          <span class="topic-text">Patterns</span>
         </a>
       </div>
     </div>
+  </div>
 
-    <div class="no-results" id="noResults">
-      <i class="fas fa-search"></i> No lessons found matching your search. Try a different term!
-    </div>
+  <footer class="footer">
+    <a href="pg6.html" class="prev-page-btn">
+      <span>←</span>
+      <span>Previous Page</span>
+    </a>
+  </footer>
 
-    <div class="nav-buttons">
-      <a href="pg9.html">
-        <i class="fas fa-arrow-left"></i> Back to Previous Page
-      </a>
+  <div id="settingsModal" class="modal">
+    <div class="modal-content">
+      <span class="close" onclick="closeSettings()">&times;</span>
+      <h3>⚙️ Fun Settings!</h3>
+      
+      <div class="settings-option">
+        <label for="theme-toggle">Dark Theme</label>
+        <label class="toggle-switch">
+          <input type="checkbox" id="theme-toggle">
+          <span class="slider"></span>
+        </label>
+      </div>
+      
+      <div class="settings-option">
+        <label for="parental-toggle">Parental Control</label>
+        <label class="toggle-switch">
+          <input type="checkbox" id="parental-toggle">
+          <span class="slider"></span>
+        </label>
+      </div>
+      
+      <div class="settings-option">
+        <label for="sound-toggle">Sound Effects</label>
+        <label class="toggle-switch">
+          <input type="checkbox" id="sound-toggle">
+          <span class="slider"></span>
+        </label>
+      </div>
+      
+      <div class="brightness-container">
+        <label for="brightness-slider">Brightness: <span id="brightness-value" class="brightness-value">100</span>%</label>
+        <input type="range" id="brightness-slider" class="brightness-slider" min="50" max="150" value="100">
+      </div>
+      
+      <div class="settings-buttons">
+        <button class="save-btn" onclick="saveSettings()">Save</button>
+        <button class="cancel-btn" onclick="closeSettings()">Cancel</button>
+      </div>
     </div>
-  </main>
+  </div>
+
+
+  <!-- Chatbot Container -->
+<div id="chatbotContainer" class="chatbot-container">
+  <div class="chatbot-header">
+    <span>Math Helper</span>
+    <span class="chatbot-close" onclick="toggleChatbot()">&times;</span>
+  </div>
+
+  <iframe
+    src="https://www.chatbase.co/chatbot-iframe/xuA-H0JZCY4Mo6tdF3tLM"
+    class="chatbot-iframe"
+    frameborder="0"
+  ></iframe>
+</div>
+
+  <!-- Chatbot Toggle Button -->
+  <div id="chatbotToggle" class="chatbot-toggle" onclick="toggleChatbot()">
+    🤖
+  </div>
+
+  <div id="chatbotToggle" class="chatbot-toggle" onclick="toggleChatbot()">
+    🤖
+  </div>
 
   <script>
-    // Create floating math symbols
-    const mathSymbols = document.getElementById('mathSymbols');
-    const symbols = ['1', '2', '3', '+', '-', '×', '÷', '=', 'π', '∑', '√', '∞', '%', '<', '>'];
+    let settings = {
+      darkTheme: false,
+      parentalControl: false,
+      sound: true,
+      brightness: 100
+    };
     
-    function createMathSymbol() {
-      const symbol = document.createElement('div');
-      symbol.className = 'math-symbol';
-      symbol.textContent = symbols[Math.floor(Math.random() * symbols.length)];
-      symbol.style.left = Math.random() * 100 + '%';
-      symbol.style.animationDuration = (Math.random() * 10 + 10) + 's';
-      symbol.style.fontSize = (Math.random() * 20 + 15) + 'px';
-      mathSymbols.appendChild(symbol);
-      
-      // Remove symbol after animation completes
-      setTimeout(() => {
-        symbol.remove();
-      }, 20000);
-    }
-    
-    // Create symbols periodically
-    setInterval(createMathSymbol, 2000);
-    
-    // Create initial symbols
-    for (let i = 0; i < 10; i++) {
-      setTimeout(createMathSymbol, i * 500);
-    }
-    
-    // Search functionality
-    const searchInput = document.getElementById('searchInput');
-    const cardsContainer = document.getElementById('cardsContainer');
-    const cards = document.querySelectorAll('.card');
-    const noResults = document.getElementById('noResults');
-
-    searchInput.addEventListener('input', function() {
-      const searchTerm = this.value.toLowerCase().trim();
-      
-      // Reset highlight
-      document.querySelectorAll('.title').forEach(title => {
-        const text = title.textContent;
-        title.innerHTML = text;
-      });
-      
-      // If search term is empty, show all cards
-      if (searchTerm === '') {
-        cards.forEach(card => {
-          card.style.display = 'flex';
-        });
-        noResults.style.display = 'none';
-        return;
+    function loadSettings() {
+      const savedSettings = localStorage.getItem('mathChampSettings');
+      if (savedSettings) {
+        settings = JSON.parse(savedSettings);
+        applySettings();
       }
-      
-      let hasResults = false;
-      
-      // Filter cards based on search term
-      cards.forEach(card => {
-        const title = card.getAttribute('data-title').toLowerCase();
-        const titleElement = card.querySelector('.title');
-        
-        if (title.includes(searchTerm)) {
-          card.style.display = 'flex';
-          hasResults = true;
-          
-          // Highlight matching text
-          const originalText = titleElement.textContent;
-          const regex = new RegExp(`(${searchTerm})`, 'gi');
-          titleElement.innerHTML = originalText.replace(regex, '<span class="highlight">$1</span>');
-        } else {
-          card.style.display = 'none';
-        }
-      });
-      
-      // Show/hide no results message
-      if (hasResults) {
-        noResults.style.display = 'none';
+    }
+    
+    function applySettings() {
+      if (settings.darkTheme) {
+        document.body.classList.add('dark-theme');
+        document.getElementById('theme-toggle').checked = true;
       } else {
-        noResults.style.display = 'block';
+        document.body.classList.remove('dark-theme');
+        document.getElementById('theme-toggle').checked = false;
       }
+      
+      document.getElementById('parental-toggle').checked = settings.parentalControl;
+      document.getElementById('sound-toggle').checked = settings.sound;
+      
+      document.getElementById('brightness-slider').value = settings.brightness;
+      document.getElementById('brightness-value').textContent = settings.brightness;
+      document.body.style.filter = `brightness(${settings.brightness}%)`;
+    }
+    
+    function saveSettings() {
+      settings.darkTheme = document.getElementById('theme-toggle').checked;
+      settings.parentalControl = document.getElementById('parental-toggle').checked;
+      settings.sound = document.getElementById('sound-toggle').checked;
+      settings.brightness = document.getElementById('brightness-slider').value;
+      
+      localStorage.setItem('mathChampSettings', JSON.stringify(settings));
+      applySettings();
+      closeSettings();
+    }
+    
+    function openSettings() {
+      document.getElementById("settingsModal").style.display = "flex";
+    }
+    function closeSettings() {
+      document.getElementById("settingsModal").style.display = "none";
+    }
+    
+    function toggleChatbot() {
+      const chatbotContainer = document.getElementById("chatbotContainer");
+      const chatbotToggle = document.getElementById("chatbotToggle");
+      
+      if (chatbotContainer.style.display === "flex") {
+        chatbotContainer.style.display = "none";
+        chatbotToggle.style.display = "flex";
+      } else {
+        chatbotContainer.style.display = "flex";
+        chatbotToggle.style.display = "none";
+      }
+    }
+    
+    function handleTopicClick(topic) {
+      if (settings.sound) {
+        playClickSound();
+      }
+      
+      localStorage.setItem('selectedTopic', topic);
+      console.log(`Selected topic: ${topic}`);
+      alert(`Great choice! You selected ${topic}! 🎉`);
+    }
+    
+    function playClickSound() {
+      const audioContext = new (window.AudioContext || window.webkitAudioContext)();
+      const oscillator = audioContext.createOscillator();
+      const gainNode = audioContext.createGain();
+      
+      oscillator.connect(gainNode);
+      gainNode.connect(audioContext.destination);
+      
+      oscillator.frequency.value = 800;
+      oscillator.type = 'sine';
+      
+      gainNode.gain.setValueAtTime(0.3, audioContext.currentTime);
+      gainNode.gain.exponentialRampToValueAtTime(0.01, audioContext.currentTime + 0.1);
+      
+      oscillator.start(audioContext.currentTime);
+      oscillator.stop(audioContext.currentTime + 0.1);
+    }
+    
+    document.getElementById('brightness-slider').addEventListener('input', function() {
+      document.getElementById('brightness-value').textContent = this.value;
     });
+    
+    window.onload = function() {
+      loadSettings();
+      document.getElementById("chatbotContainer").style.display = "none";
+    };
   </script>
 </body>
 </html>
