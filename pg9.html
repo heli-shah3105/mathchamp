@@ -105,13 +105,13 @@
       text-shadow: 2px 2px 0px #f87171;
       transition: color 0.3s ease, text-shadow 0.3s ease;
     }
-
+    
     /* Dark theme brand */
     body.dark-theme .brand {
       color: #e0e0e0;
       text-shadow: 2px 2px 0px #64b5f6;
     }
-
+    
     .brand-logo {
       width: 40px;
       height: 40px;
@@ -125,7 +125,7 @@
     /* Dark theme brand logo */
     body.dark-theme .brand-logo {
       background: conic-gradient(from 180deg,#64b5f6,#42a5f5,#5c6bc0,#7986cb,#64b5f6,#42a5f5,#64b5f6);
-      box-shadow: 0 0 15px rgba(100, 181, 246, 0.7);
+      box-shadow: 0 0 15px rgba(100,181,246,0.7);
     }
     
     @keyframes pulse {
@@ -134,19 +134,19 @@
       100% { box-shadow: 0 0 0 0 rgba(120,115,245,0); }
     }
 
-    .right-controls {
-      display: flex;
-      align-items: center;
-      gap: 16px;
+    .right-controls { 
+      display: flex; 
+      align-items: center; 
+      gap: 16px; 
     }
     .settings-btn, .avatar, .chatbot-btn {
-      width: 42px;
+      width: 42px; 
       height: 42px;
       border-radius: 50%;
-      display:flex;
-      align-items:center;
+      display:flex; 
+      align-items:center; 
       justify-content:center;
-      font-weight:bold;
+      font-weight:bold; 
       cursor:pointer;
       transition: all 0.3s ease;
     }
@@ -206,290 +206,367 @@
     }
 
     /* Welcome */
-    .welcome-box {
-      padding:25px;
-      font-size:32px;
-      font-weight:700;
-      color:#030f2e;
+    .welcome-box { 
+      padding:25px; 
+      font-size:28px; 
+      font-weight:700; 
+      color:#030f2e; 
       text-align:center;
-      margin: 20px auto;
-      max-width: 90%;
+      margin: 20px 0; 
+      width: 100%;
       background: rgba(255, 255, 255, 0.7);
       border-radius: 20px;
       box-shadow: 0 8px 20px rgba(0,0,0,0.1);
       position: relative;
       z-index: 5;
+      animation: bounce 2s infinite;
       transition: color 0.3s ease, background 0.3s ease, box-shadow 0.3s ease;
     }
-
+    
     /* Dark theme welcome box */
     body.dark-theme .welcome-box {
       color: #e0e0e0;
       background: rgba(30, 41, 59, 0.7);
       box-shadow: 0 8px 20px rgba(0, 0, 0, 0.3);
     }
+    
+    @keyframes bounce {
+      0%, 100% { transform: translateY(0); }
+      50% { transform: translateY(-10px); }
+    }
 
-    /* Top option boxes */
-    .boxes {
-      display:flex;
-      gap:20px;
+    /* First Row - Welcome box at top, Fun fact below */
+    .first-row { 
+      display:flex; 
+      gap:20px; 
       padding:0;
       margin:20px auto;
       justify-content:center;
       flex-wrap: wrap;
-      max-width: 90%;
+      max-width: 95%;
+      align-items: stretch;
     }
-    .box {
-      width:220px;
-      height:90px;
-      background:linear-gradient(135deg,#f472b6,#8b5cf6);
-      border-radius:20px;
-      text-align:center;
+
+    /* Fun Fact Box - with larger text and more kid-friendly design */
+    .fun-fact-box {
+      padding:20px 25px;
       font-size:20px;
-      font-weight:700;
-      color:#fff;
-      display:flex;
-      align-items:center;
-      justify-content:center;
-      box-shadow:0 8px 15px rgba(0,0,0,0.2);
-      transition:all 0.3s ease;
-      cursor: pointer;
-      position: relative;
-      overflow: hidden;
-    }
-
-    /* Dark theme box */
-    body.dark-theme .box {
-      background:linear-gradient(135deg,#42a5f5,#5c6bc0);
-      box-shadow:0 8px 15px rgba(0, 0, 0, 0.4);
-    }
-    
-    .box:before {
-      content: '';
-      position: absolute;
-      top: 0;
-      left: -100%;
-      width: 100%;
-      height: 100%;
-      background: rgba(255,255,255,0.3);
-      transition: all 0.5s ease;
-    }
-
-    body.dark-theme .box:before {
-      background: rgba(255,255,255,0.2);
-    }
-    
-    .box:hover:before {
-      left: 100%;
-    }
-    .box:hover { 
-      transform: translateY(-10px) scale(1.05);
-      box-shadow: 0 15px 25px rgba(0,0,0,0.2);
-    }
-
-    body.dark-theme .box:hover {
-      box-shadow: 0 15px 25px rgba(0, 0, 0, 0.4);
-    }
-    
-    .box:active {
-      transform: translateY(5px);
-    }
-
-    /* Fun Fact Box */
-    .middle-box {
-      margin:25px auto;
-      width:90%;
-      max-width:1200px;
-      height:140px;
-      padding:20px;
-      background:linear-gradient(135deg,#fef3c7,#fde68a);
-      border-radius:20px;
-      font-size:22px;
-      font-weight:600;
+      font-weight:600; 
       color:#7c2d12;
-      box-shadow:0 8px 20px rgba(0,0,0,0.15);
-      display:flex;
-      align-items:center;
-      justify-content:center;
       text-align:center;
-      transition:all 0.3s ease;
-      cursor: pointer;
+      background:linear-gradient(135deg,#fef3c7,#fde68a); 
+      border-radius:20px;
+      box-shadow:0 8px 20px rgba(0,0,0,0.15);
       position: relative;
       z-index: 5;
+      transition:all 0.3s ease;
+      cursor: pointer;
+      width: 100%;
+      margin: 5px 0;
+      min-height: 100px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      animation: bounce 2s infinite;
+      animation-delay: 0.5s;
+      border: 3px dashed #f59e0b;
     }
 
-    /* Dark theme middle box */
-    body.dark-theme .middle-box {
+    /* Dark theme fun fact box */
+    body.dark-theme .fun-fact-box {
       background:linear-gradient(135deg,#1e3a8a,#283593);
       color:#bbdefb;
       box-shadow:0 8px 20px rgba(0, 0, 0, 0.3);
+      border-color: #64b5f6;
     }
     
-    .middle-box:hover { 
-      transform: scale(1.03);
+    /* Subtle hover effect */
+    .fun-fact-box:hover { 
+      transform: translateY(-3px);
       box-shadow: 0 12px 25px rgba(0,0,0,0.2);
     }
 
-    body.dark-theme .middle-box:hover {
+    body.dark-theme .fun-fact-box:hover {
       box-shadow: 0 12px 25px rgba(0, 0, 0, 0.4);
     }
 
-    /* Main row for 3 equal cards */
-    .main-row {
-      display: flex;
-      gap: 25px;
-      margin: 30px auto;
-      flex-wrap: wrap;
-      justify-content: center;
-      max-width: 90%;
+    /* Fun fact icon */
+    .fun-fact-icon {
+      position: absolute;
+      font-size: 30px;
+      animation: spin 3s infinite linear;
     }
 
-    .progress-container, .rewards-card, .challenge-card {
-      width: 300px;
-      height: 200px;
-      border-radius: 20px;
-      box-shadow: 0 10px 20px rgba(0,0,0,0.15);
+    .fun-fact-icon.left {
+      left: 15px;
+      top: 15px;
+    }
+
+    .fun-fact-icon.right {
+      right: 15px;
+      top: 15px;
+    }
+
+    @keyframes spin {
+      0% { transform: rotate(0deg); }
+      100% { transform: rotate(360deg); }
+    }
+
+    /* Second Row - Challenge, Rewards, Learn & Revise, and Take Quiz boxes in one line */
+    .second-row { 
+      display:flex; 
+      gap:20px; 
+      padding:0;
+      margin:0 auto;
+      justify-content:center;
+      flex-wrap: wrap;
+      max-width: 95%;
+      align-items: stretch;
+    }
+
+    /* Challenge Box - with subtle animations */
+    .challenge-card {
+      padding:20px;
+      border-radius:20px;
+      box-shadow:0 10px 20px rgba(0,0,0,0.15); 
       background: rgba(255, 255, 255, 0.8);
-      flex-shrink: 0;
-      padding: 20px;
-      box-sizing: border-box;
+      flex: 1;
+      min-width: 280px;
+      max-width: 320px;
+      height: 140px;
+      box-sizing:border-box;
       transition: all 0.3s ease;
       position: relative;
       overflow: hidden;
       cursor: pointer;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
     }
 
-    /* Dark theme cards */
-    body.dark-theme .progress-container,
-    body.dark-theme .rewards-card,
+    /* Dark theme challenge card */
     body.dark-theme .challenge-card {
       background: rgba(30, 41, 59, 0.8);
       box-shadow:0 10px 20px rgba(0, 0, 0, 0.3);
     }
     
-    .progress-container:hover, .rewards-card:hover, .challenge-card:hover {
-      transform: translateY(-15px) scale(1.05);
+    .challenge-card:hover { 
+      transform: translateY(-5px) scale(1.02);
       box-shadow: 0 15px 30px rgba(0,0,0,0.2);
     }
 
-    body.dark-theme .progress-container:hover,
-    body.dark-theme .rewards-card:hover,
     body.dark-theme .challenge-card:hover {
       box-shadow: 0 15px 30px rgba(0, 0, 0, 0.4);
     }
     
-    .card-emoji {
-      position: absolute;
-      top: 15px;
-      right: 15px;
-      font-size: 30px;
-      animation: wiggle 2s infinite;
+    .challenge-card h3 { 
+      margin:0 0 8px 0; 
+      color:#ef4444; 
+      font-size:22px; 
     }
-    
-    @keyframes wiggle {
-      0%, 100% { transform: rotate(0deg); }
-      25% { transform: rotate(10deg); }
-      75% { transform: rotate(-10deg); }
-    }
-
-    /* Progress */
-    .progress-container { display:flex; align-items:center; gap:15px; }
-    .progress-circle { width:100px; height:100px; position:relative; }
-    .progress-circle svg { transform: rotate(-90deg); }
-    .progress-circle circle { fill:none; stroke-width:10; stroke-linecap:round; }
-    .progress-bg { stroke: #e5e7eb; }
-    .progress-bar {
-      stroke: url(#gradient);
-      stroke-dasharray:283;
-      stroke-dashoffset: calc(283 - (283*60)/100);
-      transition: stroke-dashoffset 0.5s ease;
-    }
-    .progress-text {
-      position:absolute; top:50%; left:50%;
-      transform: translate(-50%,-50%);
-      font-weight:bold;
-      font-size:20px;
-      color:#1e3a8a;
-    }
-    .progress-details { font-size:16px; color:#333; }
-    .progress-details strong { color:#8b5cf6; font-size:20px; }
-
-    /* Dark theme progress */
-    body.dark-theme .progress-bg { 
-      stroke: #37474f; 
-    }
-
-    body.dark-theme .progress-text {
-      color: #bbdefb;
-    }
-
-    body.dark-theme .progress-details { 
-      color: #e0e0e0; 
-    }
-
-    body.dark-theme .progress-details strong { 
-      color: #64b5f6; 
-    }
-
-    /* Rewards */
-    .rewards-card { text-align:center; }
-    .rewards-card h3 { margin-top:0; color:#22c55e; font-size:22px; }
-    .rewards-card p { font-size:16px; margin:10px 0; }
-    .rewards-card .highlight { color:#f59e0b; font-weight:bold; }
-    .badge-preview { font-size:50px; margin-top:10px; animation: bounce 2s infinite; }
-
-    /* Dark theme rewards */
-    body.dark-theme .rewards-card h3 { 
-      color: #64b5f6; 
-    }
-
-    body.dark-theme .rewards-card p { 
-      color: #e0e0e0; 
-    }
-
-    body.dark-theme .rewards-card .highlight { 
-      color: #ffb74d; 
-    }
-
-    /* Challenge */
-    .challenge-card h3 { margin-top:0; color:#ef4444; font-size:22px; }
-    .challenge-card p { font-size:16px; margin:10px 0; }
-    .streak { margin-top:15px; font-weight:bold; color:#f97316; font-size:16px; }
 
     /* Dark theme challenge */
     body.dark-theme .challenge-card h3 { 
       color: #ef5350; 
     }
+    
+    .challenge-card p { 
+      font-size:15px; 
+      margin:0; 
+      text-align: center;
+    }
 
+    /* Dark theme challenge paragraph */
     body.dark-theme .challenge-card p { 
       color: #e0e0e0; 
     }
+    
+    .streak { 
+      margin-top:10px; 
+      font-weight:bold; 
+      color:#f97316; 
+      font-size:15px; 
+    }
 
+    /* Dark theme streak */
     body.dark-theme .streak { 
       color: #ffb74d; 
     }
 
-    /* Modal */
-    .modal {
-      display:none;
-      position:fixed;
-      z-index:1000;
-      left:0; top:0;
-      width:100%; height:100%;
-      background:rgba(0,0,0,0.6);
-      justify-content:center;
+    /* Timer styles */
+    .timer {
+      margin-top: 5px;
+      font-size: 14px;
+      font-weight: bold;
+      color: #f59e0b;
+      display: flex;
+      align-items: center;
+      gap: 5px;
+    }
+
+    body.dark-theme .timer {
+      color: #ffb74d;
+    }
+
+    .timer-icon {
+      /* Animation removed */
+    }
+
+    /* Rewards Card - with subtle animations */
+    .rewards-card { 
+      padding:20px;
+      border-radius:20px;
+      box-shadow:0 10px 20px rgba(0,0,0,0.15); 
+      background: rgba(255, 255, 255, 0.8);
+      flex: 1;
+      min-width: 280px;
+      max-width: 320px;
+      height: 140px;
+      box-sizing:border-box;
+      transition: all 0.3s ease;
+      position: relative;
+      overflow: hidden;
+      cursor: pointer;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      text-align: center;
+    }
+
+    /* Dark theme rewards card */
+    body.dark-theme .rewards-card {
+      background: rgba(30, 41, 59, 0.8);
+      box-shadow:0 10px 20px rgba(0, 0, 0, 0.3);
+    }
+    
+    .rewards-card:hover { 
+      transform: translateY(-5px) scale(1.02);
+      box-shadow: 0 15px 30px rgba(0,0,0,0.2);
+    }
+
+    body.dark-theme .rewards-card:hover {
+      box-shadow: 0 15px 30px rgba(0, 0, 0, 0.4);
+    }
+    
+    .rewards-card h3 { 
+      margin:0 0 8px 0; 
+      color:#22c55e; 
+      font-size:24px; 
+    }
+
+    /* Dark theme rewards */
+    body.dark-theme .rewards-card h3 { 
+      color: #64b5f6; 
+    }
+    
+    .rewards-card p { 
+      font-size:17px; 
+      margin:0; 
+    }
+
+    /* Dark theme rewards paragraph */
+    body.dark-theme .rewards-card p { 
+      color: #e0e0e0; 
+    }
+    
+    .rewards-card .highlight { 
+      color:#f59e0b; 
+      font-weight:bold; 
+    }
+
+    /* Dark theme rewards highlight */
+    body.dark-theme .rewards-card .highlight { 
+      color: #ffb74d; 
+    }
+    
+    .badge-preview { 
+      font-size:42px; 
+      margin-top:8px; 
+      animation: bounce 2s infinite; 
+      animation-delay: 1s;
+    }
+
+    /* Top Boxes - Modified to match challenge card style */
+    .boxes { 
+      display: none; /* Hide the separate boxes container */
+    }
+    .box {
+      width: 320px;
+      height: 140px;
+      background: rgba(255, 255, 255, 0.8);
+      border-radius: 20px;
+      text-align: center;
+      font-size: 22px;
+      font-weight: 700;
+      color: #8b5cf6;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      box-shadow: 0 10px 20px rgba(0,0,0,0.15);
+      transition: all 0.3s ease;
+      cursor: pointer;
+      position: relative;
+      overflow: hidden;
+      text-decoration: none;
+      flex: 1;
+      min-width: 280px;
+      max-width: 320px;
+      box-sizing:border-box;
+    }
+
+    /* Dark theme box */
+    body.dark-theme .box {
+      background: rgba(30, 41, 59, 0.8);
+      color: #a78bfa;
+      box-shadow: 0 10px 20px rgba(0, 0, 0, 0.3);
+    }
+
+    .box:hover { 
+      transform: translateY(-5px) scale(1.02);
+      box-shadow: 0 15px 30px rgba(0,0,0,0.2);
+    }
+
+    body.dark-theme .box:hover {
+      box-shadow: 0 15px 30px rgba(0, 0, 0, 0.4);
+    }
+
+    .box:active {
+      transform: translateY(5px);
+    }
+
+    /* Box emoji icon */
+    .box-icon {
+      position: absolute;
+      top: 10px;
+      left: 10px;
+      font-size: 28px;
+      animation: bounce 2s infinite;
+      animation-delay: 0.3s;
+    }
+
+    /* Modals */
+    .modal { 
+      display:none; 
+      position:fixed; 
+      z-index:1000; 
+      left:0; top:0; 
+      width:100%; height:100%; 
+      background:rgba(0,0,0,0.6); 
+      justify-content:center; 
       align-items:center;
       backdrop-filter: blur(5px);
     }
     .modal-content {
-      background:#fff;
-      border-radius:20px;
+      background:#fff; 
+      border-radius:20px; 
       padding:25px;
-      width:90%;
-      max-width:450px;
+      width:90%; 
+      max-width:450px; 
       box-shadow:0 15px 30px rgba(0,0,0,0.3);
-      text-align:center;
-      position:relative;
+      text-align:center; 
+      position:relative; 
       animation: popIn 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
       transition: background 0.3s ease, color 0.3s ease;
     }
@@ -500,11 +577,12 @@
       color: #e0e0e0;
     }
     
-    .close {
-      position:absolute;
-      top:15px; right:20px;
-      font-size:28px;
-      font-weight:bold;
+    .close { 
+      position:absolute; 
+      top:15px; 
+      right:20px; 
+      font-size:28px; 
+      font-weight:bold; 
       cursor:pointer;
       color: #ef4444;
       transition: all 0.3s ease;
@@ -518,13 +596,22 @@
     .close:hover {
       transform: rotate(90deg);
     }
-    .options { margin-top:20px; display:flex; flex-direction:column; gap:15px; }
-    .options button {
-      padding:15px; border:none; border-radius:15px;
-      background:linear-gradient(135deg, #93c5fd, #60a5fa);
-      color:#1e3a8a; font-weight:bold;
+    .options { 
+      margin-top:20px; 
+      display:flex; 
+      flex-direction:column; 
+      gap:15px; 
+    }
+    .options button { 
+      padding:15px; 
+      border:none; 
+      border-radius:15px; 
+      background:linear-gradient(135deg, #93c5fd, #60a5fa); 
+      color:#1e3a8a; 
+      font-weight:bold;
       font-size:18px;
-      cursor:pointer; transition: all 0.3s ease;
+      cursor:pointer; 
+      transition: all 0.3s ease;
       box-shadow: 0 4px 8px rgba(0,0,0,0.1);
     }
 
@@ -549,17 +636,21 @@
     .options button:active {
       transform: translateY(2px);
     }
-    .feedback { margin-top:15px; font-weight:bold; font-size:18px; }
-    .done-btn {
-      margin-top:20px;
-      padding:12px 25px;
-      border:none;
-      border-radius:15px;
-      background:linear-gradient(135deg, #22c55e, #16a34a);
-      color:#fff;
+    .feedback { 
+      margin-top:15px; 
       font-weight:bold;
       font-size:18px;
-      cursor:pointer;
+    }
+    .done-btn { 
+      margin-top:20px; 
+      padding:12px 25px; 
+      border:none; 
+      border-radius:15px; 
+      background:linear-gradient(135deg, #22c55e, #16a34a); 
+      color:#fff; 
+      font-weight:bold;
+      font-size:18px;
+      cursor:pointer; 
       transition: all 0.3s ease;
       box-shadow: 0 4px 8px rgba(0,0,0,0.1);
     }
@@ -671,11 +762,6 @@
       box-shadow: 0 6px 16px rgba(0, 0, 0, 0.5);
     }
     
-    @keyframes popIn {
-      from { transform:scale(0.7); opacity:0; }
-      to { transform:scale(1); opacity:1; }
-    }
-
     /* Settings Modal Styles */
     .settings-option {
       display: flex;
@@ -786,25 +872,31 @@
       box-shadow: 0 5px 10px rgba(0, 0, 0, 0.4);
     }
 
+    @keyframes popIn { 
+      from { transform:scale(0.7); opacity:0; } 
+      to { transform:scale(1); opacity:1; } 
+    }
+
     /* Responsive */
-    @media(max-width: 1000px) {
-      .main-row { justify-content:center; }
-      .middle-box { width:95%; }
+    @media(max-width: 1000px) { 
+      .first-row, .second-row { justify-content:center; } 
     }
     
     @media(max-width: 768px) {
       .welcome-box {
-        font-size: 24px;
+        font-size: 20px;
         padding: 15px;
       }
       .box {
-        width: 180px;
-        height: 80px;
+        width: 280px;
+        height: 120px;
         font-size: 18px;
       }
-      .middle-box {
-        font-size: 18px;
-        height: 120px;
+      .fun-fact-box {
+        font-size: 16px;
+        padding: 15px;
+        min-height: 90px;
+        margin: 2px 0;
       }
       
       .chatbot-container {
@@ -832,6 +924,32 @@
         opacity: 0;
       }
     }
+
+    /* Additional kid-friendly elements - More subtle stars */
+    .star-decoration {
+      position: absolute;
+      color: #fbbf24;
+      font-size: 14px;
+      animation: twinkle 3s infinite alternate;
+      z-index: 1;
+      opacity: 0.2;
+    }
+
+    body.dark-theme .star-decoration {
+      color: #64b5f6;
+    }
+
+    @keyframes twinkle {
+      0% { opacity: 0.1; }
+      100% { opacity: 0.3; }
+    }
+
+    .math-icon {
+      font-size: 24px;
+      margin-right: 5px;
+      animation: bounce 2s infinite;
+      animation-delay: var(--delay);
+    }
   </style>
 </head>
 <body>
@@ -842,6 +960,12 @@
   <div class="shape square" style="width: 60px; height: 60px; bottom: 30%; left: 8%;"></div>
   <div class="shape circle" style="width: 50px; height: 50px; bottom: 20%; right: 15%;"></div>
   <div class="shape triangle" style="top: 60%; left: 15%;"></div>
+
+  <!-- Star decorations - More subtle -->
+  <div class="star-decoration" style="top: 15%; left: 20%;">⭐</div>
+  <div class="star-decoration" style="top: 25%; right: 25%; animation-delay: 0.5s;">⭐</div>
+  <div class="star-decoration" style="bottom: 30%; left: 30%; animation-delay: 1s;">⭐</div>
+  <div class="star-decoration" style="bottom: 20%; right: 20%; animation-delay: 1.5s;">⭐</div>
 
   <header class="header">
     <div class="brand">
@@ -854,72 +978,74 @@
     </div>
   </header>
 
-  <div class="welcome-box">🎉 Welcome back, Math Superstar! Ready for a fun adventure? 🌟</div>
-
-  <!-- Top Boxes Row -->
-  <div class="boxes">
-    <a href="pg11.html" class="box-link" style="text-decoration: none;">
-      <div class="box">📚 Learn & Play</div>
-    </a>
-    <div class="box">🏆 Take Quiz</div>
+  <!-- First Row - Welcome box at top -->
+  <div class="first-row" id="firstRow">
+    <div class="welcome-box" id="welcomeBox">
+      <span class="math-icon" style="--delay: 0s;">🧮</span>
+      Welcome back, young champ! Ready to play and learn?
+      <span class="math-icon" style="--delay: 0.5s;">🎲</span>
+    </div>
   </div>
 
-  <div class="middle-box">
-    ✨ Today's Math Magic: Did you know? A circle has no corners...it goes round and round forever! 🔵
+  <!-- Second Row - Fun fact box below welcome -->
+  <div class="first-row" id="firstRow">
+    <div class="fun-fact-box" id="funFactBox">
+      <div class="fun-fact-icon left">💡</div>
+      <div class="fun-fact-icon right">✨</div>
+      <div id="funFactText">Today's Math Fact: Did you know? A circle has no corners—it goes round and round forever! From planets to bubbles to wheels, circles show that math is everywhere!</div>
+    </div>
   </div>
 
-  <!-- Main Row: Progress + Rewards + Challenge -->
-  <div class="main-row">
-    <!-- Progress Box -->
-    <div class="progress-container" onclick="openProgress()">
-      <div class="card-emoji">📊</div>
-      <div class="progress-circle">
-        <svg width="100" height="100" viewBox="0 0 100 100">
-          <defs>
-            <linearGradient id="gradient" x1="1" y1="0" x2="0" y2="1">
-              <stop offset="0%" stop-color="#f472b6"/>
-              <stop offset="50%" stop-color="#8b5cf6"/>
-              <stop offset="100%" stop-color="#22d3ee"/>
-            </linearGradient>
-          </defs>
-          <circle class="progress-bg" cx="50" cy="50" r="45"/>
-          <circle class="progress-bar" cx="50" cy="50" r="45"/>
-        </svg>
-        <div class="progress-text">3/5</div>
-      </div>
-      <div class="progress-details">
-        <strong>Super Progress!</strong><br>
-        🎉 You've finished <b>3 out of 5</b> levels!
-      </div>
-    </div>
-
-    <!-- Rewards Box -->
-    <div class="rewards-card" onclick="openRewards()">
-      <div class="card-emoji">🏆</div>
-      <h3>Awesome Rewards!</h3>
-      <p>Collect <b>20 stars</b> to unlock the <span class="highlight">Golden Brain</span> badge!</p>
-      <div class="badge-preview">🧠✨</div>
-    </div>
-
-    <!-- Challenge Box -->
+  <!-- Second Row - Challenge, Rewards, Learn & Revise, and Take Quiz boxes in one line -->
+  <div class="second-row" id="secondRow">
     <div class="challenge-card" onclick="openChallenge()">
-      <div class="card-emoji">🔥</div>
-      <h3>Daily Challenge!</h3>
-      <p><b>Question:</b> Which shape has 3 sides?</p>
-      <div class="streak">🔥 Streak: <b>3 days in a row!</b></div>
+      <div class="box-icon">🔥</div>
+      <h3>Today's Challenge</h3>
+      <p id="challengeQuestion"><b>Problem:</b> Pencil 📏 = 5 cm, Crayon 🖍️ = 7 cm.<br>Which is longer?</p>
+      <div class="timer">
+        <span class="timer-icon">⏰</span>
+        <span id="timerText">Expires in: 23:59:59</span>
+      </div>
+      <div class="streak">  <b></b></div>
     </div>
+    
+    <div class="rewards-card" onclick="openRewards()">
+      <div class="box-icon">🏆</div>
+      <h3>Rewards</h3>
+      <p>Earn <b>20 stars</b> to unlock <span class="highlight">Golden Brain</span>!</p>
+      <div class="badge-preview"></div>
+    </div>
+    
+    <!-- Learn & Revise box - Changed to link to pg18.html -->
+    <a href="pg19.html" class="box-link" style="text-decoration: none;">
+      <div class="box">
+        <div class="box-icon">📚</div>
+        Learn & Revise
+      </div>
+    </a>
+    
+    <!-- Take Quiz box -->
+    <a href="pg42.html" class="box-link" style="text-decoration: none;">
+      <div class="box">
+        <div class="box-icon">📝</div>
+        Take Quiz
+      </div>
+    </a>
   </div>
 
-  <!-- Progress Modal -->
-  <div id="progressModal" class="modal">
+  <!-- Challenge Modal -->
+  <div id="challengeModal" class="modal">
     <div class="modal-content">
-      <span class="close" onclick="closeProgress()">&times;</span>
-      <h3>📊 Your Super Progress!</h3>
-      <p><b>Levels Completed:</b> 3 / 5 🌟</p>
-      <p><b>Stars Earned:</b> ⭐⭐⭐⭐ (15 stars)</p>
-      <p><b>Current Streak:</b> 🔥 3 days in a row!</p>
-      <p><b>Next Goal:</b> Finish 2 more levels to unlock a new badge!</p>
-      <button class="done-btn" onclick="closeProgress()">Awesome!</button>
+      <span class="close" onclick="closeChallenge()">&times;</span>
+      <h3>🔥 Today's Challenge</h3>
+      <p id="modalQuestion"><b>Problem:</b> Pencil 📏 = 5 cm, Crayon 🖍️ = 7 cm.<br>Which is longer?</p>
+      <div class="options">
+        <button onclick="checkAnswer('A')">Pencil 📏</button>
+        <button onclick="checkAnswer('B')">Crayon 🖍️</button>
+        <button onclick="checkAnswer('C')">They're equal</button>
+      </div>
+      <div id="feedback" class="feedback"></div>
+      <button id="doneBtn" class="done-btn" style="display:none;" onclick="closeChallenge()">Great Job!</button>
     </div>
   </div>
 
@@ -927,27 +1053,9 @@
   <div id="rewardsModal" class="modal">
     <div class="modal-content">
       <span class="close" onclick="closeRewards()">&times;</span>
-      <h3>🏆 Amazing Rewards!</h3>
-      <p>You currently have <b>15 stars</b> ⭐</p>
-      <p>Earn <b>5 more stars</b> to unlock the <span class="highlight">Golden Brain</span> badge!</p>
-      <div class="badge-preview" style="font-size:60px;">🧠✨</div>
+      <h3>🏆 Rewards</h3>
+      <p>You're close to unlocking <b>Golden Brain</b> badge. Just 20 stars needed! 🌟</p>
       <button class="done-btn" onclick="closeRewards()">Cool!</button>
-    </div>
-  </div>
-
-  <!-- Challenge Modal -->
-  <div id="challengeModal" class="modal">
-    <div class="modal-content">
-      <span class="close" onclick="closeChallenge()">&times;</span>
-      <h3>🔥 Today's Challenge!</h3>
-      <p><b>Question:</b> Which shape has 3 sides?</p>
-      <div class="options">
-        <button onclick="checkAnswer('A')">⬜ Square</button>
-        <button onclick="checkAnswer('B')">🔺 Triangle</button>
-        <button onclick="checkAnswer('C')">⚪ Circle</button>
-      </div>
-      <div id="feedback" class="feedback"></div>
-      <button id="doneBtn" class="done-btn" style="display:none;" onclick="closeChallenge()">Great Job!</button>
     </div>
   </div>
 
@@ -994,17 +1102,18 @@
   </div>
 
   <!-- Chatbot Container -->
-  <div id="chatbotContainer" class="chatbot-container">
-    <div class="chatbot-header">
-      <span>🤖 Math Helper Bot</span>
-      <span class="chatbot-close" onclick="toggleChatbot()">&times;</span>
-    </div>
-    <iframe
-      src="https://www.chatbase.co/chatbot-iframe/HIpeTs4D1ugy3PIYpwxoo"
-      class="chatbot-iframe"
-      frameborder="0"
-    ></iframe>
+<div id="chatbotContainer" class="chatbot-container">
+  <div class="chatbot-header">
+    <span>Math Helper</span>
+    <span class="chatbot-close" onclick="toggleChatbot()">&times;</span>
   </div>
+
+  <iframe
+    src="https://www.chatbase.co/chatbot-iframe/xuA-H0JZCY4Mo6tdF3tLM"
+    class="chatbot-iframe"
+    frameborder="0"
+  ></iframe>
+</div>
 
   <!-- Chatbot Toggle Button -->
   <div id="chatbotToggle" class="chatbot-toggle" onclick="toggleChatbot()">
@@ -1012,6 +1121,85 @@
   </div>
 
   <script>
+    // Challenge questions data
+    const challengeQuestions = [
+      {
+        question: "A circular pizza has a diameter of 30 cm. What is the length of the crust (the circumference)?",
+        options: ["94.2 cm", "30 cm", "15 cm"],
+        correctAnswer: 0
+      },
+      {
+        question: "A square has a perimeter of 48 cm. A circle is drawn inside the square, touching all four sides. What is the radius of that circle?",
+        options: ["12 cm", "6 cm", "24 cm"],
+        correctAnswer: 1
+      },
+      {
+        question: "A rectangular swimming pool is 10 meters long and 4 meters wide. You want to put a decorative tile border around the entire edge of the pool. If the tiles are squares with a side length of 20 cm, how many tiles will you need?",
+        options: ["28 tiles", "140 tiles", "280 tiles"],
+        correctAnswer: 1
+      },
+      {
+        question: "A rectangular garden has an area of 72 square meters. Its length is 9 meters. What is the perimeter of the garden?",
+        options: ["18 meters", "34 meters", "72 meters"],
+        correctAnswer: 1
+      },
+      {
+        question: "A triangle has two angles that are 45° and 65°. What is the size of the third angle?",
+        options: ["110°", "70°", "90°"],
+        correctAnswer: 1
+      },
+      {
+        question: "Maria is saving money to buy a bicycle that costs $250. She already has $85. She earns $12 each week for doing chores. How many full weeks does she need to work to save enough money for the bicycle?",
+        options: ["13 weeks", "14 weeks", "15 weeks"],
+        correctAnswer: 1
+      },
+      {
+        question: "A factory produces 540 toys in a day. These toys are packed into boxes, with each box holding exactly 12 toys. If the factory works for 5 days, how many boxes will they need in total?",
+        options: ["225 boxes", "270 boxes", "324 boxes"],
+        correctAnswer: 0
+      },
+      {
+        question: "A farmer has 450 apples. He sells 125 apples to one customer and 180 apples to another. He then divides the remaining apples equally into 9 small baskets. How many apples are in each basket?",
+        options: ["15 apples", "16 apples", "17 apples"],
+        correctAnswer: 0
+      },
+      {
+        question: "Liam read a book that was 150 pages long over 3 days. On the first day, he read 1/3 of the book. On the second day, he read 40 pages. How many pages did he read on the third day?",
+        options: ["50 pages", "60 pages", "70 pages"],
+        correctAnswer: 1
+      },
+      {
+        question: "A school bus has 28 seats. If 4 students can sit on each seat, how many buses are needed to take 352 students on a field trip?",
+        options: ["3 buses", "4 buses", "5 buses"],
+        correctAnswer: 1
+      },
+      {
+        question: "The line graph shows the temperature over a week. By how many degrees did the temperature change between Tuesday (22°C) and Thursday (25°C)?",
+        options: ["2°C", "3°C", "5°C"],
+        correctAnswer: 1
+      },
+      {
+        question: "A family is driving on a trip. They drive 125.5 km in the morning, take a break, and then drive another 87.75 km in the afternoon. What is the total distance they drove that day?",
+        options: ["212.25 km", "213.25 km", "214.25 km"],
+        correctAnswer: 1
+      },
+      {
+        question: "Sarah buys a notebook for $4.99, a pen for $1.50, and an eraser for $0.85. She pays with a $10 bill. How much change should she get back?",
+        options: ["$2.66", "$2.76", "$2.86"],
+        correctAnswer: 0
+      },
+      {
+        question: "A roll of ribbon is 25 meters long. You need to cut pieces that are each 1.25 meters long to make bows. How many full bows can you make from the roll?",
+        options: ["15 bows", "20 bows", "25 bows"],
+        correctAnswer: 1
+      },
+      {
+        question: "A chocolate bar costs $2.40. If you buy 6 of them and pay with a $20 bill, how much change will you receive?",
+        options: ["$5.40", "$5.60", "$5.80"],
+        correctAnswer: 1
+      }
+    ];
+
     // Initialize settings
     let settings = {
       darkTheme: false,
@@ -1020,6 +1208,10 @@
       brightness: 100
     };
     
+    // Current challenge question index
+    let currentQuestionIndex = 0;
+    let timerInterval;
+    
     // Load settings from localStorage if available
     function loadSettings() {
       const savedSettings = localStorage.getItem('mathChampSettings');
@@ -1027,6 +1219,31 @@
         settings = JSON.parse(savedSettings);
         applySettings();
       }
+      
+      // Load current question index or determine based on date
+      const savedQuestionIndex = localStorage.getItem('currentQuestionIndex');
+      const savedQuestionDate = localStorage.getItem('currentQuestionDate');
+      const today = new Date().toDateString();
+      
+      if (savedQuestionDate === today && savedQuestionIndex !== null) {
+        currentQuestionIndex = parseInt(savedQuestionIndex);
+      } else {
+        // Calculate question index based on date
+        const startDate = new Date('2023-01-01');
+        const todayDate = new Date();
+        const daysDiff = Math.floor((todayDate - startDate) / (1000 * 60 * 60 * 24));
+        currentQuestionIndex = daysDiff % challengeQuestions.length;
+        
+        // Save current question index and date
+        localStorage.setItem('currentQuestionIndex', currentQuestionIndex.toString());
+        localStorage.setItem('currentQuestionDate', today);
+      }
+      
+      // Update the challenge question
+      updateChallengeQuestion();
+      
+      // Start the timer
+      startTimer();
     }
     
     // Apply settings to UI
@@ -1052,6 +1269,75 @@
       document.body.style.filter = `brightness(${settings.brightness}%)`;
     }
     
+    // Update challenge question
+    function updateChallengeQuestion() {
+      const question = challengeQuestions[currentQuestionIndex];
+      const questionText = `<b>Problem:</b> ${question.question}`;
+      
+      // Update question in the card
+      document.getElementById('challengeQuestion').innerHTML = questionText;
+      
+      // Update question in the modal
+      document.getElementById('modalQuestion').innerHTML = questionText;
+      
+      // Update options in the modal
+      const optionsContainer = document.querySelector('.options');
+      optionsContainer.innerHTML = '';
+      
+      question.options.forEach((option, index) => {
+        const button = document.createElement('button');
+        button.textContent = option;
+        button.onclick = function() { checkAnswer(index); };
+        optionsContainer.appendChild(button);
+      });
+    }
+    
+    // Start timer
+    function startTimer() {
+      // Clear any existing timer
+      if (timerInterval) {
+        clearInterval(timerInterval);
+      }
+      
+      // Calculate time until midnight
+      const now = new Date();
+      const tomorrow = new Date(now);
+      tomorrow.setDate(tomorrow.getDate() + 1);
+      tomorrow.setHours(0, 0, 0, 0);
+      
+      const timeUntilMidnight = tomorrow - now;
+      
+      // Update timer every second
+      timerInterval = setInterval(function() {
+        const now = new Date();
+        const tomorrow = new Date(now);
+        tomorrow.setDate(tomorrow.getDate() + 1);
+        tomorrow.setHours(0, 0, 0, 0);
+        
+        const timeUntilMidnight = tomorrow - now;
+        
+        // Calculate hours, minutes, seconds
+        const hours = Math.floor(timeUntilMidnight / (1000 * 60 * 60));
+        const minutes = Math.floor((timeUntilMidnight % (1000 * 60 * 60)) / (1000 * 60));
+        const seconds = Math.floor((timeUntilMidnight % (1000 * 60)) / 1000);
+        
+        // Update timer display
+        document.getElementById('timerText').textContent = 
+          `Expires in: ${hours.toString().padStart(2, '0')}:${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}`;
+        
+        // If timer reaches zero, update question
+        if (timeUntilMidnight <= 0) {
+          clearInterval(timerInterval);
+          // Move to next question
+          currentQuestionIndex = (currentQuestionIndex + 1) % challengeQuestions.length;
+          localStorage.setItem('currentQuestionIndex', currentQuestionIndex.toString());
+          localStorage.setItem('currentQuestionDate', new Date().toDateString());
+          updateChallengeQuestion();
+          startTimer();
+        }
+      }, 1000);
+    }
+    
     // Save settings to localStorage
     function saveSettings() {
       settings.darkTheme = document.getElementById('theme-toggle').checked;
@@ -1065,33 +1351,23 @@
     }
     
     // Modal functions
-    function openProgress() {
-      document.getElementById("progressModal").style.display = "flex";
+    function openRewards() { 
+      document.getElementById("rewardsModal").style.display = "flex"; 
     }
-    function closeProgress() {
-      document.getElementById("progressModal").style.display = "none";
+    function closeRewards() { 
+      document.getElementById("rewardsModal").style.display = "none"; 
     }
-
-    function openRewards() {
-      document.getElementById("rewardsModal").style.display = "flex";
+    function openChallenge() { 
+      document.getElementById("challengeModal").style.display = "flex"; 
     }
-    function closeRewards() {
-      document.getElementById("rewardsModal").style.display = "none";
+    function closeChallenge() { 
+      document.getElementById("challengeModal").style.display = "none"; 
+      document.getElementById("feedback").textContent = ""; 
+      document.getElementById("doneBtn").style.display = "none"; 
     }
-
-    function openChallenge() {
-      document.getElementById("challengeModal").style.display = "flex";
-    }
-    function closeChallenge() {
-      document.getElementById("challengeModal").style.display = "none";
-      document.getElementById("feedback").textContent = "";
-      document.getElementById("doneBtn").style.display = "none";
-    }
-    
     function openSettings() {
       document.getElementById("settingsModal").style.display = "flex";
     }
-    
     function closeSettings() {
       document.getElementById("settingsModal").style.display = "none";
     }
@@ -1110,18 +1386,20 @@
       }
     }
     
-    function checkAnswer(choice) {
+    function checkAnswer(answerIndex) {
+      const question = challengeQuestions[currentQuestionIndex];
       const feedback = document.getElementById("feedback");
       const doneBtn = document.getElementById("doneBtn");
-      if (choice === 'B') {
-        feedback.textContent = "✅ Correct! A triangle has 3 sides. You're a math whiz!";
-        feedback.style.color = "green";
+      
+      if(answerIndex === question.correctAnswer){ 
+        feedback.textContent="✅ Correct! You're a math genius!"; 
+        feedback.style.color="green";
         createConfetti();
-      } else {
-        feedback.textContent = "❌ Oops! Try again. You've got this!";
-        feedback.style.color = "red";
+      } else { 
+        feedback.textContent="❌ Oops! That's not quite right. Try again!"; 
+        feedback.style.color="red"; 
       }
-      doneBtn.style.display = "inline-block";
+      doneBtn.style.display="inline-block";
     }
     
     // Create confetti effect
@@ -1156,13 +1434,90 @@
       document.getElementById('brightness-value').textContent = this.value;
     });
     
+    // Fun fact functionality
+    function initializeFunFact() {
+      const facts = [
+        "✨ Today's Math Fact: Did you know? A circle has no corners—it goes round and round forever! From planets to bubbles to wheels, circles show that math is everywhere!",
+        "🌟 Today's Math Fact: The number zero was invented in India! Before zero, people had to use a blank space to show nothing.",
+        "🚀 Today's Math Fact: The word 'math' comes from 'mathema,' which means 'knowledge' in Greek!",
+        "🎈 Today's Math Fact: A pizza is a circle, and when you cut it, you're practicing fractions! Yummy math!",
+        "🦋 Today's Math Fact: Butterfly wings are the same on both sides - that's called symmetry, a cool math concept!",
+        "🎯 Today's Math Fact: The number 7 is considered lucky in many cultures around the world!",
+        "🌈 Today's Math Fact: Rainbows are actually circles! We only see half of them from the ground."
+      ];
+      
+      // Get today's date to use as a seed
+      const today = new Date();
+      const dayOfYear = Math.floor((today - new Date(today.getFullYear(), 0, 0)) / 86400000);
+      
+      // Calculate which fact to show based on the day
+      const factIndex = dayOfYear % facts.length;
+      
+      // Display the fact
+      const funFactText = document.getElementById('funFactText');
+      funFactText.textContent = facts[factIndex];
+      
+      // Store the current fact index to check if we need to update
+      localStorage.setItem('currentFactDate', today.toDateString());
+      localStorage.setItem('currentFactIndex', factIndex);
+    }
+    
+    // Add interactive fun fact box - now shows a random different fact on click
+    document.getElementById('funFactBox').addEventListener('click', function() {
+      const facts = [
+        "✨ Today's Math Fact: Did you know? A circle has no corners—it goes round and round forever! From planets to bubbles to wheels, circles show that math is everywhere!",
+        "🌟 Today's Math Fact: The number zero was invented in India! Before zero, people had to use a blank space to show nothing.",
+        "🚀 Today's Math Fact: The word 'math' comes from 'mathema,' which means 'knowledge' in Greek!",
+        "🎈 Today's Math Fact: A pizza is a circle, and when you cut it, you're practicing fractions! Yummy math!",
+        "🦋 Today's Math Fact: Butterfly wings are the same on both sides - that's called symmetry, a cool math concept!",
+        "🎯 Today's Math Fact: The number 7 is considered lucky in many cultures around the world!",
+        "🌈 Today's Math Fact: Rainbows are actually circles! We only see half of them from the ground."
+      ];
+      
+      const funFactText = document.getElementById('funFactText');
+      const currentFact = funFactText.textContent;
+      
+      // Get a random fact that's different from the current one
+      let newFact;
+      do {
+        newFact = facts[Math.floor(Math.random() * facts.length)];
+      } while (newFact === currentFact);
+      
+      funFactText.textContent = newFact;
+    });
+    
     // Load settings on page load
     window.onload = function() {
       loadSettings();
       // Initialize chatbot as hidden
       document.getElementById("chatbotContainer").style.display = "none";
+      
+      // Check if we need to update the fun fact
+      const today = new Date().toDateString();
+      const lastFactDate = localStorage.getItem('currentFactDate');
+      
+      if (lastFactDate !== today) {
+        // It's a new day, update the fun fact
+        initializeFunFact();
+      } else {
+        // It's the same day, keep the current fact
+        const factIndex = localStorage.getItem('currentFactIndex');
+        if (factIndex !== null) {
+          const facts = [
+            "✨ Today's Math Fact: Did you know? A circle has no corners—it goes round and round forever! From planets to bubbles to wheels, circles show that math is everywhere!",
+            "🌟 Today's Math Fact: The number zero was invented in India! Before zero, people had to use a blank space to show nothing.",
+            "🚀 Today's Math Fact: The word 'math' comes from 'mathema,' which means 'knowledge' in Greek!",
+            "🎈 Today's Math Fact: A pizza is a circle, and when you cut it, you're practicing fractions! Yummy math!",
+            "🦋 Today's Math Fact: Butterfly wings are the same on both sides - that's called symmetry, a cool math concept!",
+            "🎯 Today's Math Fact: The number 7 is considered lucky in many cultures around the world!",
+            "🌈 Today's Math Fact: Rainbows are actually circles! We only see half of them from the ground."
+          ];
+          
+          const funFactText = document.getElementById('funFactText');
+          funFactText.textContent = facts[factIndex];
+        }
+      }
     };
   </script>
-
 </body>
 </html>
