@@ -1,0 +1,639 @@
+<!-- learning material -->
+ <!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>MathChamp Adventure — Learning is Fun!</title>
+  <link href="https://fonts.googleapis.com/css2?family=Fredoka+One&family=Nunito:wght@400;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+  <style>
+    * {
+      box-sizing: border-box;
+    }
+    
+    body {
+      margin: 0;
+      font-family: 'Nunito', sans-serif;
+      background: linear-gradient(135deg, #8A2BE2 0%, #00BFFF 50%, #00FF7F 100%);
+      color: #333;
+      min-height: 100vh;
+      position: relative;
+      overflow-x: hidden;
+    }
+    
+    /* Floating math symbols in background */
+    .math-symbols {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      pointer-events: none;
+      z-index: 0;
+      overflow: hidden;
+    }
+    
+    .math-symbol {
+      position: absolute;
+      font-size: 2rem;
+      color: rgba(255, 255, 255, 0.2);
+      animation: float 15s infinite linear;
+      font-weight: bold;
+    }
+    
+    @keyframes float {
+      0% {
+        transform: translateY(100vh) rotate(0deg);
+        opacity: 0;
+      }
+      10% {
+        opacity: 1;
+      }
+      90% {
+        opacity: 1;
+      }
+      100% {
+        transform: translateY(-100px) rotate(360deg);
+        opacity: 0;
+      }
+    }
+    
+    header {
+      background: rgba(255, 255, 255, 0.9);
+      border-bottom: 4px solid #FF6B6B;
+      padding: 15px 20px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+      position: relative;
+      z-index: 10;
+    }
+    
+    .brand {
+      display: flex;
+      align-items: center;
+      gap: 15px;
+      font-family: 'Fredoka One', cursive;
+      font-size: 24px;
+      text-decoration: none;
+      color: #FF6B6B;
+      text-shadow: 2px 2px 0px rgba(0,0,0,0.1);
+    }
+    
+    .brand-logo {
+      width: 40px;
+      height: 40px;
+      border-radius: 50%;
+      background: conic-gradient(
+        from 180deg,
+        #FF6B6B,
+        #4ECDC4,
+        #FFE66D,
+        #FF9F1C,
+        #6A0572,
+        #AB83A1,
+        #FF6B6B
+      );
+      box-shadow: 0 0 15px rgba(255,107,107,.6),
+                  0 0 25px rgba(78,205,196,.5),
+                  0 0 35px rgba(255,230,109,.45);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: white;
+      font-size: 20px;
+      animation: pulse 2s infinite;
+    }
+    
+    @keyframes pulse {
+      0% { transform: scale(1); }
+      50% { transform: scale(1.1); }
+      100% { transform: scale(1); }
+    }
+    
+    main {
+      max-width: 1000px;
+      margin: 30px auto;
+      padding: 0 20px;
+      position: relative;
+      z-index: 5;
+    }
+    
+    .page-title {
+      text-align: center;
+      font-family: 'Fredoka One', cursive;
+      font-size: 36px;
+      color: white;
+      text-shadow: 3px 3px 0px rgba(0,0,0,0.2);
+      margin-bottom: 30px;
+      animation: bounce 2s infinite;
+    }
+    
+    @keyframes bounce {
+      0%, 100% { transform: translateY(0); }
+      50% { transform: translateY(-15px); }
+    }
+    
+    .controls {
+      display: flex;
+      justify-content: space-between;
+      margin-bottom: 30px;
+      background: rgba(255, 255, 255, 0.9);
+      padding: 15px;
+      border-radius: 20px;
+      box-shadow: 0 8px 16px rgba(0,0,0,0.1);
+    }
+    
+    .search {
+      position: relative;
+      flex-grow: 1;
+      max-width: 500px;
+    }
+    
+    .search input {
+      padding: 12px 18px 12px 45px;
+      border: 3px solid #4ECDC4;
+      border-radius: 50px;
+      width: 100%;
+      font-size: 16px;
+      font-family: 'Nunito', sans-serif;
+      transition: all 0.3s;
+      box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+    }
+    
+    .search input:focus {
+      outline: none;
+      border-color: #FF6B6B;
+      box-shadow: 0 0 0 5px rgba(255,107,107,0.3);
+    }
+    
+    .search-icon {
+      position: absolute;
+      left: 16px;
+      top: 50%;
+      transform: translateY(-50%);
+      color: #4ECDC4;
+      font-size: 18px;
+    }
+    
+    .filters button {
+      padding: 10px 18px;
+      border: none;
+      border-radius: 50px;
+      background: #FF9F1C;
+      color: white;
+      font-weight: bold;
+      font-size: 14px;
+      cursor: pointer;
+      transition: all 0.3s;
+      box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+    
+    .filters button:hover {
+      background: #FF6B6B;
+      transform: translateY(-3px);
+      box-shadow: 0 6px 12px rgba(0,0,0,0.15);
+    }
+    
+    .cards {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+      gap: 20px;
+    }
+    
+    .card {
+      background: white;
+      border-radius: 20px;
+      padding: 16px;
+      display: flex;
+      flex-direction: column;
+      transition: all 0.3s;
+      box-shadow: 0 8px 16px rgba(0,0,0,0.1);
+      position: relative;
+      overflow: hidden;
+      height: 100%;
+    }
+    
+    .card::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 8px;
+      background: linear-gradient(90deg, #FF6B6B, #4ECDC4, #FFE66D, #FF9F1C);
+      background-size: 300% 300%;
+      animation: gradient 3s ease infinite;
+    }
+    
+    @keyframes gradient {
+      0% { background-position: 0% 50%; }
+      50% { background-position: 100% 50%; }
+      100% { background-position: 0% 50%; }
+    }
+    
+    .card:hover {
+      transform: translateY(-10px) scale(1.02);
+      box-shadow: 0 15px 30px rgba(0,0,0,0.15);
+    }
+    
+    .card-icon {
+      font-size: 40px;
+      margin-bottom: 12px;
+      text-align: center;
+    }
+    
+    .card[data-title="Numbers and counting"] .card-icon {
+      color: #FF6B6B;
+    }
+    
+    .card[data-title="Comparing & Sorting"] .card-icon {
+      color: #4ECDC4;
+    }
+    
+    .card[data-title="Patterns, Shapes and Space"] .card-icon {
+      color: #FFE66D;
+    }
+    
+    .card[data-title="Measurements"] .card-icon {
+      color: #FF9F1C;
+    }
+    
+    .card[data-title="Basic addition-subtraction"] .card-icon {
+      color: #6A0572;
+    }
+    
+    .card[data-title="Problem solving"] .card-icon {
+      color: #AB83A1;
+    }
+    
+    .card[data-title="Geometry"] .card-icon {
+      color: #3A86FF;
+    }
+    
+    .card[data-title="Multiplication & Division"] .card-icon {
+      color: #FB5607;
+    }
+    
+    .card[data-title="Fractions and Decimals"] .card-icon {
+      color: #8338EC;
+    }
+    
+    .card[data-title="Data and Graphs"] .card-icon {
+      color: #3A86FF;
+    }
+    
+    .meta {
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+      margin-bottom: 16px;
+      flex-grow: 1;
+    }
+    
+    .title {
+      font-family: 'Fredoka One', cursive;
+      font-size: 18px;
+      color: #333;
+      text-align: center;
+      margin: 0;
+    }
+    
+    .stats {
+      color: #666;
+      font-size: 12px;
+      text-align: center;
+    }
+    
+    .preview-btn {
+      display: block;
+      padding: 10px 16px;
+      border-radius: 50px;
+      background: linear-gradient(90deg, #FF6B6B, #4ECDC4);
+      border: none;
+      color: white;
+      font-weight: bold;
+      text-decoration: none;
+      transition: all 0.3s;
+      text-align: center;
+      box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+      font-size: 14px;
+      margin-top: auto;
+    }
+    
+    .preview-btn:hover {
+      transform: translateY(-3px);
+      box-shadow: 0 6px 12px rgba(0,0,0,0.15);
+    }
+    
+    .nav-buttons {
+      display: flex;
+      justify-content: center;
+      margin: 40px auto;
+      max-width: 900px;
+    }
+    
+    .nav-buttons a {
+      display: inline-flex;
+      align-items: center;
+      gap: 10px;
+      padding: 12px 24px;
+      background: #FF6B6B;
+      color: white;
+      font-family: 'Fredoka One', cursive;
+      font-size: 16px;
+      border-radius: 50px;
+      text-decoration: none;
+      text-align: center;
+      transition: all 0.3s;
+      box-shadow: 0 8px 16px rgba(0,0,0,0.1);
+    }
+    
+    .nav-buttons a:hover {
+      background: #FF5252;
+      transform: translateY(-5px);
+      box-shadow: 0 12px 24px rgba(0,0,0,0.15);
+    }
+    
+    .no-results {
+      text-align: center;
+      padding: 60px 20px;
+      color: white;
+      font-size: 20px;
+      font-family: 'Fredoka One', cursive;
+      display: none;
+      background: rgba(255, 255, 255, 0.2);
+      border-radius: 20px;
+      margin: 20px 0;
+    }
+    
+    .highlight {
+      background-color: #FFE66D;
+      padding: 0 5px;
+      border-radius: 4px;
+      font-weight: bold;
+    }
+    
+    @media (max-width: 768px) {
+      .brand {
+        font-size: 20px;
+      }
+      
+      .brand-logo {
+        width: 35px;
+        height: 35px;
+      }
+      
+      .page-title {
+        font-size: 28px;
+      }
+      
+      .controls {
+        flex-direction: column;
+        gap: 15px;
+      }
+      
+      .search {
+        max-width: 100%;
+      }
+      
+      .cards {
+        grid-template-columns: 1fr;
+      }
+    }
+  </style>
+</head>
+<body>
+  <!-- Floating math symbols in background -->
+  <div class="math-symbols" id="mathSymbols"></div>
+  
+  <header>
+    <a href="#" class="brand">
+      <div class="brand-logo">+</div>
+      MathChamp Adventure
+    </a>
+  </header>
+
+  <main>
+    <h1 class="page-title">Super Math Lessons! 🚀</h1>
+    
+    <div class="controls">
+      <div class="search">
+        <span class="search-icon"><i class="fas fa-search"></i></span>
+        <input type="text" id="searchInput" placeholder="Search for cool math lessons...">
+      </div>
+      <div class="filters">
+        <button><i class="fas fa-filter"></i> FILTERS</button>
+      </div>
+    </div>
+
+    <div class="cards" id="cardsContainer">
+      <div class="card" data-title="Numbers and counting">
+        <div class="card-icon"><i class="fas fa-sort-numeric-up"></i></div>
+        <div class="meta">
+          <h3 class="title">Numbers and counting</h3>
+          <div class="stats">Language: EN • Author: Admin • Sep 19, 2025</div>
+        </div>
+        <a class="preview-btn" href="nums n counting.pdf" target="_blank">
+          <i class="fas fa-play-circle"></i> START LEARNING!
+        </a>
+      </div>
+
+      <div class="card" data-title="Comparing & Sorting">
+        <div class="card-icon"><i class="fas fa-balance-scale"></i></div>
+        <div class="meta">
+          <h3 class="title">Comparing & Sorting</h3>
+          <div class="stats">Language: EN • Author: Admin • Sep 20, 2025</div>
+        </div>
+        <a class="preview-btn" href="patterns n shapes.pdf" target="_blank">
+          <i class="fas fa-play-circle"></i> START LEARNING!
+        </a>
+      </div>
+
+      <div class="card" data-title="Patterns, Shapes and Space">
+        <div class="card-icon"><i class="fas fa-shapes"></i></div>
+        <div class="meta">
+          <h3 class="title">Patterns, Shapes and Space</h3>
+          <div class="stats">Language: EN • Author: Admin • Sep 18, 2025</div>
+        </div>
+        <a class="preview-btn" href="patterns n shapes.pdf" target="_blank">
+          <i class="fas fa-play-circle"></i> START LEARNING!
+        </a>
+      </div>
+
+      <div class="card" data-title="Measurements">
+        <div class="card-icon"><i class="fas fa-ruler"></i></div>
+        <div class="meta">
+          <h3 class="title">Measurements</h3>
+          <div class="stats">Language: EN • Author: Admin • Sep 20, 2025</div>
+        </div>
+        <a class="preview-btn" href="measurement.pdf" target="_blank">
+          <i class="fas fa-play-circle"></i> START LEARNING!
+        </a>
+      </div>
+
+      <div class="card" data-title="Basic addition-subtraction">
+        <div class="card-icon"><i class="fas fa-plus-minus"></i></div>
+        <div class="meta">
+          <h3 class="title">Basic addition-subtraction</h3>
+          <div class="stats">Language: EN • Author: Admin • Sep 21, 2025</div>
+        </div>
+        <a class="preview-btn" href="AddSub.pdf" target="_blank">
+          <i class="fas fa-play-circle"></i> START LEARNING!
+        </a>
+      </div>
+
+      <div class="card" data-title="Problem solving">
+        <div class="card-icon"><i class="fas fa-puzzle-piece"></i></div>
+        <div class="meta">
+          <h3 class="title">Problem solving</h3>
+          <div class="stats">Language: EN • Author: Admin • Sep 20, 2025</div>
+        </div>
+        <a class="preview-btn" href="Class2 (word problem).pdf" target="_blank">
+          <i class="fas fa-play-circle"></i> START LEARNING!
+        </a>
+      </div>
+
+      <div class="card" data-title="Geometry">
+        <div class="card-icon"><i class="fas fa-draw-polygon"></i></div>
+        <div class="meta">
+          <h3 class="title">Geometry</h3>
+          <div class="stats">Language: EN • Author: Admin • Sep 19, 2025</div>
+        </div>
+        <a class="preview-btn" href="Geometry.pdf" target="_blank">
+          <i class="fas fa-play-circle"></i> START LEARNING!
+        </a>
+      </div>
+
+      <div class="card" data-title="Multiplication & Division">
+        <div class="card-icon"><i class="fas fa-times"></i></div>
+        <div class="meta">
+          <h3 class="title">Multiplication & Division</h3>
+          <div class="stats">Language: EN • Author: Admin • Sep 18, 2025</div>
+        </div>
+        <a class="preview-btn" href="MultiplicationDivision.pdf" target="_blank">
+          <i class="fas fa-play-circle"></i> START LEARNING!
+        </a>
+      </div>
+
+      <div class="card" data-title="Fractions and Decimals">
+        <div class="card-icon"><i class="fas fa-chart-pie"></i></div>
+        <div class="meta">
+          <h3 class="title">Fractions and Decimals</h3>
+          <div class="stats">Language: EN • Author: Admin • Sep 21, 2025</div>
+        </div>
+        <a class="preview-btn" href="Fractions.pdf" target="_blank">
+          <i class="fas fa-play-circle"></i> START LEARNING!
+        </a>
+      </div>
+
+      <div class="card" data-title="Data and Graphs">
+        <div class="card-icon"><i class="fas fa-chart-bar"></i></div>
+        <div class="meta">
+          <h3 class="title">Data and Graphs</h3>
+          <div class="stats">Language: EN • Author: Admin • Sep 20, 2025</div>
+        </div>
+        <a class="preview-btn" href="DataGraphs.pdf" target="_blank">
+          <i class="fas fa-play-circle"></i> START LEARNING!
+        </a>
+      </div>
+    </div>
+
+    <div class="no-results" id="noResults">
+      <i class="fas fa-search"></i> No lessons found matching your search. Try a different term!
+    </div>
+
+    <div class="nav-buttons">
+      <a href="pg9.html">
+        <i class="fas fa-arrow-left"></i> Back to Previous Page
+      </a>
+    </div>
+  </main>
+
+  <script>
+    // Create floating math symbols
+    const mathSymbols = document.getElementById('mathSymbols');
+    const symbols = ['1', '2', '3', '+', '-', '×', '÷', '=', 'π', '∑', '√', '∞', '%', '<', '>'];
+    
+    function createMathSymbol() {
+      const symbol = document.createElement('div');
+      symbol.className = 'math-symbol';
+      symbol.textContent = symbols[Math.floor(Math.random() * symbols.length)];
+      symbol.style.left = Math.random() * 100 + '%';
+      symbol.style.animationDuration = (Math.random() * 10 + 10) + 's';
+      symbol.style.fontSize = (Math.random() * 20 + 15) + 'px';
+      mathSymbols.appendChild(symbol);
+      
+      // Remove symbol after animation completes
+      setTimeout(() => {
+        symbol.remove();
+      }, 20000);
+    }
+    
+    // Create symbols periodically
+    setInterval(createMathSymbol, 2000);
+    
+    // Create initial symbols
+    for (let i = 0; i < 10; i++) {
+      setTimeout(createMathSymbol, i * 500);
+    }
+    
+    // Search functionality
+    const searchInput = document.getElementById('searchInput');
+    const cardsContainer = document.getElementById('cardsContainer');
+    const cards = document.querySelectorAll('.card');
+    const noResults = document.getElementById('noResults');
+
+    searchInput.addEventListener('input', function() {
+      const searchTerm = this.value.toLowerCase().trim();
+      
+      // Reset highlight
+      document.querySelectorAll('.title').forEach(title => {
+        const text = title.textContent;
+        title.innerHTML = text;
+      });
+      
+      // If search term is empty, show all cards
+      if (searchTerm === '') {
+        cards.forEach(card => {
+          card.style.display = 'flex';
+        });
+        noResults.style.display = 'none';
+        return;
+      }
+      
+      let hasResults = false;
+      
+      // Filter cards based on search term
+      cards.forEach(card => {
+        const title = card.getAttribute('data-title').toLowerCase();
+        const titleElement = card.querySelector('.title');
+        
+        if (title.includes(searchTerm)) {
+          card.style.display = 'flex';
+          hasResults = true;
+          
+          // Highlight matching text
+          const originalText = titleElement.textContent;
+          const regex = new RegExp(`(${searchTerm})`, 'gi');
+          titleElement.innerHTML = originalText.replace(regex, '<span class="highlight">$1</span>');
+        } else {
+          card.style.display = 'none';
+        }
+      });
+      
+      // Show/hide no results message
+      if (hasResults) {
+        noResults.style.display = 'none';
+      } else {
+        noResults.style.display = 'block';
+      }
+    });
+  </script>
+</body>
+</html>
